@@ -82,6 +82,8 @@ Each domain defines what composition *means*. A semantic interpretation fills ou
 |---|---|---|---|---|
 | **GDS dynamics** | `BoundaryAction`, `Policy`, `Mechanism`, `ControlAction` (roles) | Uses `BlockIR` directly | SC-001..SC-007 (on `GDSSpec`) | `CanonicalGDS` via `project_canonical()` |
 | **OGS game theory** | `OpenGame` (via `DomainBlock`) → 6 atomic game types | `OpenGameIR`, `FlowIR`, `PatternIR` | T-001..T-006, S-001..S-007 (on `PatternIR`) | Not yet implemented |
+| **Stock-flow dynamics** | Reuses GDS roles (`BoundaryAction`, `Policy`, `Mechanism`) | Compiles directly to `GDSSpec` / `SystemIR` | SF-001..SF-005 (on `StockFlowModel`) + G-001..G-006 | `CanonicalGDS` (inherited) |
+| **State-space control** | Reuses GDS roles (`BoundaryAction`, `Policy`, `Mechanism`) | Compiles directly to `GDSSpec` / `SystemIR` | CS-001..CS-006 (on `ControlModel`) + G-001..G-006 | `CanonicalGDS` (inherited) |
 
 **Key contract:** Each semantic interpretation must answer the seven questions in [Section 4](#4-the-semantic-layer-contract).
 
@@ -103,6 +105,22 @@ packages/gds-games/ogs/dsl/compile.py    # compile_to_ir()
 packages/gds-games/ogs/verification/     # T-001..T-006, S-001..S-007
 ```
 
+**Key files — StockFlow DSL:**
+```
+packages/gds-stockflow/stockflow/dsl/elements.py   # Stock, Flow, Auxiliary, Converter
+packages/gds-stockflow/stockflow/dsl/model.py      # StockFlowModel (declaration + validation)
+packages/gds-stockflow/stockflow/dsl/compile.py     # compile_model() → GDSSpec, compile_to_system() → SystemIR
+packages/gds-stockflow/stockflow/verification/      # SF-001..SF-005, verify()
+```
+
+**Key files — Control DSL:**
+```
+packages/gds-control/gds_control/dsl/elements.py   # State, Input, Sensor, Controller
+packages/gds-control/gds_control/dsl/model.py      # ControlModel (declaration + validation)
+packages/gds-control/gds_control/dsl/compile.py     # compile_model() → GDSSpec, compile_to_system() → SystemIR
+packages/gds-control/gds_control/verification/      # CS-001..CS-006, verify()
+```
+
 ### Layer 2 — DSLs (domain grammars)
 
 DSLs restrict and sugar the semantic layer. They provide convenience constructors, domain vocabulary, and registration patterns that make the semantic layer ergonomic for model authors.
@@ -120,6 +138,8 @@ DSLs restrict and sugar the semantic layer. They provide convenience constructor
 |---|---|---|
 | **gds-framework GDS layer** | `GDSSpec` (register_type/space/entity/block/wiring/parameter, `.collect()`) | `typedef()`, `entity()`, `space()`, `port()`, `interface()` from `gds/__init__.py` |
 | **gds-games OGS layer** | `Pattern` (groups games + flows + metadata) | `Signature(x=, y=, r=, s=)`, `reactive_decision_agent()`, library factories |
+| **gds-stockflow** | `StockFlowModel` (stocks, flows, auxiliaries, converters) → `compile_model()` → `GDSSpec` | `Stock`, `Flow`, `Auxiliary`, `Converter` (frozen Pydantic) |
+| **gds-control** | `ControlModel` (states, inputs, sensors, controllers) → `compile_model()` → `GDSSpec` | `State`, `Input`, `Sensor`, `Controller` (frozen Pydantic) |
 
 ### Layer 3 — Models (concrete instantiations)
 
@@ -298,6 +318,32 @@ Every semantic interpretation must answer these questions. Together, they fully 
 | 7 | T-001..T-006 (type checks: domain-codomain matching, signature completeness, flow type consistency, input resolution, unused inputs, dangling flows). S-001..S-007 (structural: sequential compatibility, parallel independence, feedback compatibility, acyclicity, decision space validation, corecursive wiring, initialization completeness). All operate on `PatternIR`. Plus optional delegation to GDS G-001..G-006 via `to_system_ir()`. |
 | 8 | Not yet implemented. Expected: extraction of strategy profiles, payoff structure, and equilibrium conditions. |
 
+### Worked Example: Stock-Flow (System Dynamics)
+
+| # | Answer |
+|---|---|
+| 1 | Blocks are stock-flow diagram elements: `Stock` (state accumulator), `Flow` (rate of change), `Auxiliary` (intermediate computation), `Converter` (exogenous constant). Mapped to GDS roles: Converter → `BoundaryAction`, Auxiliary/Flow → `Policy`, Stock → `Mechanism` + `Entity`. |
+| 2 | `>>` chains rate computation into state accumulation: auxiliaries/converters feed flows, flows feed stock mechanisms. Token overlap via explicit inter-tier wirings. |
+| 3 | `\|` composes independent elements within a tier. Stocks accumulate independently; flows compute independently. |
+| 4 | `.feedback()` not used. All within-timestep data flow is captured by sequential composition. |
+| 5 | `.loop()` carries stock levels forward across timesteps — stock accumulation at t feeds auxiliaries at t+1. COVARIANT temporal wirings from stock mechanism forward_out to auxiliary forward_in. |
+| 6 | Discrete-time accumulation: `stock[t+1] = stock[t] + net_flow[t] * dt`. Static specification — stockflow defines structure, compilation produces GDS artifacts. |
+| 7 | SF-001 orphan stocks (WARNING), SF-002 flow-stock validity (ERROR), SF-003 auxiliary acyclicity (ERROR), SF-004 converter connectivity (WARNING), SF-005 flow completeness (ERROR). Operate on `StockFlowModel`. Plus G-001..G-006 via SystemIR. |
+| 8 | Inherits `project_canonical(spec) → CanonicalGDS`. Auxiliaries/flows are in g (policy), stock mechanisms are in f (mechanism), converters are in U (boundary). Canonical holds cleanly — verified by cross-built equivalence tests. |
+
+### Worked Example: State-Space Control
+
+| # | Answer |
+|---|---|
+| 1 | Blocks are control system elements: `Input` (reference/disturbance), `Sensor` (state observation), `Controller` (control law), `State` (plant state). Mapped to GDS roles: Input → `BoundaryAction`, Sensor/Controller → `Policy`, State → `Mechanism` + `Entity`. **Key design decision:** `ControlAction` is not used — all non-state-updating blocks use `Policy`, preserving clean `(A,B,C,D) ↔ (X,U,g,f)` canonical mapping. |
+| 2 | `>>` chains observation through control into state dynamics: sensors/inputs feed controllers, controllers feed dynamics mechanisms. Explicit inter-tier wirings. |
+| 3 | `\|` composes independent elements within a tier. Multiple sensors observe independently; multiple controllers act independently. |
+| 4 | `.feedback()` not used. The classical control "feedback loop" is structurally represented as a temporal loop, not within-timestep feedback. |
+| 5 | `.loop()` carries plant state forward across timesteps — dynamics output at t feeds sensors at t+1. COVARIANT temporal wirings from dynamics mechanism forward_out to sensor forward_in. This is the discrete-time plant evolution. |
+| 6 | Discrete-time state-space: `x[t+1] = f(x[t], g(x[t], u[t]))`. Static specification — control defines structure, not a simulator. The canonical form structurally corresponds to the classical `(A, B, C, D)` state-space representation. |
+| 7 | CS-001 undriven states (WARNING), CS-002 unobserved states (WARNING), CS-003 unused inputs (WARNING), CS-004 controller read validity (ERROR), CS-005 controller drive validity (ERROR), CS-006 sensor observe validity (ERROR). Operate on `ControlModel`. Plus G-001..G-006 via SystemIR. |
+| 8 | Inherits `project_canonical(spec) → CanonicalGDS`. Sensors/controllers are in g (policy), dynamics mechanisms are in f (mechanism), inputs are in U (boundary). `\|D\| = \|sensors\| + \|controllers\|`, `\|f\| = \|states\|`, `\|U\| = \|inputs\|`. Verified via parametric invariant tests across multiple archetypes. |
+
 ### Template for New Semantic Layers
 
 When building a new DSL (e.g., `gds-stockflow`, `gds-control`), fill out this template:
@@ -399,7 +445,13 @@ The composition operators satisfy algebraic laws (associativity of `>>` and `|`,
 
 ## 7. Long-Term Research Directions
 
-These are open questions at the boundary of engineering and theory.
+These are open questions at the boundary of engineering and theory. See also [Research Boundaries and Open Questions](guides/research-boundaries.md) for detailed analysis of two specific boundary questions identified after the third DSL validation.
+
+**MIMO semantics: scalar ports vs vector-valued spaces.**
+The current architecture decomposes MIMO systems into scalar ports. Vector structure emerges from parallel composition. This is sufficient for structural modeling but cannot express matrix structure (A, B, C, D) directly. The question is whether vector-valued spaces should become first-class citizens in the type system, or whether matrix extraction should be a post-processing tool operating on the scalar decomposition. See [RQ1](guides/research-boundaries.md#research-question-1-mimo-semantics-in-a-compositional-dynamical-substrate).
+
+**Timestep semantics across DSLs.**
+The `.loop()` operator encodes structural recurrence but not scheduling semantics. StockFlow uses it for accumulation, Control uses it for observation feedback, OGS uses it for round iteration. These are semantically distinct even though structurally identical at the IR level. If a shared simulation harness is built, the meaning of a timestep must be formalized. See [RQ2](guides/research-boundaries.md#research-question-2-what-does-a-timestep-mean-across-dsls).
 
 **Canonical projection unification.**
 GDS projects specifications to `h = f . g`. OGS will project to equilibrium structure. Stock-flow will project to system dynamics equations. Are these projections related by a natural transformation? If the composition algebra is a free category and each semantic layer is a functor into its target category, then the canonical projections may be components of natural transformations between these functors. This would enable principled cross-domain translation.
