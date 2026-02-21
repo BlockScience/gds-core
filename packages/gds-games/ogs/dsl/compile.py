@@ -21,6 +21,7 @@ from gds.compiler.compile import (
     extract_wirings,
     flatten_blocks,
 )
+from gds.ir.models import sanitize_id
 
 from ogs.dsl.composition import (
     CorecursiveLoop,
@@ -146,18 +147,11 @@ def _is_choice_port(port_name: str) -> bool:
 # ---------------------------------------------------------------------------
 
 
-def _sanitize_id(name: str) -> str:
-    """Convert a name to a valid ID."""
-    import re
-
-    return re.sub(r"[^A-Za-z0-9_]", "_", name)
-
-
 def _extract_hierarchy(game: Block, counter: list[int]) -> HierarchyNodeIR:
     """Recursively walk the composition tree and build a HierarchyNodeIR."""
     if isinstance(game, AtomicGame):
         return HierarchyNodeIR(
-            id=f"leaf_{_sanitize_id(game.name)}",
+            id=f"leaf_{sanitize_id(game.name)}",
             name=game.name,
             composition_type=None,
             block_name=game.name,

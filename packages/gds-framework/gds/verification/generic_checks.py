@@ -98,27 +98,100 @@ def check_g002_signature_completeness(system: SystemIR) -> list[Finding]:
 
 
 def check_g003_direction_consistency(system: SystemIR) -> list[Finding]:
-    """G-003: Covariant wirings should not be typed as backward;
-    contravariant wirings should not be typed as forward.
+    """G-003: Validate direction flag consistency and contravariant port-slot matching.
 
-    This is a generic structural check — domain packages define their
-    own wiring_type semantics.
+    Two validations:
+
+    A) Flag consistency — ``direction``, ``is_feedback``, ``is_temporal`` must
+       not contradict:
+       - COVARIANT + is_feedback → ERROR (feedback implies contravariant)
+       - CONTRAVARIANT + is_temporal → ERROR (temporal implies covariant)
+
+    B) Contravariant port-slot matching — for CONTRAVARIANT wirings, the label
+       must be a token-subset of the source's backward_out (signature[3]) or
+       the target's backward_in (signature[2]). G-001 already covers the
+       covariant side.
     """
     findings = []
+    block_sigs = {b.name: b.signature for b in system.blocks}
+
     for wiring in system.wirings:
-        # Generic check: just verify the wiring has a direction set
-        findings.append(
-            Finding(
-                check_id="G-003",
-                severity=Severity.INFO,
-                message=(
-                    f"Wiring {wiring.label!r} ({wiring.source} -> {wiring.target}): "
-                    f"direction={wiring.direction.value}"
-                ),
-                source_elements=[wiring.source, wiring.target],
-                passed=True,
+        # A) Flag consistency
+        if wiring.direction == FlowDirection.COVARIANT and wiring.is_feedback:
+            findings.append(
+                Finding(
+                    check_id="G-003",
+                    severity=Severity.ERROR,
+                    message=(
+                        f"Wiring {wiring.label!r} "
+                        f"({wiring.source} -> {wiring.target}): "
+                        f"COVARIANT + is_feedback — contradiction"
+                    ),
+                    source_elements=[wiring.source, wiring.target],
+                    passed=False,
+                )
             )
-        )
+            continue
+
+        if wiring.direction == FlowDirection.CONTRAVARIANT and wiring.is_temporal:
+            findings.append(
+                Finding(
+                    check_id="G-003",
+                    severity=Severity.ERROR,
+                    message=(
+                        f"Wiring {wiring.label!r} "
+                        f"({wiring.source} -> {wiring.target}): "
+                        f"CONTRAVARIANT + is_temporal — contradiction"
+                    ),
+                    source_elements=[wiring.source, wiring.target],
+                    passed=False,
+                )
+            )
+            continue
+
+        # B) Contravariant port-slot matching (G-001 covers covariant)
+        if wiring.direction == FlowDirection.CONTRAVARIANT:
+            if wiring.source not in block_sigs or wiring.target not in block_sigs:
+                # Non-block endpoints — G-004 handles dangling references
+                continue
+
+            src_bwd_out = block_sigs[wiring.source][3]  # backward_out
+            tgt_bwd_in = block_sigs[wiring.target][2]  # backward_in
+
+            if not src_bwd_out and not tgt_bwd_in:
+                findings.append(
+                    Finding(
+                        check_id="G-003",
+                        severity=Severity.ERROR,
+                        message=(
+                            f"Wiring {wiring.label!r} "
+                            f"({wiring.source} -> {wiring.target}): "
+                            f"CONTRAVARIANT but both backward "
+                            f"ports are empty"
+                        ),
+                        source_elements=[wiring.source, wiring.target],
+                        passed=False,
+                    )
+                )
+                continue
+
+            compatible = tokens_subset(wiring.label, src_bwd_out) or tokens_subset(
+                wiring.label, tgt_bwd_in
+            )
+            findings.append(
+                Finding(
+                    check_id="G-003",
+                    severity=Severity.ERROR,
+                    message=(
+                        f"Wiring {wiring.label!r}: "
+                        f"{wiring.source} bwd_out={src_bwd_out!r} -> "
+                        f"{wiring.target} bwd_in={tgt_bwd_in!r}"
+                        + ("" if compatible else " — MISMATCH")
+                    ),
+                    source_elements=[wiring.source, wiring.target],
+                    passed=compatible,
+                )
+            )
 
     return findings
 
@@ -127,10 +200,8 @@ def check_g004_dangling_wirings(system: SystemIR) -> list[Finding]:
     """G-004: Flag wirings whose source or target is not in the system."""
     findings = []
     known_names = {b.name for b in system.blocks}
-    # Also include input names
     for inp in system.inputs:
-        if isinstance(inp, dict) and "name" in inp:
-            known_names.add(inp["name"])
+        known_names.add(inp.name)
 
     for wiring in system.wirings:
         src_ok = wiring.source in known_names

@@ -120,6 +120,7 @@ class PatternIR(BaseModel):
         """
         from gds.ir.models import BlockIR, SystemIR, WiringIR
         from gds.ir.models import CompositionType as GDSCompositionType
+        from gds.ir.models import InputIR as GDSInputIR
 
         blocks = [
             BlockIR(
@@ -156,11 +157,14 @@ class PatternIR(BaseModel):
         gds_comp = GDSCompositionType[comp_map[self.composition_type.value]]
 
         inputs = [
-            {
-                "name": i.name,
-                "input_type": i.input_type.value,
-                "schema_hint": i.schema_hint,
-            }
+            GDSInputIR(
+                name=i.name,
+                metadata={
+                    "input_type": i.input_type.value,
+                    "schema_hint": i.schema_hint,
+                    "shape": i.shape,
+                },
+            )
             for i in self.inputs
         ]
 
