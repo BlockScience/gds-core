@@ -1,6 +1,9 @@
 """Open Games — Typed DSL for Compositional Game Theory."""
 
+from ogs.dsl.base import OpenGame
 from ogs.dsl.compile import compile_to_ir
+from ogs.dsl.games import AtomicGame, DecisionGame
+from ogs.dsl.pattern import Pattern
 from ogs.ir.models import (
     CompositionType,
     FlowDirection,
@@ -19,6 +22,11 @@ from ogs.verification.engine import verify
 from ogs.verification.findings import Finding, Severity, VerificationReport
 
 __all__ = [
+    # DSL (re-exported for convenience)
+    "OpenGame",
+    "DecisionGame",
+    "AtomicGame",
+    "Pattern",
     # Compilation
     "compile_to_ir",
     # Verification
