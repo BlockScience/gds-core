@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-`gds-core` — monorepo for the Generalized Dynamical Systems ecosystem. Typed compositional specifications for complex systems, grounded in [GDS theory](https://doi.org/10.57938/e8d456ea-d975-4111-ac41-052ce73cb0cc). Four packages managed as a uv workspace.
+`gds-core` — monorepo for the Generalized Dynamical Systems ecosystem. Typed compositional specifications for complex systems, grounded in [GDS theory](https://doi.org/10.57938/e8d456ea-d975-4111-ac41-052ce73cb0cc). Six packages managed as a uv workspace.
 
 ## Packages
 
@@ -13,6 +13,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | gds-framework | `gds` | `packages/gds-framework/` |
 | gds-viz | `gds_viz` | `packages/gds-viz/` |
 | gds-games | `ogs` | `packages/gds-games/` |
+| gds-stockflow | `stockflow` | `packages/gds-stockflow/` |
+| gds-control | `gds_control` | `packages/gds-control/` |
 | gds-examples | — | `packages/gds-examples/` |
 
 ## Commands
@@ -25,13 +27,15 @@ uv sync --all-packages
 uv run --package gds-framework pytest packages/gds-framework/tests -v
 uv run --package gds-viz pytest packages/gds-viz/tests -v
 uv run --package gds-games pytest packages/gds-games/tests -v
+uv run --package gds-stockflow pytest packages/gds-stockflow/tests -v
+uv run --package gds-control pytest packages/gds-control/tests -v
 uv run --package gds-examples pytest packages/gds-examples -v
 
 # Run a single test
 uv run --package gds-framework pytest packages/gds-framework/tests/test_blocks.py::TestStackComposition::test_rshift_operator -v
 
-# Run all tests
-uv run --package gds-framework pytest packages/gds-framework/tests packages/gds-viz/tests packages/gds-games/tests packages/gds-examples -v
+# Run all tests across all packages
+uv run --package gds-framework pytest packages/gds-framework/tests packages/gds-viz/tests packages/gds-games/tests packages/gds-stockflow/tests packages/gds-control/tests packages/gds-examples -v
 
 # Lint & format
 uv run ruff check packages/
@@ -57,19 +61,42 @@ gds-framework  ←  core engine (no GDS dependencies)
     ↑
 gds-viz        ←  visualization (depends on gds-framework)
 gds-games      ←  game theory DSL (depends on gds-framework)
+gds-stockflow  ←  stock-flow DSL (depends on gds-framework)
+gds-control    ←  control systems DSL (depends on gds-framework)
     ↑
 gds-examples   ←  tutorials (depends on gds-framework + gds-viz)
 ```
 
 ### gds-framework: Two-Layer Design
 
-**Layer 1 — Composition Algebra** (`blocks/`, `compiler/`, `ir/`, `verification/generic_checks.py`):
+**Layer 0 — Composition Algebra** (`blocks/`, `compiler/`, `ir/`, `verification/generic_checks.py`):
 Domain-neutral engine. Blocks with bidirectional typed interfaces, composed via four operators (`>>`, `|`, `.feedback()`, `.loop()`). A 3-stage compiler flattens composition trees into flat IR (blocks + wirings + hierarchy). Six generic verification checks (G-001..G-006) validate structural properties on the IR.
 
-**Layer 2 — Specification Framework** (`spec.py`, `canonical.py`, `state.py`, `spaces.py`, `types/`):
+**Layer 1 — Specification Framework** (`spec.py`, `canonical.py`, `state.py`, `spaces.py`, `types/`):
 Where GDS theory lives. `GDSSpec` is the central registry for types, spaces, entities, blocks, wirings, and parameters. `project_canonical()` derives the formal `h = f ∘ g` decomposition. Seven semantic checks (SC-001..SC-007) validate domain properties on the spec.
 
 These layers are loosely coupled — you can use the composition algebra without `GDSSpec`, and `GDSSpec` does not depend on the compiler.
+
+### Domain DSL Pattern
+
+Three domain DSLs (stockflow, control, games) compile to GDS. The stockflow and control packages follow a shared pattern:
+
+1. **Elements** — frozen Pydantic models for user-facing declarations (not GDS blocks)
+2. **Model** — mutable container with `@model_validator` construction-time validation
+3. **Compiler** — two public functions:
+   - `compile_model(model)` → `GDSSpec` (registers types, spaces, entities, blocks, wirings, parameters)
+   - `compile_to_system(model)` → `SystemIR` (builds composition tree, delegates to `gds.compiler.compile.compile_system`)
+4. **Verification** — domain-specific checks on the model, plus optional delegation to G-001..G-006 via SystemIR
+
+All DSLs map to the same GDS roles: exogenous inputs → `BoundaryAction`, decision/observation logic → `Policy`, state updates → `Mechanism` + `Entity`. `ControlAction` is unused across all DSLs. Canonical `h = f ∘ g` holds cleanly for all three domains.
+
+The composition tree follows a convergent tiered pattern:
+```
+(exogenous inputs | observers) >> (decision logic) >> (state dynamics)
+    .loop(state dynamics → observers)
+```
+
+`gds-games` is more complex — it subclasses `AtomicBlock` as `OpenGame` with its own IR (`PatternIR`), but projects back to `SystemIR` via `PatternIR.to_system_ir()`.
 
 ### Two Type Systems
 
@@ -88,11 +115,7 @@ Block tree  →  flatten()  →  list[AtomicBlock]  →  block_compiler()  →  
             =  SystemIR(blocks, wirings, hierarchy)
 ```
 
-### How gds-games Extends gds-framework
-
-`gds-games` subclasses `AtomicBlock` as `OpenGame`, adding a `Signature(Interface)` that maps game theory's `(X, Y, R, S)` to GDS's `(forward_in, forward_out, backward_in, backward_out)`. It adds 6 atomic game types, a `Pattern` container (analogous to `GDSSpec`), its own compiler (`compile_to_ir()` → `PatternIR`), and 13 OGS-specific verification checks.
-
-The critical interop bridge is `PatternIR.to_system_ir()` — projects OGS IR to GDS `SystemIR`, enabling reuse of all 6 generic GDS verification checks without duplication. OGS also adds `CorecursiveLoop` (`.corecursive()`), which maps to GDS `TemporalLoop` at the IR level.
+Domain DSLs use explicit `StackComposition(wiring=[...])` between tiers where auto-wiring token overlap doesn't hold, falling back to `>>` auto-wiring where it does.
 
 ### Block Hierarchy (Sealed)
 
@@ -111,6 +134,7 @@ Both use the pluggable pattern: `Callable[[T], list[Finding]]`.
 
 - **Generic checks (G-001..G-006)** operate on `SystemIR` — structural topology only
 - **Semantic checks (SC-001..SC-007)** operate on `GDSSpec` — domain properties (completeness, determinism, reachability, type safety, parameter references, canonical wellformedness)
+- **Domain checks** operate on domain models (e.g., `StockFlowModel`, `ControlModel`) — pre-compilation structural validation
 
 ### Key Conventions
 
