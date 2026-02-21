@@ -60,7 +60,9 @@ class WiringIR(BaseModel):
     """A directed connection (edge) between blocks in the IR.
 
     ``is_feedback`` and ``is_temporal`` flags distinguish special wiring
-    categories for verification.
+    categories for verification. The ``category`` field is an open string
+    that domain packages can use for domain-specific edge classification;
+    the generic protocol only interprets ``"dataflow"``.
     """
 
     source: str
@@ -70,6 +72,7 @@ class WiringIR(BaseModel):
     direction: FlowDirection
     is_feedback: bool = False
     is_temporal: bool = False
+    category: str = "dataflow"
 
 
 class HierarchyNodeIR(BaseModel):

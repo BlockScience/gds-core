@@ -6,13 +6,20 @@ The compiler performs three transformations:
 2. **Wire** — extracts explicit wirings and auto-wires stack compositions.
 3. **Hierarchy** — captures the composition tree structure for visualization.
 
+Each stage is exposed as a standalone generic function (``flatten_blocks``,
+``extract_wirings``, ``extract_hierarchy``) so domain packages can reuse the
+DFS traversal with custom callbacks instead of forking the compiler.
+
 Domain packages provide a ``block_compiler`` callback to convert their
-specific atomic block types into BlockIR.
+specific atomic block types into BlockIR, and optionally a
+``wiring_emitter`` callback to transform structural wirings into domain IR.
 """
 
 from __future__ import annotations
 
 import re
+from dataclasses import dataclass
+from enum import StrEnum
 from typing import TYPE_CHECKING
 
 from gds.blocks.base import AtomicBlock, Block
@@ -38,10 +45,123 @@ if TYPE_CHECKING:
     from gds.types.interface import Port
 
 
+# ---------------------------------------------------------------------------
+# Structural intermediates
+# ---------------------------------------------------------------------------
+
+
+class WiringOrigin(StrEnum):
+    """How a structural wiring was discovered during DFS traversal."""
+
+    AUTO = "auto"
+    EXPLICIT = "explicit"
+    FEEDBACK = "feedback"
+    TEMPORAL = "temporal"
+
+
+@dataclass(frozen=True)
+class StructuralWiring:
+    """Protocol-internal intermediate between DFS traversal and IR emission.
+
+    The DFS walk produces these; the wiring emitter callback transforms them
+    into domain-specific IR (e.g. ``WiringIR`` for GDS, flow edges for OGS).
+    """
+
+    source_block: str
+    source_port: str
+    target_block: str
+    target_port: str
+    direction: FlowDirection
+    origin: WiringOrigin
+
+
+# ---------------------------------------------------------------------------
+# Stage 1: flatten_blocks
+# ---------------------------------------------------------------------------
+
+
+def flatten_blocks[B](
+    root: Block,
+    block_compiler: Callable[[AtomicBlock], B],
+) -> list[B]:
+    """Flatten the composition tree and map each leaf through *block_compiler*.
+
+    Args:
+        root: Root of the composition tree.
+        block_compiler: Callback that converts an AtomicBlock into domain IR.
+            For GDS, this produces ``BlockIR``; OGS can produce ``OpenGameIR``.
+
+    Returns:
+        Ordered list of compiled block IR objects.
+    """
+    return [block_compiler(b) for b in root.flatten()]
+
+
+# ---------------------------------------------------------------------------
+# Stage 2: extract_wirings
+# ---------------------------------------------------------------------------
+
+
+def extract_wirings[W](
+    root: Block,
+    wiring_emitter: Callable[[StructuralWiring], W] | None = None,
+) -> list[W]:
+    """Walk the composition tree and emit all wirings through *wiring_emitter*.
+
+    The DFS traversal discovers explicit wirings, auto-wired connections,
+    feedback wirings, and temporal wirings — each tagged with a
+    ``WiringOrigin``. The emitter callback transforms each
+    ``StructuralWiring`` into domain-specific IR.
+
+    Args:
+        root: Root of the composition tree.
+        wiring_emitter: Callback that converts a ``StructuralWiring`` into
+            domain IR. If None, uses the default GDS emitter that produces
+            ``WiringIR``.
+
+    Returns:
+        Ordered list of emitted wiring IR objects.
+    """
+    if wiring_emitter is None:
+        wiring_emitter = _default_wiring_emitter  # type: ignore[assignment]
+
+    structural: list[StructuralWiring] = []
+    _walk_structural_wirings(root, structural)
+    return [wiring_emitter(sw) for sw in structural]
+
+
+# ---------------------------------------------------------------------------
+# Stage 3: extract_hierarchy
+# ---------------------------------------------------------------------------
+
+
+def extract_hierarchy(root: Block) -> HierarchyNodeIR:
+    """Build a ``HierarchyNodeIR`` tree from the composition tree.
+
+    Sequential and parallel chains are flattened from binary trees into
+    n-ary groups for cleaner visualization.
+
+    Args:
+        root: Root of the composition tree.
+
+    Returns:
+        Root ``HierarchyNodeIR`` with flattened chains.
+    """
+    counter = [0]
+    hierarchy = _extract_hierarchy(root, counter)
+    return _flatten_sequential_chains(hierarchy)
+
+
+# ---------------------------------------------------------------------------
+# compile_system — thin wrapper over the three stages
+# ---------------------------------------------------------------------------
+
+
 def compile_system(
     name: str,
     root: Block,
     block_compiler: Callable[[AtomicBlock], BlockIR] | None = None,
+    wiring_emitter: Callable[[StructuralWiring], WiringIR] | None = None,
     composition_type: CompositionType = CompositionType.SEQUENTIAL,
     source: str = "",
 ) -> SystemIR:
@@ -52,32 +172,31 @@ def compile_system(
         root: Root of the composition tree.
         block_compiler: Domain-specific function to convert AtomicBlock → BlockIR.
             If None, uses a default that extracts name + interface.
+        wiring_emitter: Domain-specific function to convert StructuralWiring →
+            WiringIR. If None, uses the default GDS emitter.
         composition_type: Top-level composition type.
         source: Source identifier.
     """
     if block_compiler is None:
         block_compiler = _default_block_compiler
 
-    # 1. Flatten
-    atomic_blocks = root.flatten()
-    block_irs = [block_compiler(b) for b in atomic_blocks]
-
-    # 2. Wire
-    wirings = _extract_wirings(root)
-
-    # 3. Hierarchy
-    counter = [0]
-    hierarchy = _extract_hierarchy(root, counter)
-    hierarchy = _flatten_sequential_chains(hierarchy)
+    blocks = flatten_blocks(root, block_compiler)
+    wirings = extract_wirings(root, wiring_emitter)
+    hierarchy = extract_hierarchy(root)
 
     return SystemIR(
         name=name,
-        blocks=block_irs,
+        blocks=blocks,
         wirings=wirings,
         composition_type=composition_type,
         hierarchy=hierarchy,
         source=source,
     )
+
+
+# ---------------------------------------------------------------------------
+# Default callbacks
+# ---------------------------------------------------------------------------
 
 
 def _default_block_compiler(block: AtomicBlock) -> BlockIR:
@@ -93,6 +212,18 @@ def _default_block_compiler(block: AtomicBlock) -> BlockIR:
     )
 
 
+def _default_wiring_emitter(sw: StructuralWiring) -> WiringIR:
+    """Default wiring emitter — converts StructuralWiring to WiringIR."""
+    return WiringIR(
+        source=sw.source_block,
+        target=sw.target_block,
+        label=sw.source_port,
+        direction=sw.direction,
+        is_feedback=sw.origin == WiringOrigin.FEEDBACK,
+        is_temporal=sw.origin == WiringOrigin.TEMPORAL,
+    )
+
+
 def _ports_to_sig(ports: tuple[Port, ...]) -> str:
     """Convert a tuple of Ports to the IR signature string format."""
     if not ports:
@@ -101,48 +232,53 @@ def _ports_to_sig(ports: tuple[Port, ...]) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Wiring extraction
+# DFS wiring traversal (produces StructuralWiring intermediates)
 # ---------------------------------------------------------------------------
 
 
-def _extract_wirings(block: Block) -> list[WiringIR]:
-    """Recursively walk the block tree and collect all wirings."""
-    wirings: list[WiringIR] = []
-    _walk_wirings(block, wirings)
-    return wirings
-
-
-def _walk_wirings(block: Block, wirings: list[WiringIR]) -> None:
-    """Recursively walk the composition tree, collecting all wirings."""
+def _walk_structural_wirings(block: Block, out: list[StructuralWiring]) -> None:
+    """Recursively walk the composition tree, collecting StructuralWirings."""
     if isinstance(block, AtomicBlock):
         return
 
     if isinstance(block, StackComposition):
-        _walk_wirings(block.first, wirings)
-        _walk_wirings(block.second, wirings)
+        _walk_structural_wirings(block.first, out)
+        _walk_structural_wirings(block.second, out)
 
         for w in block.wiring:
-            wirings.append(_wiring_to_ir(w))
+            out.append(_wiring_to_structural(w, WiringOrigin.EXPLICIT))
 
         if not block.wiring:
-            _auto_wire_stack(block.first, block.second, wirings)
+            _auto_wire_stack(block.first, block.second, out)
 
     elif isinstance(block, ParallelComposition):
-        _walk_wirings(block.left, wirings)
-        _walk_wirings(block.right, wirings)
+        _walk_structural_wirings(block.left, out)
+        _walk_structural_wirings(block.right, out)
 
     elif isinstance(block, FeedbackLoop):
-        _walk_wirings(block.inner, wirings)
+        _walk_structural_wirings(block.inner, out)
         for fw in block.feedback_wiring:
-            wirings.append(_wiring_to_ir(fw, is_feedback=True))
+            out.append(_wiring_to_structural(fw, WiringOrigin.FEEDBACK))
 
     elif isinstance(block, TemporalLoop):
-        _walk_wirings(block.inner, wirings)
+        _walk_structural_wirings(block.inner, out)
         for w in block.temporal_wiring:
-            wirings.append(_wiring_to_ir(w, is_temporal=True))
+            out.append(_wiring_to_structural(w, WiringOrigin.TEMPORAL))
 
 
-def _auto_wire_stack(first: Block, second: Block, wirings: list[WiringIR]) -> None:
+def _wiring_to_structural(wiring: Wiring, origin: WiringOrigin) -> StructuralWiring:
+    """Convert a DSL Wiring to a StructuralWiring intermediate."""
+    return StructuralWiring(
+        source_block=wiring.source_block,
+        source_port=wiring.source_port,
+        target_block=wiring.target_block,
+        target_port=wiring.target_port,
+        direction=wiring.direction,
+        origin=origin,
+    )
+
+
+def _auto_wire_stack(first: Block, second: Block, out: list[StructuralWiring]) -> None:
     """Auto-wire matching forward_out→forward_in ports in stack compositions."""
     first_leaves = _get_leaf_names(first)
     second_leaves = _get_leaf_names(second)
@@ -156,30 +292,16 @@ def _auto_wire_stack(first: Block, second: Block, wirings: list[WiringIR]) -> No
                 target = (
                     _find_port_owner(second, in_port, "forward_in") or second_leaves[0]
                 )
-                wirings.append(
-                    WiringIR(
-                        source=source,
-                        target=target,
-                        label=out_port.name,
+                out.append(
+                    StructuralWiring(
+                        source_block=source,
+                        source_port=out_port.name,
+                        target_block=target,
+                        target_port=in_port.name,
                         direction=FlowDirection.COVARIANT,
+                        origin=WiringOrigin.AUTO,
                     )
                 )
-
-
-def _wiring_to_ir(
-    wiring: Wiring,
-    is_feedback: bool = False,
-    is_temporal: bool = False,
-) -> WiringIR:
-    """Convert a DSL Wiring to an IR WiringIR."""
-    return WiringIR(
-        source=wiring.source_block,
-        target=wiring.target_block,
-        label=wiring.source_port,
-        direction=wiring.direction,
-        is_feedback=is_feedback,
-        is_temporal=is_temporal,
-    )
 
 
 def _get_leaf_names(block: Block) -> list[str]:
