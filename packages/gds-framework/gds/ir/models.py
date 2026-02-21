@@ -7,12 +7,25 @@ generic models with their own block types and metadata.
 
 from __future__ import annotations
 
+import re
 from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field
 
 from gds.parameters import ParameterSchema
+
+
+def sanitize_id(name: str) -> str:
+    """Convert an arbitrary name to a valid IR/Mermaid identifier.
+
+    Replaces any character that is not alphanumeric or underscore with ``_``.
+    Prepends ``_`` if the result starts with a digit.
+    """
+    sanitized = re.sub(r"[^A-Za-z0-9_]", "_", name)
+    if sanitized and sanitized[0].isdigit():
+        sanitized = "_" + sanitized
+    return sanitized
 
 
 class FlowDirection(StrEnum):
@@ -90,6 +103,18 @@ class HierarchyNodeIR(BaseModel):
     exit_condition: str = ""
 
 
+class InputIR(BaseModel, frozen=True):
+    """An external input to the system.
+
+    Layer 0 defines only ``name`` and a generic ``metadata`` bag.
+    Domain packages store their richer fields (e.g., input_type, schema_hint)
+    inside ``metadata`` when projecting to SystemIR.
+    """
+
+    name: str
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
 class SystemIR(BaseModel):
     """A complete composed system — the top-level IR unit.
 
@@ -100,7 +125,7 @@ class SystemIR(BaseModel):
     name: str
     blocks: list[BlockIR] = Field(default_factory=list)
     wirings: list[WiringIR] = Field(default_factory=list)
-    inputs: list[dict[str, Any]] = Field(default_factory=list)
+    inputs: list[InputIR] = Field(default_factory=list)
     composition_type: CompositionType = CompositionType.SEQUENTIAL
     hierarchy: HierarchyNodeIR | None = None
     source: str = ""

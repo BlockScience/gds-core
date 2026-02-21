@@ -21,15 +21,22 @@ Validate IR topology — applicable to any model.
 
 | Check | Name | What It Validates |
 |---|---|---|
-| G-001 | Port token overlap | Sequential wirings have token overlap |
-| G-002 | Signature completeness | All ports are connected |
-| G-003 | Wiring validity | Wiring references exist in the block set |
-| G-004 | Hierarchy consistency | Hierarchy tree matches block set |
-| G-005 | Token consistency | Port tokens are internally consistent |
-| G-006 | Block uniqueness | No duplicate block names |
+| G-001 | Domain/codomain matching | Covariant wiring label is token-subset of source forward_out or target forward_in |
+| G-002 | Signature completeness | Every block has at least one input slot and one output slot |
+| G-003 | Direction consistency | Flag consistency (COVARIANT+feedback, CONTRAVARIANT+temporal contradictions) and contravariant port-slot matching |
+| G-004 | Dangling wirings | Wiring source/target references exist in the block set or input set |
+| G-005 | Sequential type compatibility | In stack composition, wiring label is token-subset of BOTH source forward_out AND target forward_in |
+| G-006 | Covariant acyclicity | Covariant flow graph is a DAG (no cycles within a timestep) |
 
 !!! note "G-002 and BoundaryActions"
     G-002 flags BoundaryActions (no inputs) and terminal Mechanisms (no outputs) as warnings. This is expected for valid GDS models — these blocks are system boundaries by design.
+
+!!! note "Layer 0 Stabilization (v0.3)"
+    Recent changes to the verification layer:
+
+    - **Typed `InputIR`** — `SystemIR.inputs` is now `list[InputIR]` (was `list[dict]`). G-004 recognizes inputs as valid wiring endpoints.
+    - **Real G-003** — replaced the previous stub (always-pass INFO) with flag consistency and contravariant port-slot matching.
+    - **Unified `sanitize_id`** — single canonical definition in `gds.ir.models` replaces 5 duplicated copies.
 
 ## Semantic Checks (SC-001..SC-007)
 

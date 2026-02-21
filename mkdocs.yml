@@ -138,4 +138,7 @@ nav:
           - Crosswalk Problem: examples/examples/crosswalk.md
       - Building Models: examples/building-models.md
       - Feature Matrix: examples/feature-matrix.md
+  - Guides:
+      - Layer 0 Milestone: guides/architecture-milestone-layer0.md
+      - DSL Roadmap: guides/dsl-roadmap.md
   - Ecosystem: framework/ecosystem.md
