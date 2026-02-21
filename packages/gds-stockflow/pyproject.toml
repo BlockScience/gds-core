@@ -1,0 +1,66 @@
+[project]
+name = "gds-stockflow"
+version = "0.1.0"
+description = "Declarative stock-flow DSL over GDS semantics — system dynamics with formal guarantees"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.12"
+authors = [
+    { name = "Rohan Mehta", email = "rohan@block.science" },
+]
+keywords = [
+    "stock-flow",
+    "system-dynamics",
+    "gds-framework",
+    "compositional-systems",
+    "dsl",
+    "verification",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+dependencies = [
+    "gds-framework>=0.2",
+    "pydantic>=2.10",
+]
+
+[tool.uv.sources]
+gds-framework = { workspace = true }
+
+[project.urls]
+Homepage = "https://github.com/BlockScience/gds-core"
+Repository = "https://github.com/BlockScience/gds-core"
+Documentation = "https://blockscience.github.io/gds-core"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["stockflow"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff.lint]
+ignore = [
+    "TC001",  # Pydantic needs runtime imports for model fields
+    "TC003",  # Pydantic needs stdlib imports at runtime for model fields
+    "RUF022", # Allow semantically-grouped __all__ (not alphabetical)
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0",
+    "ruff>=0.8",
+]
