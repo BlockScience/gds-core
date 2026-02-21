@@ -1,0 +1,30 @@
+name: Publish to PyPI
+
+on:
+  push:
+    tags:
+      - "*/v*"
+
+permissions:
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: pypi
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+
+      - name: Parse package name from tag
+        id: parse
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          PACKAGE="${TAG%%/v*}"
+          VERSION="${TAG#*/v}"
+          echo "package=$PACKAGE" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Publishing $PACKAGE v$VERSION"
+
+      - run: uv build --package ${{ steps.parse.outputs.package }}
+      - run: uv publish

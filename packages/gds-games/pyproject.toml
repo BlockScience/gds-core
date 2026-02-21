@@ -1,0 +1,81 @@
+[project]
+name = "gds-games"
+version = "0.1.1"
+description = "Typed DSL for Compositional Game Theory — define, verify, and report on open game patterns"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.12"
+authors = [
+    { name = "Rohan Mehta", email = "rohan@block.science" },
+]
+keywords = [
+    "open-games",
+    "gds-framework",
+    "compositional-game-theory",
+    "game-theory",
+    "categorical-cybernetics",
+    "dsl",
+    "verification",
+    "mechanism-design",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+dependencies = [
+    "gds-framework>=0.1",
+    "pydantic>=2.10",
+    "typer>=0.15",
+    "jinja2>=3.1",
+]
+
+[tool.uv.sources]
+gds-framework = { workspace = true }
+
+[project.scripts]
+ogs = "ogs.cli:app"
+
+[project.urls]
+Homepage = "https://github.com/BlockScience/gds-core"
+Repository = "https://github.com/BlockScience/gds-core"
+Documentation = "https://blockscience.github.io/gds-core"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["ogs"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff.lint]
+ignore = [
+    "TC001",  # Pydantic needs runtime imports for model fields and re-exports
+    "TC003",  # Pydantic needs stdlib imports at runtime for model fields
+    "RUF001", # Allow unicode math symbols in strings
+    "RUF002", # Allow unicode math symbols in docstrings
+    "RUF022", # Allow semantically-grouped __all__ (not alphabetical)
+    "UP042",  # Keep (str, Enum) pattern for Pydantic JSON serialization compatibility
+]
+
+[tool.ruff.lint.per-file-ignores]
+"ogs/reports/mermaid.py" = ["E501"]  # Mermaid init strings are inherently long
+
+[dependency-groups]
+dev = [
+    "mypy>=1.19.1",
+    "pyright>=1.1.408",
+    "pytest>=9.0.2",
+    "ruff>=0.8",
+]

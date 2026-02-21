@@ -1,0 +1,103 @@
+# {{ pattern.name }} — Domain Analysis
+
+> Auto-generated domain analysis report using '{{ tag_key }}' tag
+
+## Summary
+
+| Metric | Value |
+|--------|-------|
+| **Total Games** | {{ pattern.games | length }} |
+| **Tagged Games** | {{ domains | length }} domains, {{ pattern.games | length - ungrouped | length }} games |
+| **Ungrouped Games** | {{ ungrouped | length }} |
+| **Total Flows** | {{ pattern.flows | length }} |
+| **Internal Flows** | {{ internal_flows.values() | map('length') | sum }} |
+| **Cross-Domain Flows** | {{ external_flows | length }} |
+
+## Games by Domain
+
+{% if domains %}
+{% for domain, games in domains | dictsort %}
+### {{ domain }} ({{ games | length }} games)
+
+| Game | Type | Signature |
+|------|------|-----------|
+{% for game in games -%}
+| {{ game.name }} | {{ game.game_type.value }} | `({{ game.signature | join(', ') }})` |
+{% endfor %}
+
+**Internal Flows:** {{ internal_flows[domain] | length }}
+
+{% endfor %}
+{% endif %}
+
+{% if ungrouped %}
+### Ungrouped Games
+
+| Game | Type |
+|------|------|
+{% for game in ungrouped -%}
+| {{ game.name }} | {{ game.game_type.value }} |
+{% endfor %}
+{% endif %}
+
+## Domain Interaction Matrix
+
+Shows flow counts between domains. Rows = source, Columns = target.
+
+{% if domain_names %}
+| Source \\ Target |{% for d in domain_names %} {{ d }} |{% endfor +%}
+|-----------------|{% for d in domain_names %}---------|{% endfor +%}
+{% for src in domain_names %}
+| **{{ src }}** |{% for tgt in domain_names %} {{ interaction_matrix[src][tgt] }} |{% endfor +%}
+{% endfor %}
+{% endif %}
+
+## Coupling Metrics
+
+| Domain | Internal Flows | Outgoing | Incoming | Total | Coupling Ratio |
+|--------|----------------|----------|----------|-------|----------------|
+{% for domain in domain_names -%}
+| {{ domain }} | {{ coupling[domain].internal }} | {{ coupling[domain].outgoing }} | {{ coupling[domain].incoming }} | {{ coupling[domain].total }} | {{ "%.1f" | format(coupling[domain].coupling_ratio * 100) }}% |
+{% endfor %}
+
+## Cross-Domain Flows
+
+{% if external_flows %}
+{% for ef in external_flows %}
+### {{ ef.flow.source }} → {{ ef.flow.target }}
+- **Source Domain:** {{ ef.source_domain }}
+- **Target Domain:** {{ ef.target_domain }}
+- **Label:** {{ ef.flow.label }}
+- **Direction:** {{ ef.flow.direction.value }}
+- **Type:** {{ ef.flow.flow_type.value }}
+{% if ef.flow.is_feedback %}- **Is Feedback:** Yes
+{% endif %}
+{% if ef.flow.is_corecursive %}- **Is Corecursive:** Yes
+{% endif +%}
+{% endfor %}
+{% else %}
+No cross-domain flows detected.
+{% endif %}
+
+## Tag Consistency
+
+{% set all_tags = {} %}
+{% for game in pattern.games %}
+{% if game.tags %}
+{% for k in game.tags.keys() %}
+{% set _ = all_tags.update({k: (all_tags.get(k, 0) + 1)}) %}
+{% endfor %}
+{% endif %}
+{% endfor %}
+
+### Tag Coverage
+
+| Tag Key | Games with Tag | Coverage |
+|---------|----------------|----------|
+{% for k, count in all_tags | dictsort -%}
+| {{ k }} | {{ count }} | {{ "%.0f" | format((count / pattern.games | length) * 100) }}% |
+{% endfor %}
+
+{% if ungrouped %}
+⚠️ **Warning:** {{ ungrouped | length }} games are missing the '{{ tag_key }}' tag.
+{% endif %}

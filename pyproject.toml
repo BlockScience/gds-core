@@ -1,0 +1,29 @@
+[project]
+name = "gds-core"
+version = "0.1.0"
+description = "GDS ecosystem monorepo — typed compositional specifications for complex systems"
+requires-python = ">=3.12"
+
+[tool.uv.workspace]
+members = ["packages/*"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "UP", "B", "SIM", "TCH", "RUF"]
+
+[tool.ruff.lint.per-file-ignores]
+# Mermaid diagram strings are inherently long and cannot be wrapped
+"packages/gds-examples/prisoners_dilemma/visualize.py" = ["E501"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["gds", "gds_viz", "ogs"]
+
+[dependency-groups]
+docs = [
+    "mkdocs>=1.6",
+    "mkdocs-material>=9.5",
+    "mkdocstrings[python]>=0.27",
+]

@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+      - run: uv sync
+      - run: uv run ruff check packages/
+      - run: uv run ruff format --check packages/
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package:
+          - gds-framework
+          - gds-viz
+          - gds-games
+          - gds-examples
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+      - run: uv sync --package ${{ matrix.package }}
+      - name: Run tests
+        run: |
+          if [ "${{ matrix.package }}" = "gds-examples" ]; then
+            uv run --package ${{ matrix.package }} pytest packages/gds-examples -v
+          else
+            uv run --package ${{ matrix.package }} pytest packages/${{ matrix.package }}/tests -v
+          fi

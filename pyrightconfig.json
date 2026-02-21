@@ -1,0 +1,14 @@
+{
+  "pythonVersion": "3.12",
+  "pythonPlatform": "Linux",
+  "venvPath": ".",
+  "venv": ".venv",
+  "reportMissingImports": true,
+  "reportMissingTypeStubs": false,
+  "executionEnvironments": [
+    { "root": "packages/gds-framework", "extraPaths": ["packages/gds-framework"] },
+    { "root": "packages/gds-viz", "extraPaths": ["packages/gds-viz"] },
+    { "root": "packages/gds-games", "extraPaths": ["packages/gds-games"] },
+    { "root": "packages/gds-examples", "extraPaths": ["packages/gds-examples"] }
+  ]
+}

@@ -1,0 +1,88 @@
+[project]
+name = "gds-examples"
+version = "0.1.1"
+description = "Tutorial examples for gds-framework — six complete domain models demonstrating every framework feature"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.12"
+authors = [
+    { name = "Rohan Mehta", email = "rohan@block.science" },
+]
+keywords = [
+    "generalized-dynamical-systems",
+    "examples",
+    "tutorial",
+    "gds-framework",
+    "system-specification",
+    "compositional-systems",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "gds-framework>=0.2.0",
+    "gds-viz>=0.1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/BlockScience/gds-core"
+Repository = "https://github.com/BlockScience/gds-core"
+Documentation = "https://blockscience.github.io/gds-core"
+
+[tool.uv.sources]
+gds-framework = { workspace = true }
+gds-viz = { workspace = true }
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+only-include = [
+    "__init__.py",
+    "visualize_examples.py",
+    "crosswalk",
+    "insurance",
+    "lotka_volterra",
+    "prisoners_dilemma",
+    "sir_epidemic",
+    "thermostat",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["."]
+addopts = "--import-mode=importlib"
+
+[tool.mypy]
+explicit_package_bases = true
+namespace_packages = true
+files = [
+    "crosswalk",
+    "insurance",
+    "lotka_volterra",
+    "prisoners_dilemma",
+    "sir_epidemic",
+    "thermostat",
+    "visualize_examples.py",
+]
+
+[[tool.mypy.overrides]]
+module = ["gds_viz.*", "pytest"]
+ignore_missing_imports = true
+
+[dependency-groups]
+dev = [
+    "mypy>=1.19.1",
+    "pyright>=1.1.408",
+    "pytest>=9.0.2",
+    "ruff>=0.8",
+]

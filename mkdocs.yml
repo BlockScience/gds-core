@@ -1,0 +1,141 @@
+site_name: GDS Ecosystem
+site_description: Typed compositional specifications for complex systems — framework, visualization, games, and examples
+site_url: https://blockscience.github.io/gds-core
+repo_url: https://github.com/BlockScience/gds-core
+repo_name: BlockScience/gds-core
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: teal
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: teal
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - content.code.copy
+    - navigation.sections
+    - navigation.expand
+    - toc.follow
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_source: true
+            show_bases: true
+            members_order: source
+            docstring_style: google
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - toc:
+      permalink: true
+  - attr_list
+  - md_in_html
+
+nav:
+  - Home: index.md
+  - Framework:
+      - Overview: framework/index.md
+      - Getting Started:
+          - Installation: framework/getting-started/install.md
+          - Quick Start: framework/getting-started/quickstart.md
+      - User Guide:
+          - Architecture: framework/guide/architecture.md
+          - Type System: framework/guide/types.md
+          - Blocks & Roles: framework/guide/blocks.md
+          - Specification: framework/guide/spec.md
+          - Verification: framework/guide/verification.md
+          - Glossary: framework/guide/glossary.md
+      - Design:
+          - GDS Deep Dive: framework/design/gds-deepdive.md
+          - v0.2 Design: framework/design/v0.2-design.md
+          - Proposals:
+              - Entity Redesign: framework/design/proposals/entity-redesign.md
+      - API Reference:
+          - gds: framework/api/init.md
+          - gds.blocks: framework/api/blocks.md
+          - gds.types: framework/api/types.md
+          - gds.state: framework/api/state.md
+          - gds.spaces: framework/api/spaces.md
+          - gds.spec: framework/api/spec.md
+          - gds.canonical: framework/api/canonical.md
+          - gds.compiler: framework/api/compiler.md
+          - gds.ir: framework/api/ir.md
+          - gds.verification: framework/api/verification.md
+          - gds.query: framework/api/query.md
+          - gds.parameters: framework/api/parameters.md
+          - gds.serialize: framework/api/serialize.md
+  - Visualization:
+      - Overview: viz/index.md
+      - Getting Started: viz/getting-started.md
+      - User Guide:
+          - Views: viz/guide/views.md
+          - Theming: viz/guide/theming.md
+      - API Reference:
+          - gds_viz: viz/api/init.md
+          - gds_viz.canonical: viz/api/canonical.md
+          - gds_viz.architecture: viz/api/architecture.md
+          - gds_viz.traceability: viz/api/traceability.md
+          - gds_viz.mermaid: viz/api/mermaid.md
+  - Games:
+      - Overview: games/index.md
+      - Getting Started: games/getting-started.md
+      - User Guide:
+          - Architecture: games/guide/architecture.md
+          - Game Types: games/guide/game-types.md
+          - Patterns & Composition: games/guide/patterns.md
+          - Verification: games/guide/verification.md
+          - Reports: games/guide/reports.md
+          - Visualization: games/guide/visualization.md
+          - CLI: games/guide/cli.md
+      - Design:
+          - Architecture Overview: games/design/architecture-overview.md
+      - API Reference:
+          - ogs: games/api/init.md
+          - ogs.dsl.types: games/api/dsl-types.md
+          - ogs.dsl.base: games/api/dsl-base.md
+          - ogs.dsl.games: games/api/dsl-games.md
+          - ogs.dsl.composition: games/api/dsl-composition.md
+          - ogs.dsl.pattern: games/api/dsl-pattern.md
+          - ogs.dsl.compile: games/api/dsl-compile.md
+          - ogs.dsl.library: games/api/dsl-library.md
+          - ogs.ir: games/api/ir.md
+          - ogs.verification: games/api/verification.md
+          - ogs.viz: games/api/viz.md
+          - ogs.reports: games/api/reports.md
+          - ogs.cli: games/api/cli.md
+  - Examples:
+      - Overview: examples/index.md
+      - Learning Path: examples/learning-path.md
+      - Models:
+          - SIR Epidemic: examples/examples/sir-epidemic.md
+          - Thermostat PID: examples/examples/thermostat.md
+          - Lotka-Volterra: examples/examples/lotka-volterra.md
+          - Prisoner's Dilemma: examples/examples/prisoners-dilemma.md
+          - Insurance Contract: examples/examples/insurance.md
+          - Crosswalk Problem: examples/examples/crosswalk.md
+      - Building Models: examples/building-models.md
+      - Feature Matrix: examples/feature-matrix.md
+  - Ecosystem: framework/ecosystem.md
