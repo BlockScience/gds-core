@@ -12,7 +12,7 @@ Three independent DSLs now compile to the same algebraic core:
 |---|---|---|---|---|
 | gds-stockflow | System dynamics | Auxiliaries + Flows | Accumulation mechanisms | Clean |
 | gds-control | Control theory | Sensors + Controllers | Plant dynamics | Clean |
-| gds-games (OGS) | Game theory | Observation → Decision | Utility/coutility | Projected via `to_system_ir()` |
+| gds-games (OGS) | Game theory | All games (observation → decision → evaluation) | ∅ (no state update) | Clean — via `compile_pattern_to_spec()` |
 
 All three reduce to the same canonical form without modification:
 
@@ -26,7 +26,8 @@ Key structural facts:
 - Canonical `h = f ∘ g` has survived three domains with no extensions required.
 - No DSL uses `ControlAction` — all non-state-updating blocks map to `Policy`.
 - Role partition (boundary, policy, mechanism) is complete and disjoint in every case.
-- Cross-built equivalence (DSL-compiled vs hand-built) has been verified at Spec, Canonical, and SystemIR levels for both stockflow and control.
+- Cross-built equivalence (DSL-compiled vs hand-built) has been verified at Spec, Canonical, and SystemIR levels for all three DSLs.
+- OGS canonical validation confirms `f = ∅`, `X = ∅` — compositional game theory is a **degenerate dynamical system** where `h = g` (pure policy, no state transition). See [RQ3](#research-question-3-ogs-as-degenerate-dynamical-system) below.
 
 A canonical composition pattern has emerged across DSLs:
 
@@ -269,9 +270,172 @@ Temporal semantics should remain external. The architecture document already sta
 
 ---
 
+## Research Question 3: OGS as Degenerate Dynamical System
+
+### Finding
+
+Canonical projection of OGS patterns produces:
+
+```
+X = ∅       (no state variables — games have no persistent entities)
+U = inputs  (PatternInput → BoundaryAction)
+D = all game forward_out ports
+g = all games (observation → decision → evaluation)
+f = ∅       (no mechanisms — games don't update state)
+```
+
+The canonical decomposition reduces to `h = g`. There is no state transition. The system is **pure policy**.
+
+This is not a failure of the projection — it is the correct structural characterization of compositional game theory within GDS.
+
+### Why X = ∅ Is Expected
+
+Games compute equilibria. They do not write to persistent state variables. The game-theoretic objects (strategies, utilities, coutilities) flow through the composition as signals, not as state updates. Even corecursive loops (repeated games) carry information forward as observations, not as entity mutations.
+
+In category-theoretic terms: open games are morphisms in a symmetric monoidal category with feedback. They are maps, not state machines. The "state" of a repeated game is the sequence of past plays — which in OGS is modeled as observations flowing through the composition (the History game), not as Entity variables.
+
+### Why f = ∅ Is Semantically Correct
+
+No OGS game type performs a state update:
+
+| Game Type | Port Structure | Role |
+|---|---|---|
+| DecisionGame | (X,Y,R,S) → full 4-port | Policy — strategic choice |
+| CovariantFunction | (X,Y) → forward only | Policy — observation transform |
+| ContravariantFunction | (R,S) → backward only | Policy — utility transform |
+| DeletionGame | (X,∅) → discard | Policy — information loss |
+| DuplicationGame | (X, X×X) → broadcast | Policy — information copy |
+| CounitGame | (X,∅,∅,X) → future conditioning | Policy — temporal reference |
+
+All six map to `Policy`. None updates an Entity. Therefore `f` is empty and the mechanism layer is vacuous.
+
+### The Spectrum of Canonical Dimensionality
+
+Three domains now provide three distinct points on the canonical spectrum:
+
+| Domain | |X| | |f| | |g| | Canonical Form | Interpretation |
+|---|---|---|---|---|---|
+| OGS (games) | 0 | 0 | all | `h = g` | Stateless — pure equilibrium computation |
+| Control | n | n | sensors + controllers | `h = f ∘ g` | Full — observation, decision, state update |
+| StockFlow | n | n | auxiliaries + flows | `h = f ∘ g` | State-dominant — accumulation dynamics |
+
+This reveals that `h = f ∘ g` is not merely "a decomposition of dynamical systems." It is a **transition calculus** that gracefully degenerates:
+
+- When `f = ∅`: the system is pure policy (games, decision logic, signal processing)
+- When `g` is thin: the system is state-dominant (accumulation, diffusion)
+- When both are substantial: the system is a full feedback dynamical system
+
+The unifying abstraction is `(x, u) ↦ x'` with varying dimensionality of X. All three domains are specializations of this map.
+
+### Structural Gap That Was Bridged
+
+OGS originally had no path to canonical:
+
+1. OGS blocks subclassed `OpenGame(Block)`, not GDS roles (`Policy`/`Mechanism`/`BoundaryAction`)
+2. OGS produced `PatternIR → SystemIR`, never `GDSSpec`
+3. `project_canonical()` classifies blocks via `isinstance` against role classes
+
+The bridge (`compile_pattern_to_spec()`) resolves this by:
+- Mapping all atomic games to `Policy` blocks (preserving their GDS Interface)
+- Mapping `PatternInput` to `BoundaryAction`
+- Resolving flows via the existing compiler, then registering as `SpecWiring`
+
+This is a parallel path — `PatternIR` remains for OGS-specific tooling (reports, visualization, game-theoretic vocabulary). The bridge enables canonical projection without replacing the existing pipeline.
+
+### Implication for PatternIR
+
+`PatternIR` is no longer required for semantic correctness. Its remaining justifications:
+
+1. **Report generation** — Jinja2 templates reference `OpenGameIR` fields (game_type, signature as X/Y/R/S)
+2. **Game-theoretic vocabulary** — `FlowType.OBSERVATION` vs `FlowType.UTILITY_COUTILITY` carries domain meaning
+3. **Visualization** — Mermaid generators use game-specific metadata
+
+These are view-layer concerns (Layer 4). Whether to consolidate `PatternIR` into `GDSSpec` + metadata is a refactoring question, not a correctness question. The bridge proves they produce equivalent canonical results.
+
+---
+
+## Research Question 4: Cross-Lens Analysis — When Equilibrium and Reachability Disagree
+
+### Background
+
+With three DSLs compiling to GDSSpec, the framework now supports two independent analytical lenses on the same system:
+
+1. **Game-theoretic lens** (via PatternIR) — equilibria, incentive compatibility, strategic structure, utility propagation
+2. **Dynamical lens** (via GDSSpec/CanonicalGDS) — reachability, controllability, stability, state-space structure
+
+These lenses are orthogonal. Neither subsumes the other:
+
+- Game equilibrium does not imply dynamical stability (a Nash equilibrium can be an unstable fixed point)
+- Dynamical stability does not imply strategic optimality (a stable attractor can be Pareto-dominated)
+- Reachability does not imply incentive compatibility (a reachable state may require irrational agent behavior)
+
+### The Question
+
+**When the two lenses disagree for a concrete system, what does that disagreement mean — and which lens, if either, should be treated as normative?**
+
+### Why Neither Lens Can Be Normative
+
+If the game-theoretic lens is normative ("redesign dynamics to enforce equilibrium"), you assume the equilibrium concept is correct for the domain. But Nash equilibria can be dynamically unstable, Pareto-dominated, or unreachable from feasible initial conditions.
+
+If the dynamical lens is normative ("redesign incentives to force stability"), you assume the target attractor is desirable. But stable attractors can be socially inefficient or represent lock-in traps.
+
+### The Architectural Answer
+
+GDS is a **diagnostic instrument**, not a normative engine.
+
+The framework's value is in surfacing the disagreement. When equilibrium and reachability conflict, that conflict is information:
+
+- "Your incentive design has unintended dynamical consequences" (equilibrium exists but is unreachable)
+- "Your dynamics have unintended strategic consequences" (stable point exists but is not an equilibrium)
+
+The modeler resolves the tension using domain knowledge. The framework provides the structured vocabulary to state the problem precisely.
+
+### Implications for Architecture
+
+This means the two-lens architecture must remain genuinely parallel:
+
+```
+Pattern
+ ├─ PatternIR  → game-theoretic analysis (equilibria, incentives)
+ └─ GDSSpec    → dynamical analysis (reachability, stability)
+```
+
+Neither representation should absorb the other. If canonical were extended to encode equilibrium concepts, or if PatternIR were extended to encode reachability, the lenses would collapse and the diagnostic power would be lost.
+
+The correct architectural move is to build **cross-lens queries** — analyses that take both representations as input and report on their (dis)agreement:
+
+- "Is this Nash equilibrium a stable fixed point of the state dynamics?"
+- "Is this stable attractor consistent with individual rationality?"
+- "Does this reachable state satisfy incentive compatibility?"
+
+These are research-level questions that require both lenses simultaneously.
+
+### Connection to Timestep Semantics (RQ2)
+
+Cross-lens disagreement can also arise from implicit timestep incompatibility. If the game-theoretic lens assumes simultaneous play but the dynamical lens assumes sequential evaluation, "equilibrium" and "stability" may refer to different execution models operating on the same structural specification.
+
+This reinforces the RQ2 recommendation: temporal semantics must remain explicit and domain-local. Cross-lens analysis must verify that both lenses assume compatible execution semantics before comparing their conclusions.
+
+### Trigger
+
+This question becomes concrete when:
+
+| Trigger | What It Reveals |
+|---|---|
+| Building a game-theoretic + dynamical co-analysis tool | Whether the two lenses can be queried simultaneously |
+| A concrete system where equilibrium ≠ stable fixed point | Whether the framework can express the disagreement |
+| Mechanism design applications | Whether the framework supports prescriptive (not just descriptive) use |
+| Lean/formal verification exports | Whether canonical's analytical lossyness causes proof gaps |
+
+### Current Recommendation
+
+Do not attempt to resolve the tension architecturally. Keep the lenses parallel. Build cross-lens analysis as a separate concern that consumes both representations. The framework's role is to make the question askable, not to answer it.
+
+---
+
 ## Strategic Assessment
 
-These two questions mark the boundary between:
+These questions mark the boundary between:
 
 - **Structural compositional modeling** — validated by three DSLs, canonical proven stable
 - **Dynamical execution and control-theoretic analysis** — the next frontier
@@ -286,20 +450,25 @@ Neither question requires immediate resolution. Both are triggered by concrete f
 |---|---|
 | Building a structural controllability analyzer | RQ1 (MIMO semantics) |
 | Building a shared simulation harness | RQ2 (timestep semantics) |
-| Adding a continuous-time DSL | Both |
-| Adding a hybrid systems DSL | Both |
+| Adding a continuous-time DSL | RQ1 + RQ2 |
+| Adding a hybrid systems DSL | RQ1 + RQ2 |
 | Extracting state-space matrices (A, B, C, D) | RQ1 |
+| Consolidating OGS PatternIR into GDSSpec | RQ3 (refactoring decision) |
+| Adding a stateless DSL (signal processing, Bayesian networks) | RQ3 (validates X=∅ pattern) |
 
 Until one of these triggers occurs, the current architecture is complete and correct for its stated purpose: structural compositional modeling with formal verification and canonical decomposition.
 
 ### The Stability Claim
 
-After three independent domains:
+After three independent domains with three distinct canonical profiles (`h = g`, `h = f ∘ g` full, `h = f ∘ g` state-dominant):
 
 - The composition algebra (Layer 0) is validated and should not change.
-- The canonical projection (`h = f ∘ g`) is correctly minimal.
+- The canonical projection (`h = f ∘ g`) is correctly minimal — and gracefully degenerates when `f = ∅`.
 - The role system (Boundary, Policy, Mechanism) covers all three domains without `ControlAction`.
 - The type/space system handles semantic separation across all three domains.
 - The temporal loop pattern is structurally uniform and semantically adequate for structural modeling.
+- Cross-built equivalence holds at Spec, Canonical, and SystemIR levels for all three DSLs.
+
+The canonical form `(x, u) ↦ x'` with varying dimensionality of X now functions as a **unified transition calculus** — not merely a decomposition of dynamical systems, but a typed algebra of transition structure that absorbs stateless (games), stateful (control), and state-dominant (stockflow) formalisms under one composition substrate.
 
 Further DSLs (signal processing, compartmental models, queueing networks) should compile to this same substrate without architectural changes. If they don't, that is a signal that the boundary has been reached — not that the architecture needs extension.
