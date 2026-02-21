@@ -23,6 +23,9 @@ def prisoners_dilemma_to_mermaid() -> str:
     lines = ["flowchart TD", ""]
 
     # ========== ENVIRONMENT ==========
+    p_setting = (
+        '        P_Setting["Payoff Matrix Setting<br/>(private: 2x2x2 payoff grid)"]'
+    )
     lines.extend(
         [
             "    %% ======================",
@@ -30,7 +33,7 @@ def prisoners_dilemma_to_mermaid() -> str:
             "    %% ======================",
             "",
             "    subgraph Environment",
-            '        P_Setting["Payoff Matrix Setting Process<br/>(private: 2x2x2 payoff grid)"]',
+            p_setting,
             '        P_Realization["Payoff Realization Process"]',
             "    end",
             "",
@@ -38,6 +41,12 @@ def prisoners_dilemma_to_mermaid() -> str:
     )
 
     # ========== ALICE AGENT ==========
+    a_model = (
+        '        A_Model["Alice\'s Model of the World<br/>(private: strategy state)"]'
+    )
+    a_decision = (
+        '        A_Decision["Alice Decision Process<br/>(output: private action A)"]'
+    )
     lines.extend(
         [
             "    %% ======================",
@@ -45,8 +54,8 @@ def prisoners_dilemma_to_mermaid() -> str:
             "    %% ======================",
             "",
             '    subgraph Alice_Agent["Alice Agent"]',
-            '        A_Model["Alice\'s Model of the World<br/>(private: strategy state)"]',
-            '        A_Decision["Alice Decision Process<br/>(output: private action A)"]',
+            a_model,
+            a_decision,
             "        A_Model --> A_Decision",
             "    end",
             "",
@@ -54,6 +63,12 @@ def prisoners_dilemma_to_mermaid() -> str:
     )
 
     # ========== BOB AGENT ==========
+    b_model = (
+        '        B_Model["Bob\'s Model of the World<br/>(private: strategy state)"]'
+    )
+    b_decision = (
+        '        B_Decision["Bob Decision Process<br/>(output: private action B)"]'
+    )
     lines.extend(
         [
             "    %% ======================",
@@ -61,8 +76,8 @@ def prisoners_dilemma_to_mermaid() -> str:
             "    %% ======================",
             "",
             '    subgraph Bob_Agent["Bob Agent"]',
-            '        B_Model["Bob\'s Model of the World<br/>(private: strategy state)"]',
-            '        B_Decision["Bob Decision Process<br/>(output: private action B)"]',
+            b_model,
+            b_decision,
             "        B_Model --> B_Decision",
             "    end",
             "",
