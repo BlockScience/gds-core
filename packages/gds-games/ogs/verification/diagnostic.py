@@ -2,13 +2,13 @@
 
 import re
 
+from gds.ir.models import sanitize_id
+
 from ogs.ir.models import PatternIR
 from ogs.verification.findings import Severity, VerificationReport
 
 
-def _sanitize_id(name: str) -> str:
-    """Turn an arbitrary string into a safe Mermaid node ID."""
-    return re.sub(r"[^a-zA-Z0-9]", "_", name)
+_sanitize_id = sanitize_id
 
 
 def _is_hex_id(name: str) -> bool:

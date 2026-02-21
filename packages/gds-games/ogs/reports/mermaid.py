@@ -11,7 +11,7 @@ Both diagrams render correctly in GitHub-flavored Markdown and any Mermaid-
 compatible viewer.
 """
 
-import re
+from gds.ir.models import sanitize_id
 
 from ogs.ir.models import FlowDirection, FlowIR, PatternIR
 
@@ -55,9 +55,7 @@ def _topological_sort(games: list[str], flows: list[FlowIR]) -> list[str]:
     return result
 
 
-def _sanitize_id(name: str) -> str:
-    """Convert a name to a valid Mermaid node ID (alphanumeric + underscore only)."""
-    return re.sub(r"[^A-Za-z0-9_]", "_", name)
+_sanitize_id = sanitize_id
 
 
 def _escape_label(text: str) -> str:

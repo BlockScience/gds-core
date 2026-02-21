@@ -195,20 +195,18 @@ Domain packages provide a `block_compiler: Callable[[AtomicBlock], BlockIR]` cal
 
 The compiler never interprets the block — it calls the callback and trusts the result.
 
-### Why OGS Has Its Own Compiler
+### How OGS Reuses the Pipeline
 
-The OGS package (`ogs/dsl/compile.py`) duplicates the structural pipeline rather than reusing `compile_system()`. This is because OGS needs:
+OGS (`ogs/dsl/compile.py`) reuses the decomposed pipeline stages with domain-specific callbacks:
 
-1. **Domain-typed outputs** — `PatternIR` instead of `SystemIR`, `FlowIR` instead of `WiringIR`
-2. **Additional traversal cases** — `CorecursiveLoop` (maps to `TemporalLoop` semantically, but the DSL tree uses a different type)
-3. **Semantic flow classification** — `_infer_flow_type()` assigns `FlowType` (observation, choice_observation, utility_coutility) during wiring extraction
-4. **Input-to-flow generation** — `PatternInput` objects generate `FlowIR` entries
+- **`flatten_blocks(pattern.game, _compile_game)`** — produces `list[OpenGameIR]`
+- **`extract_wirings(pattern.game, _ogs_wiring_emitter)`** — produces `list[FlowIR]` with `FlowType` inference (observation, choice_observation, utility_coutility)
+- **Hierarchy extraction stays OGS-specific** — GDS produces `TEMPORAL` for `TemporalLoop`; OGS needs `CORECURSIVE` for `CorecursiveLoop`, so it keeps its own `_extract_hierarchy`
+- **Input-to-flow generation** — `PatternInput` objects generate `FlowIR` entries (OGS-specific, not part of the pipeline)
 
-The duplication is a known cost. The planned pipeline decomposition (below) addresses it.
+### Pipeline Decomposition
 
-### Planned Pipeline Decomposition
-
-To eliminate duplication, the structural pipeline will be decomposed into composable stages with generic callbacks:
+The structural pipeline is decomposed into composable stages with generic callbacks:
 
 ```python
 # Layer 0 owns traversal, Layer 1 owns vocabulary
@@ -222,24 +220,38 @@ def extract_wirings(root, wiring_emitter) -> list[W]:
 def extract_hierarchy(root) -> HierarchyNodeIR:
     """Hierarchy tree extraction + chain flattening. Always returns GDS HierarchyNodeIR."""
 
-def compile_system(name, root, block_compiler, wiring_emitter, ...) -> SystemIR:
+def compile_system(name, root, ..., inputs=None) -> SystemIR:
     """Convenience assembly: calls the above three, produces SystemIR."""
 ```
 
-**Design principles for the decomposition:**
+**Design principles:**
 
-- **Layer 0 owns traversal, Layer 1 owns vocabulary.** The DFS walk over the composition tree is protocol logic. The transformation of each node into domain IR is Layer 1 logic. These must be cleanly separated.
+- **Layer 0 owns traversal, Layer 1 owns vocabulary.** The DFS walk over the composition tree is protocol logic. The transformation of each node into domain IR is Layer 1 logic. These are cleanly separated.
 - **Generic return types on pipeline stages.** `flatten_blocks` returns `list[B]` where `B` is determined by the `block_compiler`. This lets OGS produce `list[OpenGameIR]` directly.
 - **Emitters cannot inject new edges or modify traversal.** A `wiring_emitter` callback transforms the wiring at each node, but it cannot change which nodes are visited or add edges between nodes the tree doesn't connect.
-- **Default emitters preserve current behavior exactly.** Passing `None` for the callbacks must produce identical output to the current `compile_system()`.
+- **Default emitters preserve current behavior exactly.** Passing `None` for the callbacks produces identical output to calling `compile_system()` with defaults.
 
-**Key types to introduce:**
+**Key types:**
 
 | Type | Purpose |
 |---|---|
 | `StructuralWiring` | Protocol-internal frozen dataclass for wiring data before emission |
 | `WiringOrigin` | Sealed enum: `AUTO`, `EXPLICIT`, `FEEDBACK`, `TEMPORAL` |
 | `WiringIR.category` | Open string field, default `"dataflow"`, protocol only interprets `"dataflow"` |
+| `InputIR` | Typed external input: `name` + `metadata` bag. Domain packages map richer fields into `metadata` |
+| `sanitize_id` | Canonical name-to-identifier function, used by hierarchy extraction and Mermaid rendering |
+
+### Layer 0 Stabilization
+
+The following gaps between the architecture document and the codebase have been closed:
+
+1. **Typed `InputIR`** — `SystemIR.inputs` is `list[InputIR]` (was `list[dict[str, Any]]`). OGS projects its richer `InputIR` (with `input_type`, `schema_hint`, `shape`) into the metadata bag. `compile_system()` accepts an optional `inputs` parameter; Layer 0 never infers inputs.
+
+2. **Real G-003 direction consistency** — replaced the stub (always-pass INFO) with two validations: flag consistency (COVARIANT+is_feedback and CONTRAVARIANT+is_temporal contradictions) and contravariant port-slot matching via `tokens_subset` against backward_out/backward_in signature slots.
+
+3. **Unified `sanitize_id`** — single canonical definition in `gds.ir.models.sanitize_id()`, replacing 5 duplicated copies across gds-framework and gds-games. Includes a leading-digit guard for Mermaid compatibility.
+
+With these changes, Layer 0 is formally consistent with the architecture document and ready for new DSL development.
 
 ---
 

@@ -59,8 +59,10 @@ from gds.ir.models import (
     CompositionType,
     FlowDirection,
     HierarchyNodeIR,
+    InputIR,
     SystemIR,
     WiringIR,
+    sanitize_id,
 )
 from gds.ir.serialization import IRDocument, IRMetadata, load_ir, save_ir
 
@@ -129,6 +131,7 @@ __all__ = [
     "HierarchyNodeIR",
     "IRDocument",
     "IRMetadata",
+    "InputIR",
     "Interface",
     "Mechanism",
     "NonNegativeFloat",
@@ -175,6 +178,7 @@ __all__ = [
     "load_ir",
     "port",
     "project_canonical",
+    "sanitize_id",
     "save_ir",
     "space",
     "spec_to_dict",

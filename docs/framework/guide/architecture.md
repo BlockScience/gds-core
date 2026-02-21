@@ -36,15 +36,22 @@ Each domain package is a thin layer. The heavy lifting — composition, compilat
 
 ## Compilation Pipeline
 
+The compiler is decomposed into three reusable stages, each exposed as a public function with generic callbacks:
+
 ```
-Block tree  →  flatten()  →  list[AtomicBlock]
-            →  block_compiler()  →  list[BlockIR]
-            →  _walk_wirings()  →  list[WiringIR]
-            →  _extract_hierarchy()  →  HierarchyNodeIR tree
-            =  SystemIR(blocks, wirings, hierarchy)
+flatten_blocks(root, block_compiler)  →  list[BlockIR]
+extract_wirings(root, wiring_emitter) →  list[WiringIR]
+extract_hierarchy(root)               →  HierarchyNodeIR
+
+compile_system(name, root, ..., inputs=None) → SystemIR
+  # Thin wrapper: calls the three stages + assembles SystemIR
 ```
 
+Domain packages supply callbacks to produce their own IR types (e.g., OGS provides `_compile_game` → `OpenGameIR` and `_ogs_wiring_emitter` → `FlowIR`). Layer 0 owns traversal; Layer 1 owns vocabulary.
+
 Auto-wiring for `>>` matches `forward_out` ports to `forward_in` ports by token overlap. Feedback marks `is_feedback=True`; temporal marks `is_temporal=True`.
+
+`SystemIR.inputs` accepts `list[InputIR]` — typed external inputs with a `metadata` bag. Layer 0 never infers inputs; domain packages supply them via `compile_system(..., inputs=...)` or by populating them in their own compilation (e.g., OGS `compile_to_ir()`).
 
 ## Canonical Projection
 

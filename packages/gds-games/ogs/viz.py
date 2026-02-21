@@ -13,6 +13,8 @@ Views:
 
 from __future__ import annotations
 
+from gds.ir.models import sanitize_id
+
 from ogs.ir.models import FlowDirection, GameType, PatternIR
 
 
@@ -256,12 +258,4 @@ def generate_all_views(pattern: PatternIR) -> dict[str, str]:
     }
 
 
-def _sanitize_id(name: str) -> str:
-    """Convert a name to a valid Mermaid ID."""
-    import re
-
-    sanitized = re.sub(r"[^A-Za-z0-9_]", "_", name)
-    # Ensure it doesn't start with a number
-    if sanitized[0].isdigit():
-        sanitized = "_" + sanitized
-    return sanitized
+_sanitize_id = sanitize_id

@@ -1,8 +1,8 @@
 """Tests for generic verification checks (G-001 through G-006)."""
 
-from gds.ir.models import BlockIR, FlowDirection, SystemIR, WiringIR
+from gds.ir.models import BlockIR, FlowDirection, InputIR, SystemIR, WiringIR
 from gds.verification.engine import verify
-from gds.verification.findings import Severity, VerificationReport
+from gds.verification.findings import VerificationReport
 from gds.verification.generic_checks import (
     check_g001_domain_codomain_matching,
     check_g002_signature_completeness,
@@ -87,11 +87,91 @@ class TestG002:
 
 
 class TestG003:
-    def test_all_wirings_get_info(self, sample_system_ir):
+    def test_covariant_wiring_no_findings(self, sample_system_ir):
+        """Covariant wirings are handled by G-001 — G-003 skips them."""
         findings = check_g003_direction_consistency(sample_system_ir)
-        assert len(findings) >= 1
-        # G-003 is an INFO check
-        assert all(f.severity == Severity.INFO for f in findings)
+        # sample_system_ir has only covariant wirings, G-003 skips those
+        assert all(f.passed for f in findings)
+
+    def test_covariant_feedback_contradiction(self):
+        sys = SystemIR(
+            name="Test",
+            blocks=[BlockIR(name="A"), BlockIR(name="B")],
+            wirings=[
+                WiringIR(
+                    source="A",
+                    target="B",
+                    label="x",
+                    direction=FlowDirection.COVARIANT,
+                    is_feedback=True,
+                )
+            ],
+        )
+        findings = check_g003_direction_consistency(sys)
+        failed = [f for f in findings if not f.passed]
+        assert len(failed) == 1
+        assert "contradiction" in failed[0].message
+
+    def test_contravariant_temporal_contradiction(self):
+        sys = SystemIR(
+            name="Test",
+            blocks=[BlockIR(name="A"), BlockIR(name="B")],
+            wirings=[
+                WiringIR(
+                    source="A",
+                    target="B",
+                    label="x",
+                    direction=FlowDirection.CONTRAVARIANT,
+                    is_temporal=True,
+                )
+            ],
+        )
+        findings = check_g003_direction_consistency(sys)
+        failed = [f for f in findings if not f.passed]
+        assert len(failed) == 1
+        assert "contradiction" in failed[0].message
+
+    def test_contravariant_matching_passes(self):
+        sys = SystemIR(
+            name="Test",
+            blocks=[
+                BlockIR(name="A", signature=("", "", "", "Cost")),
+                BlockIR(name="B", signature=("", "", "Cost", "")),
+            ],
+            wirings=[
+                WiringIR(
+                    source="A",
+                    target="B",
+                    label="cost",
+                    direction=FlowDirection.CONTRAVARIANT,
+                    is_feedback=True,
+                )
+            ],
+        )
+        findings = check_g003_direction_consistency(sys)
+        assert all(f.passed for f in findings)
+
+    def test_contravariant_mismatch_fails(self):
+        sys = SystemIR(
+            name="Test",
+            blocks=[
+                BlockIR(name="A", signature=("", "", "", "Cost")),
+                BlockIR(name="B", signature=("", "", "Reward", "")),
+            ],
+            wirings=[
+                WiringIR(
+                    source="A",
+                    target="B",
+                    label="unrelated",
+                    direction=FlowDirection.CONTRAVARIANT,
+                    is_feedback=True,
+                )
+            ],
+        )
+        findings = check_g003_direction_consistency(sys)
+        failed = [f for f in findings if not f.passed]
+        assert len(failed) == 1
+        assert "MISMATCH" in failed[0].message
 
 
 # ── G-004: Dangling wirings ──────────────────────────────────
@@ -136,6 +216,25 @@ class TestG004:
         findings = check_g004_dangling_wirings(sys)
         failed = [f for f in findings if not f.passed]
         assert len(failed) >= 1
+
+    def test_input_as_known_source(self):
+        """Wiring from an input should not be flagged as dangling."""
+        sys = SystemIR(
+            name="Test",
+            blocks=[BlockIR(name="B")],
+            inputs=[InputIR(name="env_signal")],
+            wirings=[
+                WiringIR(
+                    source="env_signal",
+                    target="B",
+                    label="signal",
+                    direction=FlowDirection.COVARIANT,
+                )
+            ],
+        )
+        findings = check_g004_dangling_wirings(sys)
+        failed = [f for f in findings if not f.passed]
+        assert failed == []
 
 
 # ── G-005: Sequential type compatibility ─────────────────────
