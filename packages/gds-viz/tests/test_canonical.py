@@ -156,11 +156,10 @@ class TestCanonicalEdges:
 
 class TestCanonicalIntegration:
     def test_sir_epidemic(self):
-        from sir_epidemic.model import build_spec
-
+        sir = __import__("pytest").importorskip("sir_epidemic")
         from gds.canonical import project_canonical
 
-        spec = build_spec()
+        spec = sir.model.build_spec()
         canon = project_canonical(spec)
         out = canonical_to_mermaid(canon)
 
@@ -180,11 +179,10 @@ class TestCanonicalIntegration:
         assert "X_next" in out
 
     def test_thermostat_has_control(self):
-        from thermostat.model import build_spec
-
+        thermo = __import__("pytest").importorskip("thermostat")
         from gds.canonical import project_canonical
 
-        spec = build_spec()
+        spec = thermo.model.build_spec()
         canon = project_canonical(spec)
         out = canonical_to_mermaid(canon)
 

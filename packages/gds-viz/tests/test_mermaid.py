@@ -205,9 +205,8 @@ class TestBlockToMermaid:
 
 class TestFullExample:
     def test_sir_epidemic_diagram(self):
-        from sir_epidemic.model import build_system
-
-        system = build_system()
+        sir = __import__("pytest").importorskip("sir_epidemic")
+        system = sir.model.build_system()
         mermaid = system_to_mermaid(system)
 
         # Check key elements
@@ -222,9 +221,8 @@ class TestFullExample:
         assert "-->" in mermaid  # covariant arrows
 
     def test_thermostat_with_feedback(self):
-        from thermostat.model import build_system
-
-        system = build_system()
+        thermo = __import__("pytest").importorskip("thermostat")
+        system = thermo.model.build_system()
         mermaid = system_to_mermaid(system)
 
         # Check feedback wiring
@@ -233,9 +231,8 @@ class TestFullExample:
         assert "==" in mermaid  # thick arrow for feedback
 
     def test_lotka_volterra_with_temporal_loop(self):
-        from lotka_volterra.model import build_system
-
-        system = build_system()
+        lv = __import__("pytest").importorskip("lotka_volterra")
+        system = lv.model.build_system()
         mermaid = system_to_mermaid(system)
 
         # Check temporal wiring
@@ -244,9 +241,8 @@ class TestFullExample:
         assert "-." in mermaid  # dashed arrow for temporal
 
     def test_prisoners_dilemma_complex(self):
-        from prisoners_dilemma.model import build_system
-
-        system = build_system()
+        pd = __import__("pytest").importorskip("prisoners_dilemma")
+        system = pd.model.build_system()
         mermaid = system_to_mermaid(system)
 
         # Should have 6 blocks

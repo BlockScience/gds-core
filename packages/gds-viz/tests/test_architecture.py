@@ -177,9 +177,8 @@ class TestArchitectureWires:
 
 class TestArchitectureIntegration:
     def test_sir_epidemic(self):
-        from sir_epidemic.model import build_spec
-
-        spec = build_spec()
+        sir = __import__("pytest").importorskip("sir_epidemic")
+        spec = sir.model.build_spec()
         out = spec_to_mermaid(spec)
 
         assert "flowchart TD" in out
@@ -193,9 +192,8 @@ class TestArchitectureIntegration:
         assert "Recovered" in out
 
     def test_prisoners_dilemma(self):
-        from prisoners_dilemma.model import build_spec
-
-        spec = build_spec()
+        pd = __import__("pytest").importorskip("prisoners_dilemma")
+        spec = pd.model.build_spec()
         out = spec_to_mermaid(spec)
 
         assert "flowchart TD" in out
