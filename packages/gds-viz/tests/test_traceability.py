@@ -102,9 +102,8 @@ class TestParamInfluence:
         assert "No parameters defined" in out
 
     def test_sir_integration(self):
-        from sir_epidemic.model import build_spec
-
-        spec = build_spec()
+        sir = __import__("pytest").importorskip("sir_epidemic")
+        spec = sir.model.build_spec()
         out = params_to_mermaid(spec)
         assert "param_beta" in out
         assert "param_gamma" in out
@@ -114,9 +113,8 @@ class TestParamInfluence:
         assert "entity_Recovered" in out
 
     def test_pd_no_params(self):
-        from prisoners_dilemma.model import build_spec
-
-        spec = build_spec()
+        pd = __import__("pytest").importorskip("prisoners_dilemma")
+        spec = pd.model.build_spec()
         out = params_to_mermaid(spec)
         assert "No parameters defined" in out
 
@@ -163,9 +161,8 @@ class TestTraceability:
         assert "flowchart RL" in out
 
     def test_sir_trace_integration(self):
-        from sir_epidemic.model import build_spec
-
-        spec = build_spec()
+        sir = __import__("pytest").importorskip("sir_epidemic")
+        spec = sir.model.build_spec()
         out = trace_to_mermaid(spec, "Susceptible", "count")
         assert "Update_Susceptible ==> target" in out
         assert "Contact_Process" in out
@@ -173,9 +170,8 @@ class TestTraceability:
         assert "param_beta" in out
 
     def test_thermostat_trace_integration(self):
-        from thermostat.model import build_spec
-
-        spec = build_spec()
+        thermo = __import__("pytest").importorskip("thermostat")
+        spec = thermo.model.build_spec()
         out = trace_to_mermaid(spec, "Room", "temperature")
         assert "Update_Room ==> target" in out
         assert "PID_Controller" in out
