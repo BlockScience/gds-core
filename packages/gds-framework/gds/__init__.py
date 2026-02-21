@@ -32,7 +32,14 @@ from gds.blocks.roles import (
 
 # ── Canonical projection ───────────────────────────────────
 from gds.canonical import CanonicalGDS, project_canonical
-from gds.compiler.compile import compile_system
+from gds.compiler.compile import (
+    StructuralWiring,
+    WiringOrigin,
+    compile_system,
+    extract_hierarchy,
+    extract_wirings,
+    flatten_blocks,
+)
 
 # ── Convenience helpers ────────────────────────────────────
 from gds.helpers import (
@@ -138,6 +145,7 @@ __all__ = [
     "SpecWiring",
     "StackComposition",
     "StateVariable",
+    "StructuralWiring",
     "SystemIR",
     "Tagged",
     "TemporalLoop",
@@ -148,6 +156,7 @@ __all__ = [
     "Wire",
     "Wiring",
     "WiringIR",
+    "WiringOrigin",
     "all_checks",
     "check_canonical_wellformedness",
     "check_completeness",
@@ -157,6 +166,9 @@ __all__ = [
     "check_type_safety",
     "compile_system",
     "entity",
+    "extract_hierarchy",
+    "extract_wirings",
+    "flatten_blocks",
     "gds_check",
     "get_custom_checks",
     "interface",
