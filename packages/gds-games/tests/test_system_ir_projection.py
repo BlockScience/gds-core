@@ -1,6 +1,6 @@
 """Tests for PatternIR.to_system_ir() projection to GDS SystemIR."""
 
-from gds.ir.models import BlockIR, SystemIR, WiringIR
+from gds.ir.models import BlockIR, InputIR, SystemIR, WiringIR
 from gds.ir.models import CompositionType as GDSCompositionType
 from ogs.dsl.compile import compile_to_ir
 from ogs.dsl.library import reactive_decision_agent
@@ -62,6 +62,13 @@ class TestToSystemIR:
         pattern_ir = _build_reactive_decision_ir()
         system = pattern_ir.to_system_ir()
         assert len(system.inputs) == len(pattern_ir.inputs)
+
+    def test_inputs_are_typed_input_ir(self):
+        """Projected inputs should be GDS InputIR instances, not dicts."""
+        pattern_ir = _build_reactive_decision_ir()
+        system = pattern_ir.to_system_ir()
+        for inp in system.inputs:
+            assert isinstance(inp, InputIR)
 
     def test_feedback_maps_to_feedback(self):
         """Reactive decision uses FEEDBACK — should map directly."""

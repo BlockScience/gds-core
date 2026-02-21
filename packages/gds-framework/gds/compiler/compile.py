@@ -17,7 +17,6 @@ specific atomic block types into BlockIR, and optionally a
 
 from __future__ import annotations
 
-import re
 from dataclasses import dataclass
 from enum import StrEnum
 from typing import TYPE_CHECKING
@@ -35,8 +34,10 @@ from gds.ir.models import (
     CompositionType,
     FlowDirection,
     HierarchyNodeIR,
+    InputIR,
     SystemIR,
     WiringIR,
+    sanitize_id,
 )
 
 if TYPE_CHECKING:
@@ -164,6 +165,7 @@ def compile_system(
     wiring_emitter: Callable[[StructuralWiring], WiringIR] | None = None,
     composition_type: CompositionType = CompositionType.SEQUENTIAL,
     source: str = "",
+    inputs: list[InputIR] | None = None,
 ) -> SystemIR:
     """Compile a Block tree into a flat SystemIR.
 
@@ -176,6 +178,8 @@ def compile_system(
             WiringIR. If None, uses the default GDS emitter.
         composition_type: Top-level composition type.
         source: Source identifier.
+        inputs: External inputs to include in the SystemIR. Layer 0 never
+            infers inputs — domain packages supply them.
     """
     if block_compiler is None:
         block_compiler = _default_block_compiler
@@ -188,6 +192,7 @@ def compile_system(
         name=name,
         blocks=blocks,
         wirings=wirings,
+        inputs=inputs or [],
         composition_type=composition_type,
         hierarchy=hierarchy,
         source=source,
@@ -323,16 +328,13 @@ def _find_port_owner(block: Block, target_port: Port, slot: str) -> str | None:
 # ---------------------------------------------------------------------------
 
 
-def _sanitize_id(name: str) -> str:
-    """Convert a name to a valid ID (alphanumeric + underscore only)."""
-    return re.sub(r"[^A-Za-z0-9_]", "_", name)
 
 
 def _extract_hierarchy(block: Block, counter: list[int]) -> HierarchyNodeIR:
     """Recursively build a HierarchyNodeIR from the composition tree."""
     if isinstance(block, AtomicBlock):
         return HierarchyNodeIR(
-            id=f"leaf_{_sanitize_id(block.name)}",
+            id=f"leaf_{sanitize_id(block.name)}",
             name=block.name,
             composition_type=None,
             block_name=block.name,
