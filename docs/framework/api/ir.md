@@ -8,11 +8,17 @@
 
 ::: gds.ir.models.WiringIR
 
+::: gds.ir.models.InputIR
+
 ::: gds.ir.models.HierarchyNodeIR
 
 ::: gds.ir.models.FlowDirection
 
 ::: gds.ir.models.CompositionType
+
+## Utilities
+
+::: gds.ir.models.sanitize_id
 
 ## Serialization
 
