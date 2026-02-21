@@ -12,7 +12,9 @@ Monorepo for the **Generalized Dynamical Systems** ecosystem — typed compositi
 | [gds-framework](packages/gds-framework/) | [![PyPI](https://img.shields.io/pypi/v/gds-framework)](https://pypi.org/project/gds-framework/) | Core engine — blocks, composition algebra, compiler, verification |
 | [gds-viz](packages/gds-viz/) | [![PyPI](https://img.shields.io/pypi/v/gds-viz)](https://pypi.org/project/gds-viz/) | Mermaid diagram renderers for GDS specifications |
 | [gds-games](packages/gds-games/) | [![PyPI](https://img.shields.io/pypi/v/gds-games)](https://pypi.org/project/gds-games/) | Typed DSL for compositional game theory (Open Games) |
-| [gds-examples](packages/gds-examples/) | [![PyPI](https://img.shields.io/pypi/v/gds-examples)](https://pypi.org/project/gds-examples/) | Six tutorial models demonstrating every framework feature |
+| [gds-stockflow](packages/gds-stockflow/) | [![PyPI](https://img.shields.io/pypi/v/gds-stockflow)](https://pypi.org/project/gds-stockflow/) | Declarative stock-flow DSL over GDS semantics |
+| [gds-control](packages/gds-control/) | [![PyPI](https://img.shields.io/pypi/v/gds-control)](https://pypi.org/project/gds-control/) | State-space control DSL over GDS semantics |
+| [gds-examples](packages/gds-examples/) | [![PyPI](https://img.shields.io/pypi/v/gds-examples)](https://pypi.org/project/gds-examples/) | Tutorial models demonstrating framework features |
 
 ## Quick Start
 
@@ -26,7 +28,7 @@ uv sync --all-packages
 uv run --package gds-framework pytest packages/gds-framework/tests -v
 
 # Run all tests
-uv run --package gds-framework pytest packages/gds-framework/tests packages/gds-viz/tests packages/gds-games/tests packages/gds-examples -v
+uv run --package gds-framework pytest packages/gds-framework/tests packages/gds-viz/tests packages/gds-games/tests packages/gds-stockflow/tests packages/gds-control/tests packages/gds-examples -v
 
 # Lint & format
 uv run ruff check packages/
@@ -35,7 +37,7 @@ uv run ruff format --check packages/
 
 ## Development
 
-This is a [uv workspace](https://docs.astral.sh/uv/concepts/workspaces/) monorepo. All four packages are developed together with shared tooling:
+This is a [uv workspace](https://docs.astral.sh/uv/concepts/workspaces/) monorepo. All six packages are developed together with shared tooling:
 
 - **Linting/formatting**: Ruff (configured at root, line-length 88)
 - **Testing**: pytest per-package
