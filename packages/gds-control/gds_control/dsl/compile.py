@@ -272,12 +272,8 @@ def _build_composition_tree(model: ControlModel) -> Block:
     if controller_blocks:
         tiers.append((_parallel_tier(controller_blocks), controller_blocks))
 
-    # Tier 3: state dynamics
-    if state_blocks:
-        tiers.append((_parallel_tier(state_blocks), state_blocks))
-
-    if not tiers:
-        return _parallel_tier(state_blocks)
+    # Tier 3: state dynamics (always non-empty — model requires ≥1 state)
+    tiers.append((_parallel_tier(state_blocks), state_blocks))
 
     # Sequential across tiers with explicit inter-tier wirings
     root, _ = tiers[0]
