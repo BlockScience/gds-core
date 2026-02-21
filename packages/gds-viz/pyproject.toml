@@ -1,6 +1,6 @@
 [project]
 name = "gds-viz"
-version = "0.1.1"
+version = "0.1.2"
 description = "Mermaid diagram renderers for gds-framework specifications"
 readme = "README.md"
 license = "Apache-2.0"

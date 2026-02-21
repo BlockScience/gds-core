@@ -1,6 +1,6 @@
 [project]
 name = "gds-examples"
-version = "0.1.1"
+version = "0.1.2"
 description = "Tutorial examples for gds-framework — six complete domain models demonstrating every framework feature"
 readme = "README.md"
 license = "Apache-2.0"
