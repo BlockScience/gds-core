@@ -2,6 +2,7 @@
 
 from ogs.dsl.base import OpenGame
 from ogs.dsl.compile import compile_to_ir
+from ogs.dsl.spec_bridge import compile_pattern_to_spec
 from ogs.dsl.games import AtomicGame, DecisionGame
 from ogs.dsl.pattern import Pattern
 from ogs.ir.models import (
@@ -29,6 +30,7 @@ __all__ = [
     "Pattern",
     # Compilation
     "compile_to_ir",
+    "compile_pattern_to_spec",
     # Verification
     "verify",
     "VerificationReport",
