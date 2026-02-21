@@ -5,15 +5,26 @@ The compiler performs three transformations:
 1. **Flatten** — walks the composition tree to extract all atomic games.
 2. **Wire** — extracts explicit flows and auto-wires sequential compositions.
 3. **Map metadata** — converts DSL-level metadata into IR equivalents.
+
+Stages 1 and 2 delegate to the reusable GDS pipeline functions
+(``flatten_blocks``, ``extract_wirings``), with OGS-specific callbacks
+to produce ``OpenGameIR`` and ``FlowIR`` respectively.  Hierarchy
+extraction remains OGS-specific to handle ``CORECURSIVE`` composition.
 """
 
 from __future__ import annotations
 
-from ogs.dsl.base import OpenGame
+from gds.blocks.base import Block
+from gds.compiler.compile import (
+    StructuralWiring,
+    WiringOrigin,
+    extract_wirings,
+    flatten_blocks,
+)
+
 from ogs.dsl.composition import (
     CorecursiveLoop,
     FeedbackLoop,
-    Flow,
     ParallelComposition,
     SequentialComposition,
 )
@@ -34,12 +45,11 @@ from ogs.ir.models import (
 
 def compile_to_ir(pattern: Pattern) -> PatternIR:
     """Compile a DSL Pattern into PatternIR."""
-    # 1. Flatten games
-    atomic_games = pattern.game.flatten()
-    game_irs = [_compile_game(g) for g in atomic_games]
+    # 1. Flatten games (GDS stage 1)
+    game_irs = flatten_blocks(pattern.game, _compile_game)
 
-    # 2. Walk composition tree to extract flows
-    flows = _extract_flows(pattern.game)
+    # 2. Extract flows (GDS stage 2 with OGS emitter)
+    flows: list[FlowIR] = extract_wirings(pattern.game, _ogs_wiring_emitter)
 
     # 3. Map inputs and generate input flows
     input_irs = []
@@ -62,7 +72,7 @@ def compile_to_ir(pattern: Pattern) -> PatternIR:
                 )
             )
 
-    # 4. Extract composition hierarchy
+    # 4. Extract composition hierarchy (OGS-specific for CORECURSIVE)
     counter = [0]
     hierarchy = _extract_hierarchy(pattern.game, counter)
     hierarchy = _flatten_sequential_chains(hierarchy)
@@ -105,125 +115,34 @@ def _ports_to_sig(ports: tuple[Port, ...]) -> str:
     return " + ".join(p.name for p in ports)
 
 
-def _extract_flows(game: OpenGame) -> list[FlowIR]:
-    """Recursively walk the game tree and collect all flows."""
-    flows: list[FlowIR] = []
-    _walk_flows(game, flows)
-    return flows
+def _ogs_wiring_emitter(sw: StructuralWiring) -> FlowIR:
+    """Convert a GDS StructuralWiring into an OGS FlowIR."""
+    if sw.direction == FlowDirection.CONTRAVARIANT:
+        flow_type = FlowType.UTILITY_COUTILITY
+    elif sw.origin == WiringOrigin.AUTO and _is_choice_port(sw.source_port):
+        flow_type = FlowType.CHOICE_OBSERVATION
+    else:
+        flow_type = FlowType.OBSERVATION
 
-
-def _walk_flows(game: OpenGame, flows: list[FlowIR]) -> None:
-    """Recursively walk the composition tree, collecting all flows."""
-    if isinstance(game, AtomicGame):
-        return
-
-    if isinstance(game, SequentialComposition):
-        _walk_flows(game.first, flows)
-        _walk_flows(game.second, flows)
-
-        for w in game.wiring:
-            flows.append(_flow_to_ir(w))
-
-        if not game.wiring:
-            _auto_wire_sequential(game.first, game.second, flows)
-
-    elif isinstance(game, ParallelComposition):
-        _walk_flows(game.left, flows)
-        _walk_flows(game.right, flows)
-
-    elif isinstance(game, FeedbackLoop):
-        _walk_flows(game.inner, flows)
-        for fw in game.feedback_wiring:
-            flows.append(_flow_to_ir(fw, is_feedback=True))
-
-    elif isinstance(game, CorecursiveLoop):
-        _walk_flows(game.inner, flows)
-        for w in game.corecursive_wiring:
-            flows.append(_flow_to_ir(w, is_corecursive=True))
-
-
-def _auto_wire_sequential(
-    first: OpenGame, second: OpenGame, flows: list[FlowIR]
-) -> None:
-    """Auto-wire matching Y→X ports between sequentially composed games."""
-    first_leaves = _get_leaf_names(first)
-    second_leaves = _get_leaf_names(second)
-
-    for y_port in first.signature.y:
-        for x_port in second.signature.x:
-            if y_port.type_tokens & x_port.type_tokens:
-                source = _find_port_owner(first, y_port, "y") or first_leaves[-1]
-                target = _find_port_owner(second, x_port, "x") or second_leaves[0]
-                flows.append(
-                    FlowIR(
-                        source=source,
-                        target=target,
-                        label=y_port.name,
-                        flow_type=_infer_flow_type(y_port, FlowDirection.COVARIANT),
-                        direction=FlowDirection.COVARIANT,
-                    )
-                )
-
-
-def _flow_to_ir(
-    flow: Flow,
-    is_feedback: bool = False,
-    is_corecursive: bool = False,
-) -> FlowIR:
-    """Convert a DSL Flow to an IR FlowIR."""
-    flow_type = (
-        FlowType.UTILITY_COUTILITY
-        if flow.direction == FlowDirection.CONTRAVARIANT
-        else FlowType.OBSERVATION
-    )
     return FlowIR(
-        source=flow.source_game,
-        target=flow.target_game,
-        label=flow.source_port,
+        source=sw.source_block,
+        target=sw.target_block,
+        label=sw.source_port,
         flow_type=flow_type,
-        direction=flow.direction,
-        is_feedback=is_feedback,
-        is_corecursive=is_corecursive,
+        direction=sw.direction,
+        is_feedback=(sw.origin == WiringOrigin.FEEDBACK),
+        is_corecursive=(sw.origin == WiringOrigin.TEMPORAL),
     )
 
 
-def _infer_flow_type(port: Port, direction: FlowDirection) -> FlowType:
-    """Infer the semantic flow type from port name and direction."""
-    if direction == FlowDirection.CONTRAVARIANT:
-        return FlowType.UTILITY_COUTILITY
-
-    name_lower = port.name.lower()
-    if "decision" in name_lower or "choice" in name_lower:
-        return FlowType.CHOICE_OBSERVATION
-    return FlowType.OBSERVATION
-
-
-def _get_leaf_names(game: OpenGame) -> list[str]:
-    """Get names of all leaf (atomic) games."""
-    return [g.name for g in game.flatten()]
-
-
-def _find_port_owner(game: OpenGame, target_port: Port, slot: str) -> str | None:
-    """Find which leaf game owns a given port in the specified slot.
-
-    Maps game-theory slot names (x, y, r, s) to interface field names.
-    """
-    slot_map = {
-        "x": "forward_in",
-        "y": "forward_out",
-        "r": "backward_in",
-        "s": "backward_out",
-    }
-    interface_slot = slot_map.get(slot, slot)
-    for leaf in game.flatten():
-        ports = getattr(leaf.interface, interface_slot)
-        if target_port in ports:
-            return leaf.name
-    return None
+def _is_choice_port(port_name: str) -> bool:
+    """Check whether a port name indicates a choice/decision flow."""
+    name_lower = port_name.lower()
+    return "decision" in name_lower or "choice" in name_lower
 
 
 # ---------------------------------------------------------------------------
-# Hierarchy extraction
+# Hierarchy extraction (OGS-specific for CORECURSIVE composition type)
 # ---------------------------------------------------------------------------
 
 
@@ -234,7 +153,7 @@ def _sanitize_id(name: str) -> str:
     return re.sub(r"[^A-Za-z0-9_]", "_", name)
 
 
-def _extract_hierarchy(game: OpenGame, counter: list[int]) -> HierarchyNodeIR:
+def _extract_hierarchy(game: Block, counter: list[int]) -> HierarchyNodeIR:
     """Recursively walk the composition tree and build a HierarchyNodeIR."""
     if isinstance(game, AtomicGame):
         return HierarchyNodeIR(
