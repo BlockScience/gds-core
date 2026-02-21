@@ -328,8 +328,6 @@ def _find_port_owner(block: Block, target_port: Port, slot: str) -> str | None:
 # ---------------------------------------------------------------------------
 
 
-
-
 def _extract_hierarchy(block: Block, counter: list[int]) -> HierarchyNodeIR:
     """Recursively build a HierarchyNodeIR from the composition tree."""
     if isinstance(block, AtomicBlock):
