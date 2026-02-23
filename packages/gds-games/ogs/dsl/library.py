@@ -23,9 +23,17 @@ State evolution per step:
 
 from __future__ import annotations
 
-from gds.ir.models import FlowDirection
+from typing import Literal, overload
 
-from ogs.dsl.composition import FeedbackLoop, Flow, SequentialComposition
+
+from ogs.dsl.base import OpenGame
+from ogs.dsl.composition import (
+    FeedbackFlow,
+    FeedbackLoop,
+    Flow,
+    ParallelComposition,
+    SequentialComposition,
+)
 from ogs.dsl.games import CovariantFunction, DecisionGame
 from ogs.dsl.types import Signature, port
 
@@ -187,94 +195,379 @@ def reactive_decision(
     return game
 
 
-def reactive_decision_agent(name: str = "Reactive Decision Agent") -> FeedbackLoop:
-    """Complete reactive decision agent — the canonical single-agent decision loop."""
-    cb = context_builder(tags={"domain": "Observation"})
-    hist = history(tags={"domain": "State"})
-    pol = policy(tags={"domain": "Learning"})
-    rd = reactive_decision(tags={"domain": "Decision"})
-    out = outcome(tags={"domain": "Outcome"})
+# ---------------------------------------------------------------------------
+# reactive_decision_agent — overloaded signatures
+# ---------------------------------------------------------------------------
 
-    # Build the inner composite with explicit wiring
-    inner = SequentialComposition(
-        name=name,
-        first=cb,
-        second=SequentialComposition(
-            name="History >> Policy >> RD >> Outcome",
+
+@overload
+def reactive_decision_agent(
+    name: str = ...,
+    include_outcome: Literal[True] = ...,
+    include_feedback: Literal[True] = ...,
+) -> FeedbackLoop: ...
+
+
+@overload
+def reactive_decision_agent(
+    name: str = ...,
+    include_outcome: Literal[False] = ...,
+    include_feedback: Literal[True] = ...,
+) -> FeedbackLoop: ...
+
+
+@overload
+def reactive_decision_agent(
+    name: str = ...,
+    include_outcome: bool = ...,
+    include_feedback: Literal[False] = ...,
+) -> SequentialComposition: ...
+
+
+def reactive_decision_agent(
+    name: str = "Reactive Decision Agent",
+    include_outcome: bool = True,
+    include_feedback: bool = True,
+) -> FeedbackLoop | SequentialComposition:
+    """Reactive decision agent — configurable single-agent decision loop.
+
+    Builds a Reactive Decision Pattern chain from atomic games.  The two
+    boolean flags control which components are included:
+
+    +------------------+------------------+------------------------------+
+    | ``include_outcome`` | ``include_feedback`` | Returns                   |
+    +==================+==================+==============================+
+    | ``True`` (default)  | ``True`` (default)  | ``FeedbackLoop`` — full    |
+    |                  |                  | 5-game loop (CB→Hist→Pol    |
+    |                  |                  | →RD→Out + 3 feedback flows) |
+    +------------------+------------------+------------------------------+
+    | ``False``           | ``True``            | ``FeedbackLoop`` — 4-game  |
+    |                  |                  | loop without Outcome game   |
+    +------------------+------------------+------------------------------+
+    | ``True``            | ``False``           | ``SequentialComposition``   |
+    |                  |                  | — 5-game open chain,        |
+    |                  |                  | no feedback wrap            |
+    +------------------+------------------+------------------------------+
+    | ``False``           | ``False``           | ``SequentialComposition``   |
+    |                  |                  | — 4-game open-loop chain    |
+    |                  |                  | (CB→Hist→Pol→RD), suited    |
+    |                  |                  | for multi-agent patterns    |
+    |                  |                  | where Outcome and feedback  |
+    |                  |                  | are wired at pattern level  |
+    +------------------+------------------+------------------------------+
+
+    Args:
+        name: Base name for the agent; used as the composition/loop name and
+              as the domain tag on each atomic game (``{"domain": name}``).
+        include_outcome: When ``True`` (default), appends the ``Outcome`` game
+            and wires ``Reactive Decision → Outcome``.  When ``False``, the
+            chain stops at ``Reactive Decision`` — useful in multi-agent
+            patterns where a shared Decision Router owns the Outcome game.
+        include_feedback: When ``True`` (default), wraps the sequential chain
+            in a ``FeedbackLoop`` with contravariant flows for outcome,
+            experience, and history-update feedback.  When ``False``, returns
+            the raw ``SequentialComposition`` chain.
+
+    Returns:
+        ``FeedbackLoop`` when ``include_feedback=True``,
+        ``SequentialComposition`` when ``include_feedback=False``.
+    """
+    tags = {"domain": name}
+    cb = context_builder(tags=tags)
+    hist = history(tags=tags)
+    pol = policy(tags=tags)
+    rd = reactive_decision(tags=tags)
+
+    # innermost: Policy >> Reactive Decision
+    pol_rd = SequentialComposition(
+        name=f"{name} Policy+RD",
+        first=pol,
+        second=rd,
+        wiring=[
+            Flow(
+                source_game=pol,
+                source_port="Latest Policy",
+                target_game=rd,
+                target_port="Latest Policy",
+            ),
+        ],
+    )
+
+    # History >> (Policy >> RD)
+    hist_pol_rd = SequentialComposition(
+        name=f"{name} Core",
+        first=hist,
+        second=pol_rd,
+        wiring=[
+            Flow(
+                source_game=hist,
+                source_port="Latest History",
+                target_game=pol,
+                target_port="Latest History",
+            ),
+        ],
+    )
+
+    if include_outcome:
+        out = outcome(tags=tags)
+
+        # (Policy >> RD) >> Outcome — reuse pol_rd as first
+        rd_out = SequentialComposition(
+            name=f"{name} RD+Outcome",
+            first=rd,
+            second=out,
+            wiring=[
+                Flow(
+                    source_game=rd,
+                    source_port="Decision",
+                    target_game=out,
+                    target_port="Decision",
+                ),
+            ],
+        )
+
+        # History >> (Policy >> RD >> Outcome)
+        hist_chain = SequentialComposition(
+            name=f"{name} Core",
             first=hist,
             second=SequentialComposition(
-                name="Policy >> RD >> Outcome",
+                name=f"{name} Policy+RD+Outcome",
                 first=pol,
-                second=SequentialComposition(
-                    name="RD >> Outcome",
-                    first=rd,
-                    second=out,
-                    wiring=[
-                        Flow(
-                            source_game="Reactive Decision",
-                            source_port="Decision",
-                            target_game="Outcome",
-                            target_port="Decision",
-                        ),
-                    ],
-                ),
+                second=rd_out,
                 wiring=[
                     Flow(
-                        source_game="Policy",
+                        source_game=pol,
                         source_port="Latest Policy",
-                        target_game="Reactive Decision",
+                        target_game=rd,
                         target_port="Latest Policy",
                     ),
                 ],
             ),
             wiring=[
                 Flow(
-                    source_game="History",
+                    source_game=hist,
                     source_port="Latest History",
-                    target_game="Policy",
+                    target_game=pol,
                     target_port="Latest History",
                 ),
             ],
-        ),
+        )
+
+        chain = SequentialComposition(
+            name=name,
+            first=cb,
+            second=hist_chain,
+            wiring=[
+                Flow(
+                    source_game=cb,
+                    source_port="Observation, Context",
+                    target_game=rd,
+                    target_port="Observation, Context",
+                ),
+            ],
+        )
+
+        if not include_feedback:
+            return chain
+
+        return FeedbackLoop(
+            name=name,
+            inner=chain,
+            feedback_wiring=[
+                FeedbackFlow(
+                    source_game=out,
+                    source_port="Outcome",
+                    target_game=rd,
+                    target_port="Outcome",
+                ),
+                FeedbackFlow(
+                    source_game=rd,
+                    source_port="Experience",
+                    target_game=pol,
+                    target_port="Experience",
+                ),
+                FeedbackFlow(
+                    source_game=pol,
+                    source_port="History Update",
+                    target_game=hist,
+                    target_port="History Update",
+                ),
+            ],
+            signature=Signature(),
+        )
+
+    # include_outcome=False — 4-game chain: CB >> Hist >> Pol >> RD
+    chain = SequentialComposition(
+        name=name,
+        first=cb,
+        second=hist_pol_rd,
         wiring=[
             Flow(
-                source_game="Context Builder",
+                source_game=cb,
                 source_port="Observation, Context",
-                target_game="Reactive Decision",
+                target_game=rd,
                 target_port="Observation, Context",
             ),
         ],
     )
 
-    # Wrap with feedback loops
+    if not include_feedback:
+        return chain
+
+    # include_outcome=False, include_feedback=True — wrap 4-game chain
     return FeedbackLoop(
         name=name,
-        inner=inner,
+        inner=chain,
         feedback_wiring=[
-            # Outcome → Reactive Decision: utility feedback
-            Flow(
-                source_game="Outcome",
-                source_port="Outcome",
-                target_game="Reactive Decision",
-                target_port="Outcome",
-                direction=FlowDirection.CONTRAVARIANT,
-            ),
-            # Reactive Decision → Policy: experience feedback
-            Flow(
-                source_game="Reactive Decision",
+            FeedbackFlow(
+                source_game=rd,
                 source_port="Experience",
-                target_game="Policy",
+                target_game=pol,
                 target_port="Experience",
-                direction=FlowDirection.CONTRAVARIANT,
             ),
-            # Policy → History: history update feedback
-            Flow(
-                source_game="Policy",
+            FeedbackFlow(
+                source_game=pol,
                 source_port="History Update",
-                target_game="History",
+                target_game=hist,
                 target_port="History Update",
-                direction=FlowDirection.CONTRAVARIANT,
             ),
         ],
-        signature=Signature(),  # computed by validator
+        signature=Signature(),
+    )
+
+
+# ---------------------------------------------------------------------------
+# parallel — N-agent parallel composition helper (#6)
+# ---------------------------------------------------------------------------
+
+
+def parallel(games: list[OpenGame], name: str | None = None) -> ParallelComposition:
+    """Compose a list of games in parallel.
+
+    Convenience wrapper for ``ParallelComposition.from_list()``.  Use this
+    when building N-agent patterns where the number of agents may vary::
+
+        agents = [
+            reactive_decision_agent(f"Agent {i}", include_outcome=False, include_feedback=False)
+            for i in range(1, n + 1)
+        ]
+        agents_parallel = parallel(agents)
+
+    Args:
+        games: At least 2 ``OpenGame`` instances.
+        name: Optional name override. Defaults to ``" | ".join(g.name for g in games)``.
+
+    Raises:
+        ValueError: If fewer than 2 games are provided.
+    """
+    return ParallelComposition.from_list(games, name=name)
+
+
+# ---------------------------------------------------------------------------
+# multi_agent_composition — parallel agents + router + auto-generated feedback (#2)
+# ---------------------------------------------------------------------------
+
+
+def multi_agent_composition(
+    agents: list[OpenGame],
+    router: OpenGame,
+    feedback_port_map: dict[str, tuple[str, str]],
+    wiring: list[Flow] | None = None,
+    name: str | None = None,
+) -> FeedbackLoop:
+    """Compose N open-loop agents in parallel, wire them into a router, and
+    generate all feedback flows automatically.
+
+    This helper encodes the three-step structure that every multi-agent pattern
+    follows:
+
+    1. **Parallel composition** — all agents run side-by-side
+    2. **Sequential composition** — agents feed into the shared ``router``
+    3. **FeedbackLoop** — ``N × K`` contravariant flows (one per agent per
+       feedback channel) route the router's outputs back into each agent
+
+    Args:
+        agents: Open-loop agent games (typically built with
+            ``reactive_decision_agent(..., include_outcome=False,
+            include_feedback=False)``).  Must contain at least 2 agents.
+        router: The shared game that receives all agent decisions and produces
+            per-agent outcomes/feedback signals (e.g. a Decision Router).
+        feedback_port_map: Maps a semantic label to a
+            ``(source_port, target_port)`` pair.  For each entry and each
+            agent, a ``FeedbackFlow`` is generated from
+            ``router.source_port`` → ``agent.target_port``.  Port names are
+            used verbatim; they are NOT prefixed with the agent name.
+
+            Example::
+
+                feedback_port_map={
+                    "outcome":    ("Outcome",        "Outcome"),
+                    "experience": ("Experience",     "Experience"),
+                    "history":    ("History Update", "History Update"),
+                }
+
+        wiring: Optional explicit ``Flow`` overrides for the sequential
+            composition step (agents_parallel >> router).  If omitted, relies
+            on token-overlap auto-wiring.
+        name: Name for the resulting ``FeedbackLoop``.  Defaults to
+            ``f"{router.name} [multi-agent feedback]"``.
+
+    Returns:
+        A ``FeedbackLoop`` wrapping ``(agents_parallel >> router)`` with all
+        ``len(agents) × len(feedback_port_map)`` contravariant flows.
+
+    Raises:
+        ValueError: If fewer than 2 agents are provided.
+
+    Example::
+
+        agent1 = reactive_decision_agent("Agent 1", include_outcome=False, include_feedback=False)
+        agent2 = reactive_decision_agent("Agent 2", include_outcome=False, include_feedback=False)
+        router = my_decision_router()
+
+        game = multi_agent_composition(
+            agents=[agent1, agent2],
+            router=router,
+            feedback_port_map={
+                "outcome":    ("Outcome",        "Outcome"),
+                "experience": ("Experience",     "Experience"),
+                "history":    ("History Update", "History Update"),
+            },
+        )
+    """
+    if len(agents) < 2:
+        raise ValueError(
+            f"multi_agent_composition() requires at least 2 agents, got {len(agents)}"
+        )
+
+    # Step 1: parallel composition of all agents
+    agents_parallel = ParallelComposition.from_list(agents)
+
+    # Step 2: sequential into router
+    inner = SequentialComposition(
+        name=f"{agents_parallel.name} >> {router.name}",
+        first=agents_parallel,
+        second=router,
+        wiring=wiring or [],
+    )
+
+    # Step 3: generate N × K contravariant feedback flows
+    feedback_wiring: list[Flow] = []
+    for agent in agents:
+        for _label, (source_port, target_port) in feedback_port_map.items():
+            feedback_wiring.append(
+                FeedbackFlow(
+                    source_game=router,
+                    source_port=source_port,
+                    target_game=agent,
+                    target_port=target_port,
+                )
+            )
+
+    loop_name = name or f"{router.name} [multi-agent feedback]"
+    return FeedbackLoop(
+        name=loop_name,
+        inner=inner,
+        feedback_wiring=feedback_wiring,
+        signature=Signature(),
     )
