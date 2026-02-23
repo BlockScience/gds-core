@@ -1,5 +1,7 @@
 """Open Games — Typed DSL for Compositional Game Theory."""
 
+__version__ = "0.2.0"
+
 from ogs.dsl.base import OpenGame
 from ogs.dsl.compile import compile_to_ir
 from ogs.dsl.spec_bridge import compile_pattern_to_spec

@@ -24,6 +24,8 @@ jobs:
           - gds-framework
           - gds-viz
           - gds-games
+          - gds-stockflow
+          - gds-control
           - gds-examples
     steps:
       - uses: actions/checkout@v6
