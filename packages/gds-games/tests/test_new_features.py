@@ -10,8 +10,6 @@ Covers:
   #7  discover_patterns() registry
 """
 
-import sys
-import types
 from pathlib import Path
 
 import pytest
@@ -25,11 +23,7 @@ from ogs.dsl import (
     Pattern,
     SequentialComposition,
     compile_to_ir,
-    context_builder,
-    outcome,
     parallel,
-    policy,
-    reactive_decision,
     reactive_decision_agent,
 )
 from ogs.dsl.composition import FeedbackFlow
