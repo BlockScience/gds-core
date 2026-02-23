@@ -29,7 +29,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 dependencies = [
-    "gds-framework>=0.2.0",
+    "gds-framework>=0.2.3",
     "gds-viz>=0.1.0",
 ]
 
