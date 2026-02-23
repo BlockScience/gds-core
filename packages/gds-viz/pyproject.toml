@@ -1,6 +1,6 @@
 [project]
 name = "gds-viz"
-version = "0.1.2"
+dynamic = ["version"]
 description = "Mermaid diagram renderers for gds-framework specifications"
 readme = "README.md"
 license = "Apache-2.0"
@@ -30,7 +30,7 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "gds-framework>=0.2.0",
+    "gds-framework>=0.2.3",
 ]
 
 [project.urls]
@@ -41,6 +41,9 @@ Documentation = "https://blockscience.github.io/gds-core"
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "gds_viz/__init__.py"
 
 [tool.hatch.build.targets.wheel]
 packages = ["gds_viz"]

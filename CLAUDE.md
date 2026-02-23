@@ -146,5 +146,6 @@ Both use the pluggable pattern: `Callable[[T], list[Finding]]`.
 - Tags (`Tagged` mixin) are inert — stripped at compile time, never affect verification
 - Parameters (Θ) are structural metadata — GDS never assigns values or binds them
 - `GDSSpec.collect()` type-dispatches TypeDef/Space/Entity/Block/ParameterDef; SpecWiring stays explicit via `register_wiring()`
+- **Versioning**: `__version__` in each package's `__init__.py` is the single source of truth — `pyproject.toml` reads it via `dynamic = ["version"]` + `[tool.hatch.version]`. When bumping a version, only edit `__init__.py`. When a package starts using a new gds-framework API, bump its `gds-framework>=` lower bound in the same change.
 - Each package published independently to PyPI via tag-based workflow (`gds-framework/v0.3.1`)
 - Per-package CLAUDE.md files contain package-specific architecture details

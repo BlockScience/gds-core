@@ -1,5 +1,7 @@
 """Visualization utilities for GDS specifications."""
 
+__version__ = "0.1.2"
+
 from gds_viz._styles import MermaidTheme
 from gds_viz.architecture import spec_to_mermaid
 from gds_viz.canonical import canonical_to_mermaid
