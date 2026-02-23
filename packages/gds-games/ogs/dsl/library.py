@@ -23,10 +23,8 @@ State evolution per step:
 
 from __future__ import annotations
 
-from functools import reduce
 from typing import Literal, overload
 
-from gds.ir.models import FlowDirection
 
 from ogs.dsl.base import OpenGame
 from ogs.dsl.composition import (
