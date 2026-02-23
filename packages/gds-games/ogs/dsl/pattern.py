@@ -67,3 +67,76 @@ class Pattern(BaseModel):
     action_spaces: list[ActionSpace] | None = None
     initializations: list[StateInitialization] | None = None
     source: str = "dsl"
+
+    def specialize(
+        self,
+        name: str,
+        terminal_conditions: list[TerminalCondition] | None = None,
+        action_spaces: list[ActionSpace] | None = None,
+        initializations: list[StateInitialization] | None = None,
+        inputs: list[PatternInput] | None = None,
+        composition_type: CompositionType | None = None,
+        source: str | None = None,
+    ) -> Pattern:
+        """Create a derived pattern that inherits this pattern's game tree.
+
+        Produces a new ``Pattern`` with the same ``game`` composition tree,
+        overriding only the fields explicitly provided.  ``inputs`` are
+        inherited from the base pattern unless a replacement list is supplied,
+        preventing the input-drift problem where derived patterns silently fall
+        out of sync with their base.
+
+        Args:
+            name: Required name for the derived pattern.
+            terminal_conditions: Domain-specific terminal conditions.  Replaces
+                the base value if provided; otherwise inherits.
+            action_spaces: Domain-specific action spaces.  Replaces the base
+                value if provided; otherwise inherits.
+            initializations: Domain-specific state initializations.  Replaces
+                the base value if provided; otherwise inherits.
+            inputs: If provided, replaces the inherited ``PatternInput`` list
+                entirely.  If omitted, a copy of the base pattern's inputs is
+                used.
+            composition_type: Override the composition type.  Defaults to the
+                base pattern's ``composition_type``.
+            source: Override the provenance tag.  Defaults to the base
+                pattern's ``source``.
+
+        Returns:
+            A new ``Pattern`` instance.  The ``game`` object is shared (not
+            deep-copied) — modifications to the game tree after calling
+            ``specialize()`` will affect both patterns.
+
+        Example::
+
+            from patterns.multi_party_agreement_zoomed_in import pattern as base
+
+            resource_exchange = base.specialize(
+                name="Multi-Party Resource Exchange",
+                terminal_conditions=[
+                    TerminalCondition(name="Agreement", actions={...}, outcome="..."),
+                ],
+                action_spaces=[
+                    ActionSpace(game="Agent 1 Reactive Decision", actions=["accept", "reject"]),
+                ],
+                # inputs inherited from base automatically
+            )
+        """
+        return Pattern(
+            name=name,
+            game=self.game,
+            inputs=list(inputs) if inputs is not None else list(self.inputs),
+            composition_type=composition_type
+            if composition_type is not None
+            else self.composition_type,
+            terminal_conditions=terminal_conditions
+            if terminal_conditions is not None
+            else self.terminal_conditions,
+            action_spaces=action_spaces
+            if action_spaces is not None
+            else self.action_spaces,
+            initializations=initializations
+            if initializations is not None
+            else self.initializations,
+            source=source if source is not None else self.source,
+        )
