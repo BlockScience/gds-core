@@ -1,9 +1,10 @@
 """Open Games — Typed DSL for Compositional Game Theory."""
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 from ogs.dsl.base import OpenGame
 from ogs.dsl.compile import compile_to_ir
+from ogs.dsl.composition import FeedbackFlow
 from ogs.dsl.spec_bridge import compile_pattern_to_spec
 from ogs.dsl.games import AtomicGame, DecisionGame
 from ogs.dsl.pattern import Pattern
@@ -20,6 +21,7 @@ from ogs.ir.models import (
     PatternIR,
 )
 from ogs.ir.serialization import IRDocument, load_ir, save_ir
+from ogs.registry import discover_patterns
 from ogs.reports.generator import generate_reports
 from ogs.verification.engine import verify
 from ogs.verification.findings import Finding, Severity, VerificationReport
@@ -30,6 +32,7 @@ __all__ = [
     "DecisionGame",
     "AtomicGame",
     "Pattern",
+    "FeedbackFlow",
     # Compilation
     "compile_to_ir",
     "compile_pattern_to_spec",
@@ -44,6 +47,8 @@ __all__ = [
     "save_ir",
     "load_ir",
     "IRDocument",
+    # Registry
+    "discover_patterns",
     # IR Models
     "PatternIR",
     "OpenGameIR",
