@@ -6,7 +6,7 @@ cybernetics (Ghani, Hedges et al.) into a single, dependency-light
 Python framework.
 """
 
-__version__ = "0.2.1"
+__version__ = "0.2.3"
 
 # ── Composition algebra ─────────────────────────────────────
 from gds.blocks.base import AtomicBlock, Block
