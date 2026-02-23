@@ -26,7 +26,13 @@ if TYPE_CHECKING:
         history as history,
     )
     from ogs.dsl.library import (
+        multi_agent_composition as multi_agent_composition,
+    )
+    from ogs.dsl.library import (
         outcome as outcome,
+    )
+    from ogs.dsl.library import (
+        parallel as parallel,
     )
     from ogs.dsl.library import (
         policy as policy,
@@ -41,6 +47,7 @@ if TYPE_CHECKING:
 from ogs.dsl.base import OpenGame
 from ogs.dsl.composition import (
     CorecursiveLoop,
+    FeedbackFlow,
     FeedbackLoop,
     Flow,
     ParallelComposition,
@@ -84,7 +91,9 @@ def __getattr__(name: str):
     _library_names = {
         "context_builder",
         "history",
+        "multi_agent_composition",
         "outcome",
+        "parallel",
         "policy",
         "reactive_decision",
         "reactive_decision_agent",
@@ -118,6 +127,7 @@ __all__ = [
     "CounitGame",
     # Composition
     "Flow",
+    "FeedbackFlow",
     "SequentialComposition",
     "ParallelComposition",
     "FeedbackLoop",
@@ -133,8 +143,10 @@ __all__ = [
     # Library (lazy)
     "context_builder",
     "history",
-    "policy",
+    "multi_agent_composition",
     "outcome",
+    "parallel",
+    "policy",
     "reactive_decision",
     "reactive_decision_agent",
     # Errors

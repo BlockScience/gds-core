@@ -70,7 +70,7 @@ References
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from gds.blocks.composition import FeedbackLoop as _GDSFeedbackLoop
 from gds.blocks.composition import ParallelComposition as _GDSParallelComposition
@@ -91,6 +91,11 @@ class Flow(BaseModel, frozen=True):
     Uses game-theory naming (``source_game``/``target_game``). Provides
     ``source_block``/``target_block`` properties for GDS interop (GDS
     composition validators access these attributes).
+
+    ``source_game`` and ``target_game`` accept either a ``str`` (game name)
+    or an ``OpenGame`` instance. When an ``OpenGame`` is provided it is
+    coerced to ``game.name`` immediately at construction time, so the IR
+    and verifier always receive plain strings.
     """
 
     source_game: str
@@ -98,6 +103,18 @@ class Flow(BaseModel, frozen=True):
     target_game: str
     target_port: str
     direction: FlowDirection = FlowDirection.COVARIANT
+
+    @model_validator(mode="before")
+    @classmethod
+    def _resolve_game_refs(cls, data: Any) -> Any:
+        """Coerce OpenGame instances to their name strings."""
+        if not isinstance(data, dict):
+            return data
+        for field in ("source_game", "target_game"):
+            val = data.get(field)
+            if isinstance(val, OpenGame):
+                data[field] = val.name
+        return data
 
     @property
     def source_block(self) -> str:
@@ -108,6 +125,31 @@ class Flow(BaseModel, frozen=True):
     def target_block(self) -> str:
         """GDS-compatible alias for ``target_game``."""
         return self.target_game
+
+
+class FeedbackFlow(Flow):
+    """A ``Flow`` with ``direction`` defaulting to ``CONTRAVARIANT``.
+
+    Use this inside ``FeedbackLoop.feedback_wiring`` to avoid repeating
+    ``direction=FlowDirection.CONTRAVARIANT`` on every flow::
+
+        FeedbackLoop(
+            name="...",
+            inner=chain,
+            feedback_wiring=[
+                FeedbackFlow(source_game="Outcome", source_port="Outcome",
+                             target_game="Reactive Decision", target_port="Outcome"),
+                FeedbackFlow(source_game="Reactive Decision", source_port="Experience",
+                             target_game="Policy", target_port="Experience"),
+            ],
+        )
+
+    Equivalent to ``Flow(..., direction=FlowDirection.CONTRAVARIANT)`` for
+    each entry, but without the repetition. Also accepts ``OpenGame`` objects
+    for ``source_game``/``target_game`` (inherited from ``Flow``).
+    """
+
+    direction: FlowDirection = FlowDirection.CONTRAVARIANT
 
 
 class SequentialComposition(StackComposition, OpenGame):
@@ -217,6 +259,42 @@ class ParallelComposition(_GDSParallelComposition, OpenGame):
 
     def flatten(self) -> list[AtomicGame]:  # type: ignore[override]
         return self.left.flatten() + self.right.flatten()
+
+    @classmethod
+    def from_list(
+        cls,
+        games: list[OpenGame],
+        name: str | None = None,
+    ) -> ParallelComposition:
+        """Compose a list of games in parallel.
+
+        Equivalent to ``games[0] | games[1] | ... | games[N-1]`` but
+        accepts a dynamic list, enabling N-agent patterns without
+        manually enumerating the ``|`` chain.
+
+        Args:
+            games: At least 2 ``OpenGame`` instances.
+            name: Optional name override for the resulting composition.
+                  Defaults to ``" | ".join(g.name for g in games)``.
+
+        Raises:
+            ValueError: If fewer than 2 games are provided.
+
+        Example::
+
+            agents = [reactive_decision_agent(f"Agent {i}") for i in range(1, 4)]
+            agents_parallel = ParallelComposition.from_list(agents)
+        """
+        if len(games) < 2:
+            raise ValueError(
+                f"ParallelComposition.from_list() requires at least 2 games, got {len(games)}"
+            )
+        result: ParallelComposition = games[0] | games[1]  # type: ignore[assignment]
+        for g in games[2:]:
+            result = result | g  # type: ignore[assignment]
+        if name is not None:
+            result = result.model_copy(update={"name": name})
+        return result
 
 
 class FeedbackLoop(_GDSFeedbackLoop, OpenGame):
