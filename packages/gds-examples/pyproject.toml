@@ -31,6 +31,7 @@ classifiers = [
 dependencies = [
     "gds-framework>=0.2.3",
     "gds-viz>=0.1.0",
+    "gds-control>=0.1.0",
 ]
 
 [project.urls]
@@ -41,6 +42,7 @@ Documentation = "https://blockscience.github.io/gds-core"
 [tool.uv.sources]
 gds-framework = { workspace = true }
 gds-viz = { workspace = true }
+gds-control = { workspace = true }
 
 [build-system]
 requires = ["hatchling"]
@@ -56,6 +58,7 @@ only-include = [
     "prisoners_dilemma",
     "sir_epidemic",
     "thermostat",
+    "double_integrator",
 ]
 
 [tool.pytest.ini_options]
@@ -72,11 +75,12 @@ files = [
     "prisoners_dilemma",
     "sir_epidemic",
     "thermostat",
+    "double_integrator",
     "visualize_examples.py",
 ]
 
 [[tool.mypy.overrides]]
-module = ["gds_viz.*", "pytest"]
+module = ["gds_viz.*", "gds_control.*", "pytest"]
 ignore_missing_imports = true
 
 [dependency-groups]
