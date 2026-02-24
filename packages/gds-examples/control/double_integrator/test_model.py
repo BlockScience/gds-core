@@ -1,6 +1,5 @@
 """Tests for the Double Integrator control model (gds-control DSL)."""
 
-
 from double_integrator.model import (
     build_canonical,
     build_model,
@@ -85,8 +84,7 @@ class TestDSLVerification:
         model = build_model()
         report = cs_verify(model)
         undriven = [
-            f for f in report.findings
-            if f.check_id == "CS-001" and not f.passed
+            f for f in report.findings if f.check_id == "CS-001" and not f.passed
         ]
         assert undriven == []
 
@@ -94,8 +92,7 @@ class TestDSLVerification:
         model = build_model()
         report = cs_verify(model)
         unobserved = [
-            f for f in report.findings
-            if f.check_id == "CS-002" and not f.passed
+            f for f in report.findings if f.check_id == "CS-002" and not f.passed
         ]
         assert unobserved == []
 
