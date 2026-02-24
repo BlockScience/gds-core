@@ -13,6 +13,8 @@ Typed DSL for compositional game theory, built on [gds-framework](https://github
 - [Architecture](#architecture)
 - [Game Types](#game-types)
 - [Composition](#composition)
+- [Multi-Agent Helpers](#multi-agent-helpers)
+- [Pattern Registry](#pattern-registry)
 - [IR Layers](#ir-layers)
 - [Verification](#verification)
 - [CLI](#cli)
@@ -53,6 +55,8 @@ print(f"{report.checks_passed}/{report.checks_total} checks passed")
 
 - **6 atomic game types** with port-constraint validators
 - **Pattern composition** — sequential, parallel, feedback, and corecursive operators
+- **Multi-agent helpers** — `parallel()`, `multi_agent_composition()`, `reactive_decision_agent()` with configurable flags
+- **Pattern registry** — `discover_patterns()` auto-discovers patterns from a directory; `Pattern.specialize()` derives named variants
 - **Dual IR** — `PatternIR` for game-theoretic analysis + projection to GDS `SystemIR`
 - **13 verification checks** — type matching (T-001..T-006) and structural validation (S-001..S-007)
 - **Canonical bridge** — `compile_pattern_to_spec()` maps games to `GDSSpec` for `h = f ∘ g` projection
@@ -198,6 +202,140 @@ pair = alice | bob
 system = observation >> (alice | bob) >> payoff
 ```
 
+### FeedbackFlow
+
+A convenience subclass of `Flow` that defaults to `CONTRAVARIANT` direction — avoids repeating `direction=FlowDirection.CONTRAVARIANT` on every feedback wiring:
+
+```python
+from ogs.dsl.composition import FeedbackFlow
+
+FeedbackFlow(source_game="Outcome", source_port="Outcome",
+             target_game="Reactive Decision", target_port="Outcome")
+# equivalent to: Flow(..., direction=FlowDirection.CONTRAVARIANT)
+```
+
+### Object References in Flows
+
+`Flow` and `FeedbackFlow` accept `OpenGame` instances for `source_game`/`target_game` — they are coerced to name strings at construction time:
+
+```python
+out = outcome()
+rd = reactive_decision()
+
+# Pass game objects instead of strings
+FeedbackFlow(source_game=out, source_port="Outcome",
+             target_game=rd, target_port="Outcome")
+```
+
+## Multi-Agent Helpers
+
+### reactive_decision_agent()
+
+Builds a configurable single-agent decision loop from atomic games. Two boolean flags control which components are included:
+
+```python
+from ogs.dsl.library import reactive_decision_agent
+
+# Full 5-game loop with feedback (default)
+agent = reactive_decision_agent("Agent 1")
+
+# Open-loop chain without feedback — for multi-agent patterns
+agent = reactive_decision_agent("Agent 1", include_outcome=False, include_feedback=False)
+```
+
+| `include_outcome` | `include_feedback` | Returns | Games |
+|---|---|---|---|
+| `True` (default) | `True` (default) | `FeedbackLoop` | CB → Hist → Pol → RD → Out + 3 feedback flows |
+| `False` | `True` | `FeedbackLoop` | CB → Hist → Pol → RD + 2 feedback flows |
+| `True` | `False` | `SequentialComposition` | CB → Hist → Pol → RD → Out (open chain) |
+| `False` | `False` | `SequentialComposition` | CB → Hist → Pol → RD (open chain) |
+
+### parallel()
+
+Compose a dynamic list of games in parallel — enables N-agent patterns without manually enumerating the `|` chain:
+
+```python
+from ogs.dsl.library import parallel
+
+agents = [reactive_decision_agent(f"Agent {i}", include_outcome=False, include_feedback=False)
+          for i in range(1, 4)]
+agents_parallel = parallel(agents)
+```
+
+Also available as `ParallelComposition.from_list(games)`.
+
+### multi_agent_composition()
+
+Composes N open-loop agents in parallel, wires them into a shared router, and auto-generates all N × K contravariant feedback flows:
+
+```python
+from ogs.dsl.library import multi_agent_composition
+
+agent1 = reactive_decision_agent("Agent 1", include_outcome=False, include_feedback=False)
+agent2 = reactive_decision_agent("Agent 2", include_outcome=False, include_feedback=False)
+
+game = multi_agent_composition(
+    agents=[agent1, agent2],
+    router=my_decision_router(),
+    feedback_port_map={
+        "outcome":    ("Outcome",        "Outcome"),
+        "experience": ("Experience",     "Experience"),
+        "history":    ("History Update", "History Update"),
+    },
+)
+# Returns FeedbackLoop with 2 × 3 = 6 contravariant feedback flows
+```
+
+The three-step structure: (1) parallel composition of agents, (2) sequential into router, (3) feedback loop with auto-generated flows.
+
+## Pattern Registry
+
+### Pattern.specialize()
+
+Derive a named pattern variant from a base, inheriting the game tree and overriding only metadata:
+
+```python
+base = Pattern(name="Base", game=game_tree, inputs=[...])
+
+variant = base.specialize(
+    name="Resource Exchange",
+    terminal_conditions=[TerminalCondition(name="Agreement", ...)],
+    action_spaces=[ActionSpace(game="Agent 1 Reactive Decision", actions=["accept", "reject"])],
+    # inputs inherited from base automatically
+)
+```
+
+The game tree is shared (not deep-copied). All other fields (`inputs`, `terminal_conditions`, `action_spaces`, `initializations`, `composition_type`, `source`) inherit from the base unless explicitly overridden.
+
+### discover_patterns()
+
+Auto-discover all `Pattern` objects from Python files in a directory:
+
+```python
+from ogs.registry import discover_patterns
+
+# Scan directory for modules with a `pattern` attribute
+all_patterns = discover_patterns("./patterns")
+
+for name, pattern in all_patterns.items():
+    ir = compile_to_ir(pattern)
+    report = verify(ir)
+```
+
+Skips `__init__.py` and `_`-prefixed files. Silently skips modules that fail to import. Returns an ordered dict mapping module stem name to `Pattern` object.
+
+Works well with pytest parametrize for batch verification:
+
+```python
+ALL_PATTERNS = discover_patterns(PATTERNS_DIR)
+
+@pytest.mark.parametrize("name,pattern", ALL_PATTERNS.items())
+def test_compile_all(name, pattern):
+    ir = compile_to_ir(pattern)
+    report = verify(ir)
+    assert report.passed
+```
+
 ## IR Layers
 
 ### PatternIR (domain-specific)
@@ -284,7 +422,7 @@ Three tutorial examples in [`gds-examples`](https://github.com/BlockScience/gds-
 
 ## Status
 
-**v0.2.0 — Alpha.** Full DSL with 6 game types, 13 verification checks, 7 report templates, 6 diagram generators, canonical GDS bridge, and CLI. 229 tests.
+**v0.3.0 — Alpha.** Full DSL with 6 game types, 13 verification checks, 7 report templates, 6 diagram generators, canonical GDS bridge, CLI, multi-agent composition helpers, and pattern registry. 303 tests.
 
 ## License
 
