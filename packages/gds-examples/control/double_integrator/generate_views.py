@@ -11,6 +11,7 @@ or viewed in VS Code / Obsidian markdown preview.
 import sys
 from pathlib import Path
 
+from double_integrator.model import build_spec, build_system
 from gds.canonical import project_canonical
 from gds_viz import (
     canonical_to_mermaid,
@@ -19,7 +20,6 @@ from gds_viz import (
     system_to_mermaid,
     trace_to_mermaid,
 )
-from double_integrator.model import build_spec, build_system
 
 TITLE = "Double Integrator"
 
