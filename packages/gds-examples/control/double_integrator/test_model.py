@@ -1,9 +1,13 @@
 """Tests for the Double Integrator control model (gds-control DSL)."""
 
-import pytest
 
+from double_integrator.model import (
+    build_canonical,
+    build_model,
+    build_spec,
+    build_system,
+)
 from gds.blocks.roles import BoundaryAction, Mechanism, Policy
-from gds.canonical import project_canonical
 from gds.ir.models import FlowDirection
 from gds.query import SpecQuery
 from gds.verification.engine import verify
@@ -19,11 +23,7 @@ from gds.verification.spec_checks import (
     check_determinism,
     check_type_safety,
 )
-
 from gds_control.verification.engine import verify as cs_verify
-
-from double_integrator.model import build_canonical, build_model, build_spec, build_system
-
 
 # ── Model Declaration ──────────────────────────────────────────
 
@@ -84,13 +84,19 @@ class TestDSLVerification:
     def test_no_undriven_states(self):
         model = build_model()
         report = cs_verify(model)
-        undriven = [f for f in report.findings if f.check_id == "CS-001" and not f.passed]
+        undriven = [
+            f for f in report.findings
+            if f.check_id == "CS-001" and not f.passed
+        ]
         assert undriven == []
 
     def test_no_unobserved_states(self):
         model = build_model()
         report = cs_verify(model)
-        unobserved = [f for f in report.findings if f.check_id == "CS-002" and not f.passed]
+        unobserved = [
+            f for f in report.findings
+            if f.check_id == "CS-002" and not f.passed
+        ]
         assert unobserved == []
 
 

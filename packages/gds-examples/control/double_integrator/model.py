@@ -37,7 +37,6 @@ Composition (auto-generated):
 from gds.canonical import CanonicalGDS, project_canonical
 from gds.ir.models import SystemIR
 from gds.spec import GDSSpec
-
 from gds_control.dsl.compile import compile_model, compile_to_system
 from gds_control.dsl.elements import Controller, Input, Sensor, State
 from gds_control.dsl.model import ControlModel
@@ -94,8 +93,9 @@ def build_system() -> SystemIR:
     """Compile the ControlModel to SystemIR via the composition tree.
 
     The compiler builds:
-        (force | pos_sensor | vel_sensor) >> PD >> (position Dynamics | velocity Dynamics)
-            .loop([
+        (force | pos_sensor | vel_sensor) >> PD
+            >> (position Dynamics | velocity Dynamics)
+        .loop([
                 position Dynamics → pos_sensor (COVARIANT),
                 velocity Dynamics → vel_sensor (COVARIANT),
             ])
