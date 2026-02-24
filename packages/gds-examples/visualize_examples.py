@@ -22,6 +22,7 @@ def main():
         ("Lotka-Volterra", "lotka_volterra.model"),
         ("Prisoner's Dilemma", "prisoners_dilemma.model"),
         ("Crosswalk Problem", "crosswalk.model"),
+        ("Double Integrator", "double_integrator.model"),
     ]
 
     for name, module_path in examples:

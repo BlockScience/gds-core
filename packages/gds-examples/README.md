@@ -4,7 +4,15 @@
 [![Python](https://img.shields.io/pypi/pyversions/gds-examples)](https://pypi.org/project/gds-examples/)
 [![License](https://img.shields.io/github/license/BlockScience/gds-examples)](LICENSE)
 
-Six complete domain models demonstrating every [gds-framework](https://github.com/BlockScience/gds-framework) feature. Each `model.py` is written as a tutorial chapter with inline GDS theory commentary — read them in order.
+Six complete domain models demonstrating every [gds-framework](https://github.com/BlockScience/gds-core/tree/main/packages/gds-framework) feature. Each `model.py` is written as a tutorial chapter with inline GDS theory commentary — read them in order.
+
+Examples are organized by domain and built using the GDS framework primitives directly. For higher-level domain DSLs that compile to GDS automatically, see the individual packages:
+
+| Domain | DSL Package | Examples Here |
+|--------|-------------|---------------|
+| System dynamics | [gds-stockflow](https://github.com/BlockScience/gds-core/tree/main/packages/gds-stockflow) | SIR Epidemic, Lotka-Volterra |
+| Control theory | [gds-control](https://github.com/BlockScience/gds-core/tree/main/packages/gds-control) | Thermostat PID |
+| Game theory | [gds-games](https://github.com/BlockScience/gds-core/tree/main/packages/gds-games) | Prisoner's Dilemma, Insurance, Crosswalk |
 
 ## Table of Contents
 
@@ -20,14 +28,14 @@ Six complete domain models demonstrating every [gds-framework](https://github.co
 
 Start with SIR Epidemic and work down. Each example introduces one new concept.
 
-| # | Example | New Concept | Composition | Roles |
-|:-:|---------|-------------|-------------|-------|
-| 1 | [SIR Epidemic](#sir-epidemic) | Fundamentals — TypeDef, Entity, Space, blocks | `>>` `\|` | BA, P, M |
-| 2 | [Thermostat PID](#thermostat-pid) | `.feedback()`, CONTRAVARIANT backward flow | `>>` `.feedback()` | BA, P, CA, M |
-| 3 | [Lotka-Volterra](#lotka-volterra) | `.loop()`, COVARIANT temporal iteration | `>>` `\|` `.loop()` | BA, P, M |
-| 4 | [Prisoner's Dilemma](#prisoners-dilemma) | Nested `\|`, multi-entity X, complex trees | `\|` `>>` `.loop()` | BA, P, M |
-| 5 | [Insurance Contract](#insurance-contract) | ControlAction role, complete 4-role taxonomy | `>>` | BA, P, CA, M |
-| 6 | [Crosswalk Problem](#crosswalk-problem) | Mechanism design, discrete Markov transitions | `>>` | BA, P, CA, M |
+| # | Example | Domain | New Concept | Composition | Roles |
+|:-:|---------|--------|-------------|-------------|-------|
+| 1 | [SIR Epidemic](#sir-epidemic) | Stock-flow | Fundamentals — TypeDef, Entity, Space, blocks | `>>` `\|` | BA, P, M |
+| 2 | [Thermostat PID](#thermostat-pid) | Control | `.feedback()`, CONTRAVARIANT backward flow | `>>` `.feedback()` | BA, P, CA, M |
+| 3 | [Lotka-Volterra](#lotka-volterra) | Stock-flow | `.loop()`, COVARIANT temporal iteration | `>>` `\|` `.loop()` | BA, P, M |
+| 4 | [Prisoner's Dilemma](#prisoners-dilemma) | Games | Nested `\|`, multi-entity X, complex trees | `\|` `>>` `.loop()` | BA, P, M |
+| 5 | [Insurance Contract](#insurance-contract) | Games | ControlAction role, complete 4-role taxonomy | `>>` | BA, P, CA, M |
+| 6 | [Crosswalk Problem](#crosswalk-problem) | Games | Mechanism design, discrete Markov transitions | `>>` | BA, P, CA, M |
 
 **Roles:** BA = BoundaryAction, P = Policy, CA = ControlAction, M = Mechanism
 
@@ -35,25 +43,41 @@ Start with SIR Epidemic and work down. Each example introduces one new concept.
 
 ```bash
 # Run all example tests (168 tests)
-uv run pytest examples/ -v
+uv run --package gds-examples pytest packages/gds-examples -v
 
 # Run a specific example
-uv run pytest examples/sir_epidemic/ -v
+uv run --package gds-examples pytest packages/gds-examples/stockflow/sir_epidemic/ -v
 
 # Generate all structural diagrams
-uv run python examples/visualize_examples.py
+uv run python packages/gds-examples/visualize_examples.py
 
 # Generate all 6 views for one example
-uv run python examples/sir_epidemic/generate_views.py          # print to stdout
-uv run python examples/sir_epidemic/generate_views.py --save   # write VIEWS.md
+uv run python packages/gds-examples/stockflow/sir_epidemic/generate_views.py          # print to stdout
+uv run python packages/gds-examples/stockflow/sir_epidemic/generate_views.py --save   # write VIEWS.md
 ```
 
 ## File Structure
 
-Each example follows the same layout:
+Examples are organized by domain, each following the same layout:
 
 ```
-examples/sir_epidemic/
+packages/gds-examples/
+├── stockflow/
+│   ├── sir_epidemic/           # Epidemiology — basic roles + composition
+│   └── lotka_volterra/         # Population dynamics — temporal loops
+├── control/
+│   └── thermostat/             # Control theory — feedback composition
+├── games/
+│   ├── prisoners_dilemma/      # Game theory — nested parallel + loops
+│   ├── insurance/              # Finance — 4-role taxonomy
+│   └── crosswalk/              # Mechanism design — Markov transitions
+└── visualize_examples.py       # Generate structural diagrams for all
+```
+
+Each example contains:
+
+```
+sir_epidemic/
 ├── __init__.py          # empty
 ├── model.py             # types, entities, spaces, blocks, build_spec(), build_system()
 ├── test_model.py        # comprehensive tests for every layer
@@ -65,7 +89,7 @@ examples/sir_epidemic/
 
 ### SIR Epidemic
 
-**Start here.** 3 compartments (Susceptible, Infected, Recovered) with contact-driven infection dynamics.
+**Start here.** 3 compartments (Susceptible, Infected, Recovered) with contact-driven infection dynamics. Models the core stock-flow pattern: accumulation levels change via rate flows.
 
 ```
 X = (S, I, R)    U = contact_rate    g = infection_policy    f = (update_s, update_i, update_r)    Θ = {beta, gamma, contact_rate}
@@ -88,13 +112,15 @@ contact >> infection_policy >> (update_s | update_i | update_r)
 
 </details>
 
-**Files:** [model.py](sir_epidemic/model.py) · [tests](sir_epidemic/test_model.py) · [views](sir_epidemic/VIEWS.md)
+**Domain:** Stock-flow — see [gds-stockflow](https://github.com/BlockScience/gds-core/tree/main/packages/gds-stockflow) for the declarative DSL
+
+**Files:** [model.py](stockflow/sir_epidemic/model.py) · [tests](stockflow/sir_epidemic/test_model.py) · [views](stockflow/sir_epidemic/VIEWS.md)
 
 ---
 
 ### Thermostat PID
 
-**Adds feedback** — backward information flow within a single timestep.
+**Adds feedback** — backward information flow within a single timestep. Models a classic sensor → controller → plant control loop with energy cost feedback.
 
 ```
 X = (T, E)    U = measured_temp    g = pid_controller    f = update_room    Θ = {setpoint, Kp, Ki, Kd}
@@ -116,13 +142,15 @@ X = (T, E)    U = measured_temp    g = pid_controller    f = update_room    Θ =
 
 </details>
 
-**Files:** [model.py](thermostat/model.py) · [tests](thermostat/test_model.py) · [views](thermostat/VIEWS.md)
+**Domain:** Control — see [gds-control](https://github.com/BlockScience/gds-core/tree/main/packages/gds-control) for the declarative DSL
+
+**Files:** [model.py](control/thermostat/model.py) · [tests](control/thermostat/test_model.py) · [views](control/thermostat/VIEWS.md)
 
 ---
 
 ### Lotka-Volterra
 
-**Adds temporal loops** — forward iteration across timesteps.
+**Adds temporal loops** — forward iteration across timesteps. Predator-prey dynamics where population levels at timestep *t* feed rate computations at *t+1*.
 
 ```
 X = (x, y)    U = population_signal    g = compute_rates    f = (update_prey, update_predator)    Θ = {prey_birth_rate, ...}
@@ -144,13 +172,15 @@ X = (x, y)    U = population_signal    g = compute_rates    f = (update_prey, up
 
 </details>
 
-**Files:** [model.py](lotka_volterra/model.py) · [tests](lotka_volterra/test_model.py) · [views](lotka_volterra/VIEWS.md)
+**Domain:** Stock-flow — see [gds-stockflow](https://github.com/BlockScience/gds-core/tree/main/packages/gds-stockflow) for the declarative DSL
+
+**Files:** [model.py](stockflow/lotka_volterra/model.py) · [tests](stockflow/lotka_volterra/test_model.py) · [views](stockflow/lotka_volterra/VIEWS.md)
 
 ---
 
 ### Prisoner's Dilemma
 
-**Most complex composition** — nested parallel + sequential + temporal loop.
+**Most complex composition** — nested parallel + sequential + temporal loop. Two agents independently choose strategies, receive payoffs, and update their world models across rounds.
 
 ```
 X = (s_A, U_A, s_B, U_B, t)    U = game_config    g = (alice, bob)    f = (payoff, world_models)    Θ = {}
@@ -171,13 +201,15 @@ system = pipeline.loop([world models -> decisions])
 
 </details>
 
-**Files:** [model.py](prisoners_dilemma/model.py) · [tests](prisoners_dilemma/test_model.py) · [views](prisoners_dilemma/VIEWS.md) · [architecture viz](prisoners_dilemma/visualize.py)
+**Domain:** Game theory — see [gds-games](https://github.com/BlockScience/gds-core/tree/main/packages/gds-games) for the OGS DSL with compositional game patterns
+
+**Files:** [model.py](games/prisoners_dilemma/model.py) · [tests](games/prisoners_dilemma/test_model.py) · [views](games/prisoners_dilemma/VIEWS.md) · [architecture viz](games/prisoners_dilemma/visualize.py)
 
 ---
 
 ### Insurance Contract
 
-**Completes the role taxonomy** — the only example using all 4 block roles.
+**Completes the role taxonomy** — the only example using all 4 block roles. Models claim events flowing through risk assessment, premium calculation, and reserve updates.
 
 ```
 X = (R, P, C, H)    U = claim_event    g = risk_assessment    d = premium_calculation    f = (claim_payout, reserve_update)    Θ = {base_premium_rate, deductible, coverage_limit}
@@ -198,7 +230,9 @@ claim >> risk >> premium >> payout >> reserve_update
 
 </details>
 
-**Files:** [model.py](insurance/model.py) · [tests](insurance/test_model.py) · [views](insurance/VIEWS.md)
+**Domain:** Game theory / finance — see [gds-games](https://github.com/BlockScience/gds-core/tree/main/packages/gds-games) for the OGS DSL
+
+**Files:** [model.py](games/insurance/model.py) · [tests](games/insurance/test_model.py) · [views](games/insurance/VIEWS.md)
 
 ---
 
@@ -224,11 +258,13 @@ observe >> decide >> check >> transition
 
 </details>
 
-**Files:** [model.py](crosswalk/model.py) · [tests](crosswalk/test_model.py) · [views](crosswalk/VIEWS.md) · [README](crosswalk/README.md)
+**Domain:** Game theory / mechanism design — see [gds-games](https://github.com/BlockScience/gds-core/tree/main/packages/gds-games) for the OGS DSL
+
+**Files:** [model.py](games/crosswalk/model.py) · [tests](games/crosswalk/test_model.py) · [views](games/crosswalk/VIEWS.md) · [README](games/crosswalk/README.md)
 
 ## Visualization Views
 
-Each example includes a `generate_views.py` script that produces 6 complementary views via [`gds-viz`](https://github.com/BlockScience/gds-viz):
+Each example includes a `generate_views.py` script that produces 6 complementary views via [`gds-viz`](https://github.com/BlockScience/gds-core/tree/main/packages/gds-viz):
 
 | View | Input | What It Shows |
 |------|-------|--------------|
@@ -332,15 +368,15 @@ flowchart LR
 
 </details>
 
-Each example's [VIEWS.md](sir_epidemic/VIEWS.md) contains all 6 views with commentary. Output is Mermaid markdown — renders in GitHub, GitLab, VS Code, Obsidian, and [mermaid.live](https://mermaid.live).
+Each example's [VIEWS.md](stockflow/sir_epidemic/VIEWS.md) contains all 6 views with commentary. Output is Mermaid markdown — renders in GitHub, GitLab, VS Code, Obsidian, and [mermaid.live](https://mermaid.live).
 
 ```bash
 # Generate views for one example
-uv run python examples/sir_epidemic/generate_views.py --save
+uv run python packages/gds-examples/stockflow/sir_epidemic/generate_views.py --save
 
 # Generate views for all examples
-for d in sir_epidemic thermostat lotka_volterra prisoners_dilemma insurance crosswalk; do
-    uv run python examples/$d/generate_views.py --save
+for d in stockflow/sir_epidemic stockflow/lotka_volterra control/thermostat games/prisoners_dilemma games/insurance games/crosswalk; do
+    uv run python packages/gds-examples/$d/generate_views.py --save
 done
 ```
 
