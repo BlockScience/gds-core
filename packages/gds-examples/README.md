@@ -4,15 +4,15 @@
 [![Python](https://img.shields.io/pypi/pyversions/gds-examples)](https://pypi.org/project/gds-examples/)
 [![License](https://img.shields.io/github/license/BlockScience/gds-examples)](LICENSE)
 
-Six complete domain models demonstrating every [gds-framework](https://github.com/BlockScience/gds-core/tree/main/packages/gds-framework) feature. Each `model.py` is written as a tutorial chapter with inline GDS theory commentary — read them in order.
+Complete domain models demonstrating every [gds-framework](https://github.com/BlockScience/gds-core/tree/main/packages/gds-framework) feature. Each `model.py` is written as a tutorial chapter with inline GDS theory commentary — read them in order.
 
-Examples are organized by domain and built using the GDS framework primitives directly. For higher-level domain DSLs that compile to GDS automatically, see the individual packages:
+Examples are organized by domain. Some are built using GDS framework primitives directly, while others use higher-level domain DSLs that compile to GDS automatically. See the individual DSL packages:
 
-| Domain | DSL Package | Examples Here |
-|--------|-------------|---------------|
-| System dynamics | [gds-stockflow](https://github.com/BlockScience/gds-core/tree/main/packages/gds-stockflow) | SIR Epidemic, Lotka-Volterra |
-| Control theory | [gds-control](https://github.com/BlockScience/gds-core/tree/main/packages/gds-control) | Thermostat PID |
-| Game theory | [gds-games](https://github.com/BlockScience/gds-core/tree/main/packages/gds-games) | Prisoner's Dilemma, Insurance, Crosswalk |
+| Domain | DSL Package | Raw GDS Examples | DSL Examples |
+|--------|-------------|-------------------|--------------|
+| System dynamics | [gds-stockflow](https://github.com/BlockScience/gds-core/tree/main/packages/gds-stockflow) | SIR Epidemic, Lotka-Volterra | SIR Epidemic (DSL) |
+| Control theory | [gds-control](https://github.com/BlockScience/gds-core/tree/main/packages/gds-control) | Thermostat PID | Double Integrator |
+| Game theory | [gds-games](https://github.com/BlockScience/gds-core/tree/main/packages/gds-games) | Prisoner's Dilemma, Insurance, Crosswalk | — |
 
 ## Table of Contents
 
@@ -31,6 +31,7 @@ Start with SIR Epidemic and work down. Each example introduces one new concept.
 | # | Example | Domain | New Concept | Composition | Roles |
 |:-:|---------|--------|-------------|-------------|-------|
 | 1 | [SIR Epidemic](#sir-epidemic) | Stock-flow | Fundamentals — TypeDef, Entity, Space, blocks | `>>` `\|` | BA, P, M |
+| 1b | [SIR Epidemic (DSL)](#sir-epidemic-dsl) | Stock-flow | gds-stockflow DSL — same model, declarative style | auto | BA, P, M |
 | 2 | [Thermostat PID](#thermostat-pid) | Control | `.feedback()`, CONTRAVARIANT backward flow | `>>` `.feedback()` | BA, P, CA, M |
 | 3 | [Lotka-Volterra](#lotka-volterra) | Stock-flow | `.loop()`, COVARIANT temporal iteration | `>>` `\|` `.loop()` | BA, P, M |
 | 4 | [Prisoner's Dilemma](#prisoners-dilemma) | Games | Nested `\|`, multi-entity X, complex trees | `\|` `>>` `.loop()` | BA, P, M |
@@ -63,10 +64,12 @@ Examples are organized by domain, each following the same layout:
 ```
 packages/gds-examples/
 ├── stockflow/
-│   ├── sir_epidemic/           # Epidemiology — basic roles + composition
+│   ├── sir_epidemic/           # Epidemiology — basic roles + composition (raw GDS)
+│   ├── sir_epidemic_dsl/       # Epidemiology — same model via gds-stockflow DSL
 │   └── lotka_volterra/         # Population dynamics — temporal loops
 ├── control/
-│   └── thermostat/             # Control theory — feedback composition
+│   ├── thermostat/             # Control theory — feedback composition
+│   └── double_integrator/      # State-space control via gds-control DSL
 ├── games/
 │   ├── prisoners_dilemma/      # Game theory — nested parallel + loops
 │   ├── insurance/              # Finance — 4-role taxonomy
@@ -115,6 +118,41 @@ contact >> infection_policy >> (update_s | update_i | update_r)
 **Domain:** Stock-flow — see [gds-stockflow](https://github.com/BlockScience/gds-core/tree/main/packages/gds-stockflow) for the declarative DSL
 
 **Files:** [model.py](stockflow/sir_epidemic/model.py) · [tests](stockflow/sir_epidemic/test_model.py) · [views](stockflow/sir_epidemic/VIEWS.md)
+
+---
+
+### SIR Epidemic (DSL)
+
+**Same model, declarative style.** Reimplements the SIR epidemic using the `gds-stockflow` DSL. Instead of manually constructing TypeDefs, Entities, Spaces, Blocks, and wiring, you declare Stocks, Flows, Auxiliaries, and Converters — the compiler handles all GDS mapping automatically.
+
+```
+Stocks: Susceptible, Infected, Recovered
+Flows: Infection (S→I), Recovery (I→R)
+Auxiliaries: Infection Rate, Recovery Rate
+Converters: Contact Rate, Recovery Time
+```
+```python
+# The entire model in ~20 lines of declarations
+model = StockFlowModel(name="SIR Epidemic", stocks=[...], flows=[...], auxiliaries=[...], converters=[...])
+spec = compile_model(model)       # → GDSSpec with 9 blocks, 3 entities
+system = compile_to_system(model)  # → SystemIR with temporal loops
+```
+
+<details>
+<summary>What you'll learn</summary>
+
+- StockFlowModel declarative API (Stock, Flow, Auxiliary, Converter)
+- compile_model() for automatic GDSSpec generation (types, spaces, entities, blocks, wirings)
+- compile_to_system() for automatic composition with temporal loops
+- SF-001..SF-005 domain verification checks
+- Comparison: ~200 lines of manual GDS vs ~20 lines of DSL declarations
+- How DSL elements map to GDS roles (Converter → BoundaryAction, Auxiliary/Flow → Policy, Stock → Mechanism + Entity)
+
+</details>
+
+**Domain:** Stock-flow — built with [gds-stockflow](https://github.com/BlockScience/gds-core/tree/main/packages/gds-stockflow) DSL
+
+**Files:** [model.py](stockflow/sir_epidemic_dsl/model.py) · [tests](stockflow/sir_epidemic_dsl/test_sir_epidemic_dsl.py) · [views](stockflow/sir_epidemic_dsl/VIEWS.md)
 
 ---
 
@@ -375,28 +413,29 @@ Each example's [VIEWS.md](stockflow/sir_epidemic/VIEWS.md) contains all 6 views 
 uv run python packages/gds-examples/stockflow/sir_epidemic/generate_views.py --save
 
 # Generate views for all examples
-for d in stockflow/sir_epidemic stockflow/lotka_volterra control/thermostat games/prisoners_dilemma games/insurance games/crosswalk; do
+for d in stockflow/sir_epidemic stockflow/sir_epidemic_dsl stockflow/lotka_volterra control/thermostat games/prisoners_dilemma games/insurance games/crosswalk; do
     uv run python packages/gds-examples/$d/generate_views.py --save
 done
 ```
 
 ## Feature Coverage Matrix
 
-| Feature | SIR | Thermostat | Lotka-V | Prisoner's D | Insurance | Crosswalk |
-|---|:---:|:---:|:---:|:---:|:---:|:---:|
-| BoundaryAction | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Policy | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Mechanism | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| ControlAction | | ✓ | | | ✓ | ✓ |
-| `>>` (sequential) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| `\|` (parallel) | ✓ | | ✓ | ✓ | | |
-| `.feedback()` | | ✓ | | | | |
-| `.loop()` | | | ✓ | ✓ | | |
-| CONTRAVARIANT wiring | | ✓ | | | | |
-| Temporal wiring | | | ✓ | ✓ | | |
-| Multi-variable Entity | | ✓ | | ✓ | ✓ | |
-| Multiple entities | ✓ | | ✓ | ✓ | ✓ | |
-| Parameters (Θ) | ✓ | ✓ | ✓ | | ✓ | ✓ |
+| Feature | SIR | SIR DSL | Thermostat | Lotka-V | Prisoner's D | Insurance | Crosswalk |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| BoundaryAction | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Policy | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Mechanism | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| ControlAction | | | ✓ | | | ✓ | ✓ |
+| `>>` (sequential) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| `\|` (parallel) | ✓ | ✓ | | ✓ | ✓ | | |
+| `.feedback()` | | | ✓ | | | | |
+| `.loop()` | | ✓ | | ✓ | ✓ | | |
+| CONTRAVARIANT wiring | | | ✓ | | | | |
+| Temporal wiring | | ✓ | | ✓ | ✓ | | |
+| Multi-variable Entity | | | ✓ | | ✓ | ✓ | |
+| Multiple entities | ✓ | ✓ | | ✓ | ✓ | ✓ | |
+| Parameters (Θ) | ✓ | ✓ | ✓ | ✓ | | ✓ | ✓ |
+| Domain DSL | | ✓ | | | | | |
 
 ## Building New Examples
 

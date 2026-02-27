@@ -32,6 +32,7 @@ dependencies = [
     "gds-framework>=0.2.3",
     "gds-viz>=0.1.0",
     "gds-control>=0.1.0",
+    "gds-stockflow>=0.1.0",
 ]
 
 [project.urls]
@@ -43,6 +44,7 @@ Documentation = "https://blockscience.github.io/gds-core"
 gds-framework = { workspace = true }
 gds-viz = { workspace = true }
 gds-control = { workspace = true }
+gds-stockflow = { workspace = true }
 
 [build-system]
 requires = ["hatchling"]
@@ -57,6 +59,7 @@ only-include = [
     "lotka_volterra",
     "prisoners_dilemma",
     "sir_epidemic",
+    "sir_epidemic_dsl",
     "thermostat",
     "double_integrator",
 ]
@@ -74,13 +77,14 @@ files = [
     "lotka_volterra",
     "prisoners_dilemma",
     "sir_epidemic",
+    "sir_epidemic_dsl",
     "thermostat",
     "double_integrator",
     "visualize_examples.py",
 ]
 
 [[tool.mypy.overrides]]
-module = ["gds_viz.*", "gds_control.*", "pytest"]
+module = ["gds_viz.*", "gds_control.*", "stockflow.*", "pytest"]
 ignore_missing_imports = true
 
 [dependency-groups]
