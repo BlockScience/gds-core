@@ -442,9 +442,7 @@ class TestCrossStageVerification:
 # Marimo Notebook
 # ══════════════════════════════════════════════════════════════
 
-_NOTEBOOK = (
-    Path(__file__).resolve().parent / "notebook.py"
-)
+_NOTEBOOK = Path(__file__).resolve().parent / "notebook.py"
 
 
 class TestMarimoNotebook:
@@ -467,9 +465,7 @@ class TestMarimoNotebook:
         assert count >= 10, f"Expected 10+ cells, found {count}"
 
     def test_loads_as_module(self):
-        spec = importlib.util.spec_from_file_location(
-            "notebook", _NOTEBOOK
-        )
+        spec = importlib.util.spec_from_file_location("notebook", _NOTEBOOK)
         mod = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(mod)
         assert hasattr(mod, "app")
