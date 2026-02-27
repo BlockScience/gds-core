@@ -17,12 +17,13 @@ SpecQuery answers: "How does information flow through my specification?"
 
 from gds.query import SpecQuery
 from gds.spec import GDSSpec
-from guides.getting_started.stage3_dsl import build_spec
 
 
 def build_query(spec: GDSSpec | None = None) -> SpecQuery:
     """Create a SpecQuery for the thermostat model."""
     if spec is None:
+        from guides.getting_started.stage3_dsl import build_spec
+
         spec = build_spec()
     return SpecQuery(spec)
 
@@ -79,6 +80,8 @@ def show_dependency_graph(query: SpecQuery) -> dict[str, set[str]]:
 
 
 if __name__ == "__main__":
+    from guides.getting_started.stage3_dsl import build_spec
+
     spec = build_spec()
     query = build_query(spec)
 

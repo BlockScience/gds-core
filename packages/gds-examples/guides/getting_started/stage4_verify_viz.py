@@ -48,7 +48,6 @@ from gds.verification.spec_checks import (
     check_type_safety,
 )
 from gds_viz import canonical_to_mermaid, spec_to_mermaid, system_to_mermaid
-from guides.getting_started.stage3_dsl import build_spec, build_system
 
 
 def run_generic_checks(system: SystemIR) -> VerificationReport:
@@ -132,6 +131,8 @@ def generate_canonical_view(spec: GDSSpec) -> str:
 
 
 if __name__ == "__main__":
+    from guides.getting_started.stage3_dsl import build_spec, build_system
+
     spec = build_spec()
     system = build_system()
 
