@@ -7,7 +7,7 @@ thermostat control system. Run with: marimo run notebook.py
 import marimo
 
 __generated_with = "0.13.0"
-app = marimo.App(width="medium")
+app = marimo.App(width="medium", app_title="GDS Getting Started Guide")
 
 
 @app.cell
