@@ -5,9 +5,8 @@ produces valid GDS output without errors.
 """
 
 import importlib
+import importlib.util
 from pathlib import Path
-
-import pytest
 
 from gds.blocks.roles import BoundaryAction, Mechanism, Policy
 from gds.ir.models import FlowDirection
@@ -467,10 +466,6 @@ class TestMarimoNotebook:
         count = source.count("@app.cell")
         assert count >= 10, f"Expected 10+ cells, found {count}"
 
-    @pytest.mark.skipif(
-        importlib.util.find_spec("marimo") is None,
-        reason="marimo not installed",
-    )
     def test_loads_as_module(self):
         spec = importlib.util.spec_from_file_location(
             "notebook", _NOTEBOOK
