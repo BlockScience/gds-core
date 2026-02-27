@@ -13,12 +13,18 @@ Available themes:
     "forest"   -- green-tinted, earthy nature-inspired fills
     "base"     -- minimal chrome, very light fills, thin strokes
 
-Usage:
-    uv run python guides/visualization/theme_customization.py
+Usage (interactive notebook):
+    uv run marimo edit packages/gds-examples/guides/visualization/notebook.py
+
+Usage (tests):
+    uv run --package gds-examples pytest packages/gds-examples/guides/visualization/ -v
+
+Note: This module is designed to be imported by the test suite and marimo
+notebook, which handle sys.path setup via conftest.py. Running as a
+standalone script requires stockflow/ and control/ on sys.path.
 """
 
-from gds_viz import system_to_mermaid
-from gds_viz._styles import MermaidTheme
+from gds_viz import MermaidTheme, system_to_mermaid
 
 # All 5 built-in themes
 ALL_THEMES: list[MermaidTheme] = ["neutral", "default", "dark", "forest", "base"]

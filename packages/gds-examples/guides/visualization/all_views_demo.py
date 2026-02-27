@@ -13,8 +13,15 @@ base. Each view provides a different perspective on the same system:
 All views produce Mermaid markdown that renders in GitHub, GitLab,
 VS Code, Obsidian, and mermaid.live.
 
-Usage:
-    uv run python guides/visualization/all_views_demo.py
+Usage (interactive notebook):
+    uv run marimo edit packages/gds-examples/guides/visualization/notebook.py
+
+Usage (tests):
+    uv run --package gds-examples pytest packages/gds-examples/guides/visualization/ -v
+
+Note: This module is designed to be imported by the test suite and marimo
+notebook, which handle sys.path setup via conftest.py. Running as a
+standalone script requires stockflow/ and control/ on sys.path.
 """
 
 from gds.canonical import project_canonical

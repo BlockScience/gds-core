@@ -346,13 +346,14 @@ A dedicated guide at [`guides/visualization/`](guides/visualization/) makes [`gd
 | [`test_visualization_guide.py`](guides/visualization/test_visualization_guide.py) | Tests verifying all scripts produce valid Mermaid output |
 
 ```bash
+# Launch the interactive marimo notebook (recommended)
+uv run marimo edit packages/gds-examples/guides/visualization/notebook.py
+
+# Run as a read-only app
+uv run marimo run packages/gds-examples/guides/visualization/notebook.py
+
 # Run the visualization guide tests
 uv run --package gds-examples pytest packages/gds-examples/guides/visualization/ -v
-
-# Run individual demo scripts
-uv run python packages/gds-examples/guides/visualization/all_views_demo.py
-uv run python packages/gds-examples/guides/visualization/theme_customization.py
-uv run python packages/gds-examples/guides/visualization/cross_dsl_views.py
 ```
 
 ## Visualization Views
