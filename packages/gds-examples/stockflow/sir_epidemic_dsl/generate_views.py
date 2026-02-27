@@ -1,8 +1,12 @@
 """Generate all 6 GDS visualization views for the SIR Epidemic DSL model.
 
-Usage:
-    uv run python stockflow/sir_epidemic_dsl/generate_views.py
-    uv run python stockflow/sir_epidemic_dsl/generate_views.py --save   # write VIEWS.md
+Usage (from repo root)::
+
+    uv run python \
+      packages/gds-examples/stockflow/sir_epidemic_dsl/generate_views.py
+    uv run python \
+      packages/gds-examples/stockflow/sir_epidemic_dsl/generate_views.py \
+      --save
 
 Output can be pasted into GitHub/GitLab markdown, rendered at https://mermaid.live,
 or viewed in VS Code / Obsidian markdown preview.

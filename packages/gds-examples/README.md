@@ -413,7 +413,7 @@ Each example's [VIEWS.md](stockflow/sir_epidemic/VIEWS.md) contains all 6 views 
 uv run python packages/gds-examples/stockflow/sir_epidemic/generate_views.py --save
 
 # Generate views for all examples
-for d in stockflow/sir_epidemic stockflow/lotka_volterra control/thermostat games/prisoners_dilemma games/insurance games/crosswalk; do
+for d in stockflow/sir_epidemic stockflow/sir_epidemic_dsl stockflow/lotka_volterra control/thermostat games/prisoners_dilemma games/insurance games/crosswalk; do
     uv run python packages/gds-examples/$d/generate_views.py --save
 done
 ```

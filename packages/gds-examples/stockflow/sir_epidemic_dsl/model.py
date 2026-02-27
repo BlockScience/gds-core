@@ -47,7 +47,8 @@ def build_model() -> StockFlowModel:
     levels and exogenous parameters. Two converters provide the exogenous
     parameters (Contact Rate, Recovery Time).
 
-    No numerical values are specified — GDS is structural, not numerical.
+    Initial conditions are provided (999/1/0), but rate equations and
+    parameter values are omitted — GDS captures structure, not dynamics.
     The compiler infers all types, spaces, entities, blocks, and wirings
     from these declarations.
     """
