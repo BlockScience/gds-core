@@ -319,29 +319,22 @@ def _(mo):
         for f in _report.findings
     )
     _generic_table = mo.md(
-        f"""
-        ### Generic Checks (SystemIR)
-
-        | Check | Result | Message |
-        |-------|--------|---------|
-        {_generic_rows}
-
-        **Summary**: {_report.checks_passed}/{_report.checks_total} passed,\
- {_report.errors} errors
-        """
+        "### Generic Checks (SystemIR)\n\n"
+        "| Check | Result | Message |\n"
+        "|-------|--------|---------|"
+        + ("\n" + _generic_rows if _generic_rows else "")
+        + f"\n\n**Summary**: {_report.checks_passed}/{_report.checks_total} passed,"
+        f" {_report.errors} errors"
     )
 
     # -- Semantic checks --
     _semantic_results = _run_semantic(_spec_s4)
     _semantic_rows = "\n".join(f"| {line} |" for line in _semantic_results)
     _semantic_table = mo.md(
-        f"""
-        ### Semantic Checks (GDSSpec)
-
-        | Result |
-        |--------|
-        {_semantic_rows}
-        """
+        "### Semantic Checks (GDSSpec)\n\n"
+        "| Result |\n"
+        "|--------|"
+        + ("\n" + _semantic_rows if _semantic_rows else "")
     )
 
     # -- Mermaid views in tabs --
@@ -418,15 +411,11 @@ def _(mo):
         f"| `{param}` | {', '.join(blocks)} |" for param, blocks in _param_map.items()
     )
     _param_table = mo.md(
-        f"""
-        ### Parameter Influence
-
-        Which blocks does each parameter affect?
-
-        | Parameter | Blocks |
-        |-----------|--------|
-        {_param_rows}
-        """
+        "### Parameter Influence\n\n"
+        "Which blocks does each parameter affect?\n\n"
+        "| Parameter | Blocks |\n"
+        "|-----------|--------|"
+        + ("\n" + _param_rows if _param_rows else "")
     )
 
     # -- Entity updates --
@@ -437,15 +426,11 @@ def _(mo):
             _entity_rows_list.append(f"| `{_ent}` | `{_var}` | {', '.join(_mechs)} |")
     _entity_rows = "\n".join(_entity_rows_list)
     _entity_table = mo.md(
-        f"""
-        ### Entity Update Map
-
-        Which mechanisms update each entity variable?
-
-        | Entity | Variable | Mechanisms |
-        |--------|----------|------------|
-        {_entity_rows}
-        """
+        "### Entity Update Map\n\n"
+        "Which mechanisms update each entity variable?\n\n"
+        "| Entity | Variable | Mechanisms |\n"
+        "|--------|----------|------------|"
+        + ("\n" + _entity_rows if _entity_rows else "")
     )
 
     # -- Blocks by role --
@@ -456,25 +441,18 @@ def _(mo):
         if blocks
     )
     _role_table = mo.md(
-        f"""
-        ### Blocks by Role
-
-        | Role | Blocks |
-        |------|--------|
-        {_role_rows}
-        """
+        "### Blocks by Role\n\n"
+        "| Role | Blocks |\n"
+        "|------|--------|"
+        + ("\n" + _role_rows if _role_rows else "")
     )
 
     # -- Causal chain --
     _affecting = _show_causal_chain(_query, "temperature", "value")
     _causal_table = mo.md(
-        f"""
-        ### Causal Chain: temperature.value
-
-        Blocks that can transitively affect `temperature.value`:
-
-        {", ".join(f"`{b}`" for b in _affecting)}
-        """
+        "### Causal Chain: temperature.value\n\n"
+        "Blocks that can transitively affect `temperature.value`:\n\n"
+        + ", ".join(f"`{b}`" for b in _affecting)
     )
 
     # -- Dependency graph --
@@ -484,15 +462,11 @@ def _(mo):
         for src, targets in _dep_graph.items()
     )
     _dep_table = mo.md(
-        f"""
-        ### Dependency Graph
-
-        Block-to-block information flow:
-
-        | Source | Targets |
-        |--------|---------|
-        {_dep_rows}
-        """
+        "### Dependency Graph\n\n"
+        "Block-to-block information flow:\n\n"
+        "| Source | Targets |\n"
+        "|--------|---------|"
+        + ("\n" + _dep_rows if _dep_rows else "")
     )
 
     mo.vstack(
