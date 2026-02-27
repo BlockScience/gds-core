@@ -53,11 +53,25 @@ gds-framework = { workspace = true }
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+addopts = "--import-mode=importlib --cov=gds_viz --cov-report=term-missing --no-header -q"
+
+[tool.coverage.run]
+source = ["gds_viz"]
+omit = ["gds_viz/__init__.py"]
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true
+exclude_lines = [
+    "if TYPE_CHECKING:",
+    "pragma: no cover",
+]
 
 [dependency-groups]
 dev = [
     "mypy>=1.19.1",
     "pyright>=1.1.408",
     "pytest>=8.0",
+    "pytest-cov>=6.0",
     "ruff>=0.8",
 ]
