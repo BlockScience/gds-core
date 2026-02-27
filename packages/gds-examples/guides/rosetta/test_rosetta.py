@@ -395,7 +395,9 @@ class TestGameCanonical:
     def test_formula_is_pure_policy(self):
         """h = g (not h = f . g) because there are no mechanisms."""
         c = build_game_canonical()
-        assert c.formula() == "h : X -> X  (h = f . g)" or "g" in c.formula()
+        assert len(c.mechanism_blocks) == 0, "Game view should have no mechanisms"
+        assert len(c.policy_blocks) > 0, "Game view should have policies"
+        assert not c.has_parameters, "Game view should have no parameters"
 
 
 # ── Cross-Domain Comparison ──────────────────────────────────────

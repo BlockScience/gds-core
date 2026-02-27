@@ -96,7 +96,7 @@ def print_comparison() -> None:
         print(f"  Input U:    {list(c.input_ports)}")
         print(f"  Boundary:   {list(c.boundary_blocks)}")
         print(f"  Policy g:   {list(c.policy_blocks)}")
-        print(f"  Mechanism f:{list(c.mechanism_blocks)}")
+        print(f"  Mechanism f: {list(c.mechanism_blocks)}")
         if c.update_map:
             print(f"  Updates:    {list(c.update_map)}")
     print()
