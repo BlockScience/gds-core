@@ -72,6 +72,7 @@ packages/gds-examples/
 │   └── double_integrator/      # State-space control via gds-control DSL
 ├── games/
 │   ├── prisoners_dilemma/      # Game theory — nested parallel + loops
+│   ├── prisoners_dilemma_dsl/  # Game theory — OGS DSL version
 │   ├── insurance/              # Finance — 4-role taxonomy
 │   └── crosswalk/              # Mechanism design — Markov transitions
 └── visualize_examples.py       # Generate structural diagrams for all
@@ -242,6 +243,36 @@ system = pipeline.loop([world models -> decisions])
 **Domain:** Game theory — see [gds-games](https://github.com/BlockScience/gds-core/tree/main/packages/gds-games) for the OGS DSL with compositional game patterns
 
 **Files:** [model.py](games/prisoners_dilemma/model.py) · [tests](games/prisoners_dilemma/test_model.py) · [views](games/prisoners_dilemma/VIEWS.md) · [architecture viz](games/prisoners_dilemma/visualize.py)
+
+---
+
+### Prisoner's Dilemma (OGS DSL)
+
+**Same game, different approach** -- reimplements the Prisoner's Dilemma using the [gds-games](https://github.com/BlockScience/gds-core/tree/main/packages/gds-games) (OGS) typed DSL instead of hand-wiring GDS blocks. Demonstrates how the OGS DSL expresses the same game-theoretic structure more concisely.
+
+```python
+decisions = alice_decision | bob_decision
+game_round = decisions >> payoff_computation
+system = game_round.feedback([payoff -> decisions])
+```
+
+<details>
+<summary>What you'll learn</summary>
+
+- OGS DecisionGame and CovariantFunction atomic game types
+- OGS composition operators (`>>`, `|`, `.feedback()`)
+- OGS Pattern with TerminalCondition and ActionSpace metadata
+- `compile_to_ir()` for OGS PatternIR generation
+- `compile_pattern_to_spec()` for GDS projection
+- OGS verification checks via `verify()`
+- OGS report generation via `generate_reports()`
+- Contrast: manual GDS blocks vs OGS DSL for the same domain
+
+</details>
+
+**Domain:** Game theory -- see [gds-games](https://github.com/BlockScience/gds-core/tree/main/packages/gds-games) for the OGS DSL
+
+**Files:** [model.py](games/prisoners_dilemma_dsl/model.py) · [tests](games/prisoners_dilemma_dsl/test_prisoners_dilemma_dsl.py) · [views script](games/prisoners_dilemma_dsl/generate_views.py)
 
 ---
 
