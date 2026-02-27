@@ -52,7 +52,7 @@ def _(mo):
             "Stage 4 -- Verification & Visualization": "stage4",
             "Stage 5 -- Query API": "stage5",
         },
-        value="stage1",
+        value="Stage 1 -- Minimal Model",
         label="Jump to stage:",
     )
     return (_stage_selector,)
