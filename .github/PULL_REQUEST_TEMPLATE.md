@@ -1,3 +1,5 @@
+**Target branch: `dev`** (all PRs merge to `dev` first; `dev` → `main` for releases)
+
 ## Summary
 
 <!-- Brief description of the changes -->
