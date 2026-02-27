@@ -118,6 +118,7 @@ def _build_input_block(inp: Input) -> BoundaryAction:
         interface=Interface(
             forward_out=(port(_reference_port_name(inp.name)),),
         ),
+        params_used=[inp.name],
     )
 
 
@@ -139,12 +140,14 @@ def _build_sensor_block(sensor: Sensor) -> Policy:
 def _build_controller_block(ctrl: Controller, model: ControlModel) -> Policy:
     """Controller → Policy: receives Measurement/Reference ports, emits Control."""
     forward_in_ports = []
+    params = []
     for read_name in ctrl.reads:
         if read_name in model.sensor_names:
             forward_in_ports.append(port(_measurement_port_name(read_name)))
         else:
             # Must be an input name
             forward_in_ports.append(port(_reference_port_name(read_name)))
+            params.append(read_name)
 
     return Policy(
         name=ctrl.name,
@@ -152,6 +155,7 @@ def _build_controller_block(ctrl: Controller, model: ControlModel) -> Policy:
             forward_in=tuple(forward_in_ports),
             forward_out=(port(_control_port_name(ctrl.name)),),
         ),
+        params_used=params if params else [],
     )
 
 
