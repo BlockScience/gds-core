@@ -17,6 +17,7 @@ from gds_viz import system_to_mermaid
 def main():
     examples = [
         ("SIR Epidemic", "sir_epidemic.model"),
+        ("SIR Epidemic (DSL)", "sir_epidemic_dsl.model"),
         ("Thermostat PID", "thermostat.model"),
         ("Insurance Contract", "insurance.model"),
         ("Lotka-Volterra", "lotka_volterra.model"),
