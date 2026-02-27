@@ -1,11 +1,15 @@
-"""Tests for the verification and analysis showcase.
+"""Tests for the verification and analysis showcase and marimo notebook.
 
 Verifies that:
     - Each broken model produces expected findings
     - Fixed models pass verification
     - Specific check IDs are triggered by specific errors
     - Domain checks complement generic checks
+    - The interactive marimo notebook is a valid marimo app
 """
+
+import importlib.util
+from pathlib import Path
 
 from gds.verification.engine import verify
 from gds.verification.findings import Severity
@@ -392,3 +396,55 @@ class TestVerificationReportStructure:
         sc_findings = check_completeness(spec)
         sc_failures = [f for f in sc_findings if not f.passed]
         assert sc_failures[0].severity == Severity.WARNING
+
+
+# ══════════════════════════════════════════════════════════════════
+# Marimo Notebook tests
+# ══════════════════════════════════════════════════════════════════
+
+_NOTEBOOK_PATH = Path(__file__).parent / "notebook.py"
+
+
+class TestMarimoNotebook:
+    """Tests for the interactive marimo notebook."""
+
+    def test_notebook_file_exists(self):
+        assert _NOTEBOOK_PATH.exists()
+
+    def test_notebook_imports_marimo(self):
+        source = _NOTEBOOK_PATH.read_text()
+        assert "import marimo" in source
+
+    def test_notebook_has_app_object(self):
+        source = _NOTEBOOK_PATH.read_text()
+        assert "app = marimo.App(" in source
+
+    def test_notebook_has_cell_decorators(self):
+        source = _NOTEBOOK_PATH.read_text()
+        assert source.count("@app.cell") >= 10
+
+    def test_notebook_loads_as_module(self):
+        spec = importlib.util.spec_from_file_location("notebook", _NOTEBOOK_PATH)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        assert hasattr(mod, "app")
+
+    def test_notebook_covers_generic_checks(self):
+        source = _NOTEBOOK_PATH.read_text()
+        assert "G-004" in source
+        assert "G-001" in source
+        assert "G-006" in source
+
+    def test_notebook_covers_semantic_checks(self):
+        source = _NOTEBOOK_PATH.read_text()
+        assert "SC-001" in source
+        assert "SC-002" in source
+
+    def test_notebook_covers_domain_checks(self):
+        source = _NOTEBOOK_PATH.read_text()
+        assert "SF-001" in source
+        assert "SF-003" in source
+
+    def test_notebook_has_interactive_controls(self):
+        source = _NOTEBOOK_PATH.read_text()
+        assert "mo.ui.dropdown(" in source
