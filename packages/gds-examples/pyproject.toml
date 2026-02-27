@@ -65,6 +65,7 @@ only-include = [
     "sir_epidemic_dsl",
     "thermostat",
     "double_integrator",
+    "guides",
 ]
 
 [tool.pytest.ini_options]
@@ -84,6 +85,7 @@ files = [
     "sir_epidemic_dsl",
     "thermostat",
     "double_integrator",
+    "guides",
     "visualize_examples.py",
 ]
 
@@ -91,8 +93,12 @@ files = [
 module = ["gds_viz.*", "gds_control.*", "stockflow.*", "ogs.*", "pytest"]
 ignore_missing_imports = true
 
+[project.optional-dependencies]
+notebooks = ["marimo>=0.20.0"]
+
 [dependency-groups]
 dev = [
+    "marimo>=0.20.0",
     "mypy>=1.19.1",
     "pyright>=1.1.408",
     "pytest>=9.0.2",

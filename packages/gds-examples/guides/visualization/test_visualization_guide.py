@@ -1,8 +1,12 @@
-"""Tests for the visualization guide scripts.
+"""Tests for the visualization guide scripts and marimo notebook.
 
-Verifies that all demo scripts produce valid Mermaid output and that
-the gds-viz API works correctly across themes, view types, and DSLs.
+Verifies that all demo scripts produce valid Mermaid output, that
+the gds-viz API works correctly across themes, view types, and DSLs,
+and that the interactive marimo notebook is a valid marimo app.
 """
+
+import importlib.util
+from pathlib import Path
 
 import pytest
 
@@ -249,3 +253,59 @@ class TestViewConsistency:
         output = system_to_mermaid(system, theme=theme)
         _assert_valid_mermaid(output)
         assert len(output) > 100
+
+
+# ── Marimo Notebook ──────────────────────────────────────────
+
+_NOTEBOOK_PATH = Path(__file__).parent / "notebook.py"
+
+
+class TestMarimoNotebook:
+    """Tests for the interactive marimo notebook."""
+
+    def test_notebook_file_exists(self):
+        assert _NOTEBOOK_PATH.exists()
+
+    def test_notebook_imports_marimo(self):
+        """The notebook file must import marimo at the top level."""
+        source = _NOTEBOOK_PATH.read_text()
+        assert "import marimo" in source
+
+    def test_notebook_has_app_object(self):
+        """The notebook defines a marimo App."""
+        source = _NOTEBOOK_PATH.read_text()
+        assert "app = marimo.App(" in source
+
+    def test_notebook_has_cell_decorators(self):
+        """The notebook defines cells with @app.cell."""
+        source = _NOTEBOOK_PATH.read_text()
+        assert source.count("@app.cell") >= 10
+
+    def test_notebook_loads_as_module(self):
+        """The notebook is valid Python and loads without error."""
+        spec = importlib.util.spec_from_file_location("notebook", _NOTEBOOK_PATH)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        assert hasattr(mod, "app")
+
+    def test_notebook_covers_all_sections(self):
+        """The notebook includes all 3 guide sections."""
+        source = _NOTEBOOK_PATH.read_text()
+        assert "All 6" in source or "6 Views" in source
+        assert "Theme" in source
+        assert "Cross-DSL" in source
+
+    def test_notebook_uses_mo_mermaid(self):
+        """The notebook renders Mermaid via mo.mermaid()."""
+        source = _NOTEBOOK_PATH.read_text()
+        assert "mo.mermaid(" in source
+
+    def test_notebook_has_interactive_controls(self):
+        """The notebook uses dropdowns for interactivity."""
+        source = _NOTEBOOK_PATH.read_text()
+        assert "mo.ui.dropdown(" in source
+
+    def test_notebook_has_tabs(self):
+        """The notebook uses tabs for all-views-at-once layout."""
+        source = _NOTEBOOK_PATH.read_text()
+        assert "mo.ui.tabs(" in source
