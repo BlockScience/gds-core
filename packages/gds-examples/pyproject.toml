@@ -65,6 +65,7 @@ only-include = [
     "sir_epidemic_dsl",
     "thermostat",
     "double_integrator",
+    "guides",
 ]
 
 [tool.pytest.ini_options]
@@ -84,6 +85,7 @@ files = [
     "sir_epidemic_dsl",
     "thermostat",
     "double_integrator",
+    "guides",
     "visualize_examples.py",
 ]
 
