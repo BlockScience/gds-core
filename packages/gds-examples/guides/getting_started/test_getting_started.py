@@ -4,6 +4,11 @@ Each stage is tested independently. Tests verify that each stage
 produces valid GDS output without errors.
 """
 
+import importlib
+from pathlib import Path
+
+import pytest
+
 from gds.blocks.roles import BoundaryAction, Mechanism, Policy
 from gds.ir.models import FlowDirection
 from gds.verification.engine import verify
@@ -432,3 +437,60 @@ class TestCrossStageVerification:
         spec = build_spec()
         findings = check_canonical_wellformedness(spec)
         assert all(f.passed for f in findings)
+
+
+# ══════════════════════════════════════════════════════════════
+# Marimo Notebook
+# ══════════════════════════════════════════════════════════════
+
+_NOTEBOOK = (
+    Path(__file__).resolve().parent / "notebook.py"
+)
+
+
+class TestMarimoNotebook:
+    """Tests for the interactive marimo Getting Started notebook."""
+
+    def test_file_exists(self):
+        assert _NOTEBOOK.exists(), f"Missing: {_NOTEBOOK}"
+
+    def test_imports_marimo(self):
+        source = _NOTEBOOK.read_text()
+        assert "import marimo" in source
+
+    def test_has_app_object(self):
+        source = _NOTEBOOK.read_text()
+        assert "app = marimo.App(" in source
+
+    def test_has_enough_cell_decorators(self):
+        source = _NOTEBOOK.read_text()
+        count = source.count("@app.cell")
+        assert count >= 10, f"Expected 10+ cells, found {count}"
+
+    @pytest.mark.skipif(
+        importlib.util.find_spec("marimo") is None,
+        reason="marimo not installed",
+    )
+    def test_loads_as_module(self):
+        spec = importlib.util.spec_from_file_location(
+            "notebook", _NOTEBOOK
+        )
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        assert hasattr(mod, "app")
+
+    def test_covers_all_five_stages(self):
+        source = _NOTEBOOK.read_text()
+        assert "stage1_minimal" in source
+        assert "stage2_feedback" in source
+        assert "stage3_dsl" in source
+        assert "stage4_verify_viz" in source
+        assert "stage5_query" in source
+
+    def test_has_mermaid_diagrams(self):
+        source = _NOTEBOOK.read_text()
+        assert "mo.mermaid(" in source
+
+    def test_has_interactive_controls(self):
+        source = _NOTEBOOK.read_text()
+        assert "mo.ui.dropdown(" in source
