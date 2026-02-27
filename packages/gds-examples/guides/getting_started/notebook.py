@@ -96,8 +96,8 @@ def _(mo):
 
         | Component | Count | Details |
         |-----------|------:|---------|
-        | Entities  | {len(_spec_s1.entities)} | {', '.join(_spec_s1.entities.keys())} |
-        | Blocks    | {len(_spec_s1.blocks)} | {', '.join(_spec_s1.blocks.keys())} |
+        | Entities  | {len(_spec_s1.entities)} | {", ".join(_spec_s1.entities.keys())} |
+        | Blocks    | {len(_spec_s1.blocks)} | {", ".join(_spec_s1.blocks.keys())} |
         | Wirings   | {len(_system_s1.wirings)} | auto-wired via token overlap |
         | Parameters | {len(_spec_s1.parameters)} | *(none yet -- added in stage 2)* |
         """
@@ -224,9 +224,7 @@ def _(mo):
     _spec_s3 = _build_spec_s3()
     _system_s3 = _build_system_s3()
     _canonical_s3 = _build_canonical_s3()
-    _n_temporal_s3 = len(
-        [w for w in _system_s3.wirings if w.is_temporal]
-    )
+    _n_temporal_s3 = len([w for w in _system_s3.wirings if w.is_temporal])
 
     _dsl_comparison = mo.md(
         f"""
@@ -335,9 +333,7 @@ def _(mo):
 
     # -- Semantic checks --
     _semantic_results = _run_semantic(_spec_s4)
-    _semantic_rows = "\n".join(
-        f"| {line} |" for line in _semantic_results
-    )
+    _semantic_rows = "\n".join(f"| {line} |" for line in _semantic_results)
     _semantic_table = mo.md(
         f"""
         ### Semantic Checks (GDSSpec)
@@ -419,8 +415,7 @@ def _(mo):
     # -- Parameter influence --
     _param_map = _show_param_influence(_query)
     _param_rows = "\n".join(
-        f"| `{param}` | {', '.join(blocks)} |"
-        for param, blocks in _param_map.items()
+        f"| `{param}` | {', '.join(blocks)} |" for param, blocks in _param_map.items()
     )
     _param_table = mo.md(
         f"""
@@ -439,9 +434,7 @@ def _(mo):
     _entity_rows_list = []
     for _ent, _vars in _entity_map.items():
         for _var, _mechs in _vars.items():
-            _entity_rows_list.append(
-                f"| `{_ent}` | `{_var}` | {', '.join(_mechs)} |"
-            )
+            _entity_rows_list.append(f"| `{_ent}` | `{_var}` | {', '.join(_mechs)} |")
     _entity_rows = "\n".join(_entity_rows_list)
     _entity_table = mo.md(
         f"""
@@ -480,7 +473,7 @@ def _(mo):
 
         Blocks that can transitively affect `temperature.value`:
 
-        {', '.join(f'`{b}`' for b in _affecting)}
+        {", ".join(f"`{b}`" for b in _affecting)}
         """
     )
 
