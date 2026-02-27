@@ -75,6 +75,8 @@ packages/gds-examples/
 │   ├── prisoners_dilemma_dsl/  # Game theory — OGS DSL version
 │   ├── insurance/              # Finance — 4-role taxonomy
 │   └── crosswalk/              # Mechanism design — Markov transitions
+├── guides/
+│   └── verification/           # Verification and analysis showcase
 └── visualize_examples.py       # Generate structural diagrams for all
 ```
 
@@ -330,6 +332,30 @@ observe >> decide >> check >> transition
 **Domain:** Game theory / mechanism design — see [gds-games](https://github.com/BlockScience/gds-core/tree/main/packages/gds-games) for the OGS DSL
 
 **Files:** [model.py](games/crosswalk/model.py) · [tests](games/crosswalk/test_model.py) · [views](games/crosswalk/VIEWS.md) · [README](games/crosswalk/README.md)
+
+## Verification Showcase
+
+The `guides/verification/` directory demonstrates GDS verification as a feature using deliberately broken models. It covers all three verification layers:
+
+| Layer | Checks | Operates On | What It Catches |
+|-------|--------|-------------|-----------------|
+| Generic | G-001..G-006 | SystemIR | Structural topology: dangling wirings, type mismatches, cycles |
+| Semantic | SC-001..SC-007 | GDSSpec | Domain properties: orphan state, write conflicts, empty canonical form |
+| Domain | SF-001..SF-005 | StockFlowModel | Stock-flow semantics: orphan stocks, auxiliary cycles, unused converters |
+
+### Files
+
+| File | Purpose |
+|------|---------|
+| `broken_models.py` | Collection of deliberately broken models, each triggering specific checks |
+| `verification_demo.py` | Step-by-step demo of generic and semantic checks, fix-and-re-verify workflow |
+| `domain_checks_demo.py` | Domain-specific checks using the stockflow DSL |
+| `test_verification_guide.py` | Tests verifying that each broken model triggers expected findings |
+
+```bash
+# Run the verification showcase tests
+uv run --package gds-examples pytest packages/gds-examples/guides/verification/ -v
+```
 
 ## Visualization Views
 
