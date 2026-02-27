@@ -95,6 +95,7 @@ ignore_missing_imports = true
 
 [dependency-groups]
 dev = [
+    "marimo>=0.10",
     "mypy>=1.19.1",
     "pyright>=1.1.408",
     "pytest>=9.0.2",

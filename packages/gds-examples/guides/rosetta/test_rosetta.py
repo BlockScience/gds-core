@@ -5,6 +5,8 @@ resource pool scenario, verifying that each compiles successfully, passes
 verification, and produces the expected canonical decomposition.
 """
 
+from pathlib import Path
+
 from gds.blocks.roles import BoundaryAction, Mechanism, Policy
 from gds.ir.models import FlowDirection
 from gds.verification.engine import verify
@@ -449,3 +451,61 @@ class TestComparison:
         assert len(canonicals["Stock-Flow"].state_variables) > 0
         assert len(canonicals["Control"].state_variables) > 0
         assert len(canonicals["Game Theory"].state_variables) == 0
+
+
+# ── Marimo Notebook ─────────────────────────────────────────────
+
+
+class TestMarimoNotebook:
+    """Validate the interactive marimo notebook for the Rosetta Stone guide."""
+
+    NOTEBOOK = Path(__file__).resolve().parent / "notebook.py"
+
+    def test_file_exists(self):
+        assert self.NOTEBOOK.exists(), f"Notebook not found: {self.NOTEBOOK}"
+
+    def test_imports_marimo(self):
+        source = self.NOTEBOOK.read_text()
+        assert "import marimo" in source
+
+    def test_has_app_object(self):
+        source = self.NOTEBOOK.read_text()
+        assert "app = marimo.App(" in source
+
+    def test_has_ten_plus_cell_decorators(self):
+        source = self.NOTEBOOK.read_text()
+        count = source.count("@app.cell")
+        assert count >= 10, f"Expected >=10 @app.cell, found {count}"
+
+    def test_loads_as_module(self):
+        """The notebook file can be imported as a Python module."""
+        import importlib.util
+
+        spec = importlib.util.spec_from_file_location(
+            "notebook", self.NOTEBOOK
+        )
+        assert spec is not None
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        assert hasattr(mod, "app")
+
+    def test_covers_stockflow_view(self):
+        source = self.NOTEBOOK.read_text()
+        assert "stockflow_view" in source or "sf_view" in source
+
+    def test_covers_control_view(self):
+        source = self.NOTEBOOK.read_text()
+        assert "control_view" in source or "ctrl_view" in source
+
+    def test_covers_game_view(self):
+        source = self.NOTEBOOK.read_text()
+        assert "game_view" in source
+
+    def test_has_comparison_spectrum_table(self):
+        source = self.NOTEBOOK.read_text()
+        assert "canonical_spectrum_table" in source
+        assert "comparison" in source
+
+    def test_has_dropdown_controls(self):
+        source = self.NOTEBOOK.read_text()
+        assert "mo.ui.dropdown" in source
