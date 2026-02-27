@@ -481,9 +481,7 @@ class TestMarimoNotebook:
         """The notebook file can be imported as a Python module."""
         import importlib.util
 
-        spec = importlib.util.spec_from_file_location(
-            "notebook", self.NOTEBOOK
-        )
+        spec = importlib.util.spec_from_file_location("notebook", self.NOTEBOOK)
         assert spec is not None
         mod = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(mod)
