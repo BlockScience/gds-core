@@ -19,6 +19,7 @@ Examples are organized by domain. Some are built using GDS framework primitives 
 - [Learning Path](#learning-path)
 - [Quick Start](#quick-start)
 - [Examples](#examples)
+- [Visualization Guide](#visualization-guide)
 - [Visualization Views](#visualization-views)
 - [Feature Coverage Matrix](#feature-coverage-matrix)
 - [Building New Examples](#building-new-examples)
@@ -69,12 +70,14 @@ packages/gds-examples/
 │   └── lotka_volterra/         # Population dynamics — temporal loops
 ├── control/
 │   ├── thermostat/             # Control theory — feedback composition
-│   └── double_integrator/      # State-space control via gds-control DSL
+│   └── double_integrator/      # Control DSL — state-space (A,B,C,D) mapping
 ├── games/
 │   ├── prisoners_dilemma/      # Game theory — nested parallel + loops
 │   ├── prisoners_dilemma_dsl/  # Game theory — OGS DSL version
 │   ├── insurance/              # Finance — 4-role taxonomy
 │   └── crosswalk/              # Mechanism design — Markov transitions
+├── guides/
+│   └── visualization/          # Dedicated gds-viz guide (see below)
 └── visualize_examples.py       # Generate structural diagrams for all
 ```
 
@@ -330,6 +333,28 @@ observe >> decide >> check >> transition
 **Domain:** Game theory / mechanism design — see [gds-games](https://github.com/BlockScience/gds-core/tree/main/packages/gds-games) for the OGS DSL
 
 **Files:** [model.py](games/crosswalk/model.py) · [tests](games/crosswalk/test_model.py) · [views](games/crosswalk/VIEWS.md) · [README](games/crosswalk/README.md)
+
+## Visualization Guide
+
+A dedicated guide at [`guides/visualization/`](guides/visualization/) makes [`gds-viz`](https://github.com/BlockScience/gds-core/tree/main/packages/gds-viz) a first-class citizen with focused, runnable demos:
+
+| Script | What It Demonstrates |
+|--------|---------------------|
+| [`all_views_demo.py`](guides/visualization/all_views_demo.py) | All 6 view types from a single model (SIR Epidemic), with docstrings explaining when to use each view |
+| [`theme_customization.py`](guides/visualization/theme_customization.py) | All 5 built-in Mermaid themes (neutral, default, dark, forest, base) applied to the same model |
+| [`cross_dsl_views.py`](guides/visualization/cross_dsl_views.py) | Same viz API across different DSLs (hand-built SIR vs gds-control Double Integrator) |
+| [`test_visualization_guide.py`](guides/visualization/test_visualization_guide.py) | Tests verifying all scripts produce valid Mermaid output |
+
+```bash
+# Launch the interactive marimo notebook (recommended)
+uv run marimo edit packages/gds-examples/guides/visualization/notebook.py
+
+# Run as a read-only app
+uv run marimo run packages/gds-examples/guides/visualization/notebook.py
+
+# Run the visualization guide tests
+uv run --package gds-examples pytest packages/gds-examples/guides/visualization/ -v
+```
 
 ## Visualization Views
 
