@@ -11,7 +11,22 @@ from ogs.ir.models import (
     GameType,
     PatternIR,
 )
+from ogs.reports.generator import (
+    generate_implementation_checklist,
+    generate_interface_contracts,
+    generate_system_overview,
+    generate_verification_summary,
+)
 from ogs.verification.findings import VerificationReport
+from ogs.viz import (
+    architecture_by_domain_to_mermaid,
+    architecture_by_role_to_mermaid,
+    flow_topology_to_mermaid,
+    generate_all_views,
+    hierarchy_to_mermaid,
+    structural_to_mermaid,
+    terminal_conditions_to_mermaid,
+)
 from prisoners_dilemma_dsl.model import (
     alice_decision,
     bob_decision,
@@ -63,6 +78,8 @@ class TestModel:
         assert len(sig.s) == 1
         assert sig.x[0].name == "Bob Observation"
         assert sig.y[0].name == "Bob Action"
+        assert sig.r[0].name == "Bob Payoff"
+        assert sig.s[0].name == "Bob Experience"
 
     def test_payoff_signature_no_contravariant(self):
         """CovariantFunction must have empty R and S ports."""
@@ -236,8 +253,6 @@ class TestVisualization:
     """Test OGS visualization output."""
 
     def test_structural_view(self):
-        from ogs.viz import structural_to_mermaid
-
         ir = build_ir()
         mermaid = structural_to_mermaid(ir)
         assert "flowchart" in mermaid
@@ -246,15 +261,11 @@ class TestVisualization:
         assert "Payoff Computation" in mermaid
 
     def test_architecture_by_role_view(self):
-        from ogs.viz import architecture_by_role_to_mermaid
-
         ir = build_ir()
         mermaid = architecture_by_role_to_mermaid(ir)
         assert "flowchart" in mermaid
 
     def test_architecture_by_domain_view(self):
-        from ogs.viz import architecture_by_domain_to_mermaid
-
         ir = build_ir()
         mermaid = architecture_by_domain_to_mermaid(ir)
         assert "Alice" in mermaid
@@ -262,29 +273,21 @@ class TestVisualization:
         assert "Environment" in mermaid
 
     def test_hierarchy_view(self):
-        from ogs.viz import hierarchy_to_mermaid
-
         ir = build_ir()
         mermaid = hierarchy_to_mermaid(ir)
         assert "flowchart" in mermaid
 
     def test_flow_topology_view(self):
-        from ogs.viz import flow_topology_to_mermaid
-
         ir = build_ir()
         mermaid = flow_topology_to_mermaid(ir)
         assert "flowchart" in mermaid
 
     def test_terminal_conditions_view(self):
-        from ogs.viz import terminal_conditions_to_mermaid
-
         ir = build_ir()
         mermaid = terminal_conditions_to_mermaid(ir)
         assert "stateDiagram" in mermaid
 
     def test_generate_all_views(self):
-        from ogs.viz import generate_all_views
-
         ir = build_ir()
         views = generate_all_views(ir)
         assert len(views) == 6
@@ -308,29 +311,21 @@ class TestReports:
                 assert p.suffix == ".md"
 
     def test_system_overview_report(self):
-        from ogs.reports.generator import generate_system_overview
-
         ir = build_ir()
         content = generate_system_overview(ir)
         assert "Iterated Prisoners Dilemma" in content
 
     def test_verification_summary_report(self):
-        from ogs.reports.generator import generate_verification_summary
-
         ir = build_ir()
         content = generate_verification_summary(ir)
         assert len(content) > 0
 
     def test_interface_contracts_report(self):
-        from ogs.reports.generator import generate_interface_contracts
-
         ir = build_ir()
         content = generate_interface_contracts(ir)
         assert "Alice Decision" in content
 
     def test_implementation_checklist_report(self):
-        from ogs.reports.generator import generate_implementation_checklist
-
         ir = build_ir()
         content = generate_implementation_checklist(ir)
         assert len(content) > 0

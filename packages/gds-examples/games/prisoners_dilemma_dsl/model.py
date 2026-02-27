@@ -3,8 +3,8 @@
 Reimplements the manual Prisoner's Dilemma example using the gds-games (OGS)
 typed DSL. Instead of hand-wiring GDS blocks, this version uses OGS atomic
 games (DecisionGame, CovariantFunction), OGS composition operators (>>, |,
-.feedback(), .corecursive()), and Pattern metadata to express the same
-two-player iterated game.
+.feedback()), and Pattern metadata to express the same two-player iterated
+game.
 
 Concepts Covered:
     - OGS DecisionGame for strategic choices (Cooperate/Defect)
@@ -22,7 +22,6 @@ OGS Game Theory Decomposition:
     Payoff Matrix: (R, T, S, P) = (3, 5, 0, 1)
     Composition: (alice_decision | bob_decision) >> payoff_computation
         .feedback([payoff -> decisions])
-    Temporal: .corecursive([payoff -> decisions]) for iterated play
 
 Architecture (OGS perspective):
     X (observations):  Previous round payoffs
