@@ -136,6 +136,13 @@ Both use the pluggable pattern: `Callable[[T], list[Finding]]`.
 - **Semantic checks (SC-001..SC-007)** operate on `GDSSpec` — domain properties (completeness, determinism, reachability, type safety, parameter references, canonical wellformedness)
 - **Domain checks** operate on domain models (e.g., `StockFlowModel`, `ControlModel`) — pre-compilation structural validation
 
+### Branching Workflow
+
+- **`main`** — stable release branch. Only receives merges from `dev`.
+- **`dev`** — integration branch. All feature/fix PRs target `dev` first.
+- Feature branches branch from `dev` and PR back to `dev`.
+- When `dev` is stable and ready for release, merge `dev` → `main`.
+
 ### Key Conventions
 
 - All data models are Pydantic v2 `BaseModel` — frozen for value objects, mutable for registries
