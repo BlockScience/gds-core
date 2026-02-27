@@ -10,7 +10,7 @@ Run with: marimo run guides/rosetta/notebook.py
 import marimo
 
 __generated_with = "0.10.0"
-app = marimo.App(width="medium")
+app = marimo.App(width="medium", app_title="GDS Rosetta Stone Guide")
 
 
 @app.cell
