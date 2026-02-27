@@ -255,9 +255,10 @@ def demo_generic_vs_semantic() -> dict:
     Returns:
         Dict with 'generic' and 'semantic' VerificationReports.
     """
-    # Build a spec that is structurally sound but semantically flawed:
-    # the orphan state spec has no mechanisms, so canonical checks fail,
-    # but a compiled SystemIR from a simple pipeline passes G-checks.
+    # Use a well-formed spec and a well-formed pipeline system to show
+    # how generic (G-series) and semantic (SC-series) checks are applied
+    # to different representations of a model, and that both families can
+    # independently succeed on correctly constructed inputs.
     spec = fixed_spec()
 
     # Semantic checks on the spec
