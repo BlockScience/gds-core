@@ -105,7 +105,7 @@ def view_selector(mo):
             "Parameter Influence": "params",
             "Traceability": "trace",
         },
-        value="structural",
+        value="Structural (SystemIR)",
         label="Select view",
     )
     return (view_dropdown,)
@@ -275,7 +275,7 @@ def theme_controls(mo):
             "Structural": "structural",
             "Architecture by Role": "role",
         },
-        value="structural",
+        value="Structural",
         label="View",
     )
     mo.hstack([theme_dropdown, theme_view_dropdown], justify="start", gap=1)
@@ -373,7 +373,7 @@ def cross_dsl_controls(mo):
             "SIR Epidemic (hand-built)": "sir",
             "Double Integrator (control DSL)": "di",
         },
-        value="sir",
+        value="SIR Epidemic (hand-built)",
         label="Model",
     )
     cross_view_dropdown = mo.ui.dropdown(
@@ -384,7 +384,7 @@ def cross_dsl_controls(mo):
             "Parameter Influence": "params",
             "Traceability": "trace",
         },
-        value="structural",
+        value="Structural",
         label="View",
     )
     mo.hstack([model_dropdown, cross_view_dropdown], justify="start", gap=1)

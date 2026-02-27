@@ -80,7 +80,7 @@ def generic_selector(mo):
             "G-003: Direction Contradiction": "direction",
             "G-002: Incomplete Signature": "signature",
         },
-        value="dangling",
+        value="G-004: Dangling Wiring",
         label="Broken model",
     )
     return (generic_dropdown,)
@@ -279,7 +279,7 @@ def semantic_selector(mo):
             "SC-002: Write Conflict": "conflict",
             "SC-006/007: Empty Canonical": "empty",
         },
-        value="orphan",
+        value="SC-001: Orphan State Variable",
         label="Broken spec",
     )
     return (semantic_dropdown,)
@@ -434,7 +434,7 @@ def domain_selector(mo):
             "SF-003: Auxiliary Cycle": "cycle",
             "SF-004: Unused Converter": "converter",
         },
-        value="orphan",
+        value="SF-001: Orphan Stock",
         label="Broken model",
     )
     return (domain_dropdown,)
@@ -528,7 +528,7 @@ def combined_selector(mo):
             "Good Model (Population)": "good",
             "Broken Model (Orphan Stock)": "broken",
         },
-        value="good",
+        value="Good Model (Population)",
         label="Model",
     )
     return (combined_dropdown,)
