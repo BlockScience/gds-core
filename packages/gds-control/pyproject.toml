@@ -54,6 +54,19 @@ packages = ["gds_control"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+addopts = "--import-mode=importlib --cov=gds_control --cov-report=term-missing --no-header -q"
+
+[tool.coverage.run]
+source = ["gds_control"]
+omit = ["gds_control/__init__.py"]
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true
+exclude_lines = [
+    "if TYPE_CHECKING:",
+    "pragma: no cover",
+]
 
 [tool.ruff.lint]
 ignore = [
@@ -65,5 +78,6 @@ ignore = [
 [dependency-groups]
 dev = [
     "pytest>=9.0",
+    "pytest-cov>=6.0",
     "ruff>=0.8",
 ]

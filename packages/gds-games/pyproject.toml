@@ -61,6 +61,19 @@ packages = ["ogs"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+addopts = "--import-mode=importlib --cov=ogs --cov-report=term-missing --no-header -q"
+
+[tool.coverage.run]
+source = ["ogs"]
+omit = ["ogs/__init__.py"]
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true
+exclude_lines = [
+    "if TYPE_CHECKING:",
+    "pragma: no cover",
+]
 
 [tool.ruff.lint]
 ignore = [
@@ -80,5 +93,6 @@ dev = [
     "mypy>=1.19.1",
     "pyright>=1.1.408",
     "pytest>=9.0.2",
+    "pytest-cov>=6.0",
     "ruff>=0.8",
 ]
