@@ -220,9 +220,7 @@ def _(mo, gds_viz, sf_view, ctrl_view, game_view, comparison):
 
     _sf_canonical_mermaid = gds_viz.canonical_to_mermaid(_canonicals["Stock-Flow"])
     _ctrl_canonical_mermaid = gds_viz.canonical_to_mermaid(_canonicals["Control"])
-    _game_canonical_mermaid = gds_viz.canonical_to_mermaid(
-        _canonicals["Game Theory"]
-    )
+    _game_canonical_mermaid = gds_viz.canonical_to_mermaid(_canonicals["Game Theory"])
 
     view_dropdown = mo.ui.dropdown(
         options=["Stock-Flow", "Control", "Game Theory"],
@@ -252,8 +250,7 @@ def _(mo, gds_viz, sf_view, ctrl_view, game_view, comparison):
     _comparison_md = mo.md(
         "### Comparison Data\n\n"
         "| View | |X| | |U| | |g| | |f| | Formula | Character |\n"
-        "|------|-----|-----|-----|-----|---------|----------|\n"
-        + "\n".join(_rows)
+        "|------|-----|-----|-----|-----|---------|----------|\n" + "\n".join(_rows)
     )
 
     mo.vstack(
