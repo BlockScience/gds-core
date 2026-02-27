@@ -25,6 +25,17 @@ from gds import (
 )
 ```
 
+## Guides
+
+Interactive tutorials with code, diagrams, and runnable marimo notebooks:
+
+| Guide | What You'll Learn |
+|-------|-------------------|
+| **[Getting Started](guides/getting-started.md)** | Build a thermostat model in 5 progressive stages — from raw blocks to DSL to verification |
+| **[Rosetta Stone](guides/rosetta-stone.md)** | Same resource-pool problem modeled with stockflow, control, and game theory DSLs |
+| **[Verification](guides/verification.md)** | All 3 verification layers demonstrated with deliberately broken models |
+| **[Visualization](guides/visualization.md)** | 6 view types, 5 themes, and cross-DSL rendering with gds-viz |
+
 ## Architecture
 
 ```

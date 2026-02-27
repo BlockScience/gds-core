@@ -139,6 +139,11 @@ nav:
       - Building Models: examples/building-models.md
       - Feature Matrix: examples/feature-matrix.md
   - Guides:
-      - Layer 0 Milestone: guides/architecture-milestone-layer0.md
-      - DSL Roadmap: guides/dsl-roadmap.md
+      - Getting Started: guides/getting-started.md
+      - Rosetta Stone: guides/rosetta-stone.md
+      - Verification: guides/verification.md
+      - Visualization: guides/visualization.md
+      - Design Notes:
+          - Layer 0 Milestone: guides/architecture-milestone-layer0.md
+          - DSL Roadmap: guides/dsl-roadmap.md
   - Ecosystem: framework/ecosystem.md
