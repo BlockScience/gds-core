@@ -14,6 +14,5 @@ jobs:
       - uses: astral-sh/setup-uv@v7
         with:
           python-version: "3.12"
-      - run: uv tool install pip-audit
       - run: uv sync --all-packages
-      - run: uv run pip-audit
+      - run: uv tool run pip-audit
