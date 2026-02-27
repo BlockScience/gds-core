@@ -27,7 +27,7 @@ All three compile to `GDSSpec` / `SystemIR` and produce clean canonical decompos
 
 ## DSL Contract Checklist
 
-Every new DSL must answer the [Semantic Layer Contract](../architecture.md#4-the-semantic-layer-contract) — eight questions that fully specify how a domain maps onto the composition algebra:
+Every new DSL must answer the [Semantic Layer Contract](../framework/guide/architecture.md#4-the-semantic-layer-contract) — eight questions that fully specify how a domain maps onto the composition algebra:
 
 1. **Block semantics** — what does a block represent?
 2. **Sequential (`>>`)** — what operation is induced?
@@ -65,7 +65,7 @@ Before the first external release of a new DSL:
 
 ## Potential Future DSLs
 
-These formalisms are in-scope per the [architecture scope boundary](../architecture.md#5-scope-boundary) and should compile to the existing substrate without architectural changes:
+These formalisms are in-scope per the [architecture scope boundary](../framework/guide/architecture.md#5-scope-boundary) and should compile to the existing substrate without architectural changes:
 
 | Formalism | Expected Mapping | Complexity |
 |---|---|---|

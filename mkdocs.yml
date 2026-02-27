@@ -146,4 +146,6 @@ nav:
       - Design Notes:
           - Layer 0 Milestone: guides/architecture-milestone-layer0.md
           - DSL Roadmap: guides/dsl-roadmap.md
+          - Research Boundaries: guides/research-boundaries.md
+          - View Stratification: guides/view-stratification.md
   - Ecosystem: framework/ecosystem.md
