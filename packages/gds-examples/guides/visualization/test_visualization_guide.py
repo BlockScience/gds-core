@@ -204,14 +204,14 @@ class TestCrossDslViews:
         di_keys = set(all_views["double_integrator"].keys())
         assert sir_keys == di_keys
 
-    def test_sir_has_parameters_double_integrator_does_not(self):
+    def test_sir_and_double_integrator_both_have_parameters(self):
         all_views = generate_cross_dsl_views()
         sir_params = all_views["sir_epidemic"]["parameter_influence"]
         di_params = all_views["double_integrator"]["parameter_influence"]
         # SIR has beta, gamma, contact_rate
         assert "param_beta" in sir_params
-        # Double integrator has no explicit parameters
-        assert "No parameters defined" in di_params
+        # Double integrator has force (Input → parameter)
+        assert "param_force" in di_params
 
     def test_both_canonical_views_have_x_nodes(self):
         all_views = generate_cross_dsl_views()

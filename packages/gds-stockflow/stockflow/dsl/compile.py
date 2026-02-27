@@ -118,6 +118,7 @@ def _build_converter_block(conv: Converter) -> BoundaryAction:
         interface=Interface(
             forward_out=(port(_signal_port_name(conv.name)),),
         ),
+        params_used=[conv.name],
     )
 
 
