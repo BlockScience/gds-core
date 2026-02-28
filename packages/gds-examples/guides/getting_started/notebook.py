@@ -333,8 +333,7 @@ def _(mo):
     _semantic_table = mo.md(
         "### Semantic Checks (GDSSpec)\n\n"
         "| Result |\n"
-        "|--------|"
-        + ("\n" + _semantic_rows if _semantic_rows else "")
+        "|--------|" + ("\n" + _semantic_rows if _semantic_rows else "")
     )
 
     # -- Mermaid views in tabs --
@@ -414,8 +413,7 @@ def _(mo):
         "### Parameter Influence\n\n"
         "Which blocks does each parameter affect?\n\n"
         "| Parameter | Blocks |\n"
-        "|-----------|--------|"
-        + ("\n" + _param_rows if _param_rows else "")
+        "|-----------|--------|" + ("\n" + _param_rows if _param_rows else "")
     )
 
     # -- Entity updates --
@@ -443,8 +441,7 @@ def _(mo):
     _role_table = mo.md(
         "### Blocks by Role\n\n"
         "| Role | Blocks |\n"
-        "|------|--------|"
-        + ("\n" + _role_rows if _role_rows else "")
+        "|------|--------|" + ("\n" + _role_rows if _role_rows else "")
     )
 
     # -- Causal chain --
@@ -465,8 +462,7 @@ def _(mo):
         "### Dependency Graph\n\n"
         "Block-to-block information flow:\n\n"
         "| Source | Targets |\n"
-        "|--------|---------|"
-        + ("\n" + _dep_rows if _dep_rows else "")
+        "|--------|---------|" + ("\n" + _dep_rows if _dep_rows else "")
     )
 
     mo.vstack(
