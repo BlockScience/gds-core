@@ -102,7 +102,7 @@ The composition tree follows a convergent tiered pattern:
 
 These coexist at different levels:
 
-1. **Token-based** (`types/tokens.py`) — structural set matching at composition/wiring time. Port names auto-tokenize (split on spaces, lowercase → frozenset). The `>>` operator and auto-wiring use token overlap for matching. `"Heater Command"` auto-wires to `"Command Signal"` because they share the token `"command"`.
+1. **Token-based** (`types/tokens.py`) — structural set matching at composition/wiring time. Port names auto-tokenize by splitting on ` + ` (space-plus-space) and `, ` (comma-space), then lowercasing each part. Plain spaces are NOT delimiters: `"Heater Command"` is one token `"heater command"`. The `>>` operator and auto-wiring use token overlap for matching. `"Temperature + Setpoint"` auto-wires to `"Temperature"` because they share the token `"temperature"`.
 
 2. **TypeDef-based** (`types/typedef.py`) — runtime validation at the data level. TypeDef wraps a Python type + optional constraint predicate. Used by Spaces and Entities to validate actual data values. Never called during compilation.
 

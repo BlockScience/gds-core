@@ -29,7 +29,19 @@ def typedef(
     description: str = "",
     units: str | None = None,
 ) -> TypeDef:
-    """Create a TypeDef with positional name + type, keyword-only rest."""
+    """Create a TypeDef with positional name + type, keyword-only rest.
+
+    Args:
+        name: Unique type name (e.g. ``"Temperature"``).
+        python_type: Python type for isinstance checks (e.g. ``float``).
+        constraint: Optional predicate for runtime validation
+            (e.g. ``lambda x: x >= 0``).
+        description: Human-readable description.
+        units: Optional unit label (e.g. ``"celsius"``).
+
+    Returns:
+        A frozen ``TypeDef`` instance.
+    """
     return TypeDef(
         name=name,
         python_type=python_type,
@@ -45,10 +57,19 @@ def state_var(
     symbol: str = "",
     description: str = "",
 ) -> StateVariable:
-    """Create a StateVariable without specifying a name.
+    """Create a StateVariable from a TypeDef, deferring name resolution to ``entity()``.
 
-    The name is resolved by ``entity()`` from the kwarg key.
-    If used standalone, falls back to ``td.name``.
+    The variable name defaults to ``td.name`` but is overridden by the kwarg key
+    when passed to ``entity()``. Use this instead of constructing ``StateVariable``
+    directly to avoid specifying the name twice.
+
+    Args:
+        td: The TypeDef that defines this variable's type and constraints.
+        symbol: Optional math symbol (e.g. ``"x"``).
+        description: Human-readable description.
+
+    Returns:
+        A frozen ``StateVariable`` instance.
     """
     return StateVariable(
         name=td.name, typedef=td, symbol=symbol, description=description
@@ -58,9 +79,22 @@ def state_var(
 def entity(name: str, *, description: str = "", **variables: StateVariable) -> Entity:
     """Create an Entity with variables as keyword arguments.
 
-    Each kwarg key becomes the variable name. If the StateVariable was created
+    Each kwarg key becomes the variable name. If the ``StateVariable`` was created
     via ``state_var()`` (which uses the typedef name as a placeholder), the name
     is replaced with the kwarg key.
+
+    Args:
+        name: Entity name (e.g. ``"Room"``, ``"Agent"``).
+        description: Human-readable description.
+        **variables: Named state variables. Keys become variable names.
+
+    Returns:
+        A frozen ``Entity`` instance.
+
+    Example::
+
+        temp = gds.typedef("Temperature", float)
+        room = gds.entity("Room", temperature=gds.state_var(temp))
     """
     resolved: dict[str, StateVariable] = {}
     for var_name, sv in variables.items():
@@ -77,7 +111,16 @@ def entity(name: str, *, description: str = "", **variables: StateVariable) -> E
 
 
 def space(name: str, *, description: str = "", **fields: TypeDef) -> Space:
-    """Create a Space with fields as keyword arguments."""
+    """Create a Space with fields as keyword arguments.
+
+    Args:
+        name: Space name (e.g. ``"TemperatureSignal"``).
+        description: Human-readable description.
+        **fields: Named fields mapping to TypeDef instances.
+
+    Returns:
+        A frozen ``Space`` instance.
+    """
     return Space(name=name, fields=fields, description=description)
 
 
@@ -93,7 +136,18 @@ def interface(
 ) -> Interface:
     """Create an Interface from lists of port name strings.
 
-    Each string is auto-converted to a Port via ``port()``.
+    Each string is auto-converted to a ``Port`` via ``port()``, which
+    tokenizes the name for structural matching (e.g. ``"Heater Command"``
+    becomes tokens ``{"heater", "command"}``).
+
+    Args:
+        forward_in: Covariant input port names.
+        forward_out: Covariant output port names.
+        backward_in: Contravariant input port names.
+        backward_out: Contravariant output port names.
+
+    Returns:
+        A frozen ``Interface`` instance.
     """
 
     def _to_ports(names: list[str] | None) -> tuple[Port, ...]:
