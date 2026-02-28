@@ -64,7 +64,10 @@ nav:
       - User Guide:
           - Architecture: framework/guide/architecture.md
           - Type System: framework/guide/types.md
+          - Spaces: framework/guide/spaces.md
+          - State & Entities: framework/guide/state.md
           - Blocks & Roles: framework/guide/blocks.md
+          - Composition: framework/guide/composition.md
           - Specification: framework/guide/spec.md
           - Verification: framework/guide/verification.md
           - Glossary: framework/guide/glossary.md
@@ -74,6 +77,7 @@ nav:
           - Proposals:
               - Entity Redesign: framework/design/proposals/entity-redesign.md
       - API Reference:
+          - Overview: framework/api/index.md
           - gds: framework/api/init.md
           - gds.blocks: framework/api/blocks.md
           - gds.types: framework/api/types.md
@@ -138,6 +142,8 @@ nav:
           - Crosswalk Problem: examples/examples/crosswalk.md
       - Building Models: examples/building-models.md
       - Feature Matrix: examples/feature-matrix.md
+  - Tutorials:
+      - Getting Started: tutorials/getting-started.md
   - Guides:
       - Getting Started: guides/getting-started.md
       - Rosetta Stone: guides/rosetta-stone.md
