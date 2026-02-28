@@ -65,13 +65,14 @@ def build_sir():
         if _path not in sys.path:
             sys.path.insert(0, _path)
 
-    from sir_epidemic.model import build_spec, build_system
+    from sir_epidemic.model import build_spec as _sir_build_spec
+    from sir_epidemic.model import build_system as _sir_build_system
 
-    from gds.canonical import project_canonical
+    from gds.canonical import project_canonical as _sir_project_canonical
 
-    sir_spec = build_spec()
-    sir_system = build_system()
-    sir_canonical = project_canonical(sir_spec)
+    sir_spec = _sir_build_spec()
+    sir_system = _sir_build_system()
+    sir_canonical = _sir_project_canonical(sir_spec)
     return sir_canonical, sir_spec, sir_system
 
 
@@ -211,22 +212,30 @@ def all_views_tabs_header(mo):
 @app.cell
 def all_views_tabs(mo, sir_spec, sir_system, sir_canonical):
     from gds_viz import (
-        canonical_to_mermaid,
-        params_to_mermaid,
-        spec_to_mermaid,
-        system_to_mermaid,
-        trace_to_mermaid,
+        canonical_to_mermaid as _canonical_to_mermaid,
+    )
+    from gds_viz import (
+        params_to_mermaid as _params_to_mermaid,
+    )
+    from gds_viz import (
+        spec_to_mermaid as _spec_to_mermaid,
+    )
+    from gds_viz import (
+        system_to_mermaid as _system_to_mermaid,
+    )
+    from gds_viz import (
+        trace_to_mermaid as _trace_to_mermaid,
     )
 
     _tabs = mo.ui.tabs(
         {
-            "1. Structural": mo.mermaid(system_to_mermaid(sir_system)),
-            "2. Canonical": mo.mermaid(canonical_to_mermaid(sir_canonical)),
-            "3. By Role": mo.mermaid(spec_to_mermaid(sir_spec)),
-            "4. By Domain": mo.mermaid(spec_to_mermaid(sir_spec, group_by="domain")),
-            "5. Parameters": mo.mermaid(params_to_mermaid(sir_spec)),
+            "1. Structural": mo.mermaid(_system_to_mermaid(sir_system)),
+            "2. Canonical": mo.mermaid(_canonical_to_mermaid(sir_canonical)),
+            "3. By Role": mo.mermaid(_spec_to_mermaid(sir_spec)),
+            "4. By Domain": mo.mermaid(_spec_to_mermaid(sir_spec, group_by="domain")),
+            "5. Parameters": mo.mermaid(_params_to_mermaid(sir_spec)),
             "6. Traceability": mo.mermaid(
-                trace_to_mermaid(sir_spec, "Susceptible", "count")
+                _trace_to_mermaid(sir_spec, "Susceptible", "count")
             ),
         }
     )
@@ -284,15 +293,16 @@ def theme_controls(mo):
 
 @app.cell
 def render_themed_view(mo, theme_dropdown, theme_view_dropdown, sir_spec, sir_system):
-    from gds_viz import spec_to_mermaid, system_to_mermaid
+    from gds_viz import spec_to_mermaid as _spec_to_mermaid
+    from gds_viz import system_to_mermaid as _system_to_mermaid
 
     _theme = theme_dropdown.value
     _view = theme_view_dropdown.value
 
     if _view == "structural":
-        _mermaid = system_to_mermaid(sir_system, theme=_theme)
+        _mermaid = _system_to_mermaid(sir_system, theme=_theme)
     else:
-        _mermaid = spec_to_mermaid(sir_spec, theme=_theme)
+        _mermaid = _spec_to_mermaid(sir_spec, theme=_theme)
 
     mo.vstack(
         [
@@ -317,10 +327,10 @@ def theme_comparison_header(mo):
 
 @app.cell
 def theme_side_by_side(mo, sir_system):
-    from gds_viz import system_to_mermaid
+    from gds_viz import system_to_mermaid as _system_to_mermaid
 
-    _neutral = system_to_mermaid(sir_system, theme="neutral")
-    _dark = system_to_mermaid(sir_system, theme="dark")
+    _neutral = _system_to_mermaid(sir_system, theme="neutral")
+    _dark = _system_to_mermaid(sir_system, theme="dark")
 
     mo.hstack(
         [
@@ -356,13 +366,14 @@ def section_cross_dsl_header(mo):
 
 @app.cell
 def build_double_integrator():
-    from double_integrator.model import build_spec, build_system
+    from double_integrator.model import build_spec as _di_build_spec
+    from double_integrator.model import build_system as _di_build_system
 
-    from gds.canonical import project_canonical
+    from gds.canonical import project_canonical as _di_project_canonical
 
-    di_spec = build_spec()
-    di_system = build_system()
-    di_canonical = project_canonical(di_spec)
+    di_spec = _di_build_spec()
+    di_system = _di_build_system()
+    di_canonical = _di_project_canonical(di_spec)
     return di_canonical, di_spec, di_system
 
 
@@ -404,11 +415,19 @@ def render_cross_dsl_view(
     di_canonical,
 ):
     from gds_viz import (
-        canonical_to_mermaid,
-        params_to_mermaid,
-        spec_to_mermaid,
-        system_to_mermaid,
-        trace_to_mermaid,
+        canonical_to_mermaid as _canonical_to_mermaid,
+    )
+    from gds_viz import (
+        params_to_mermaid as _params_to_mermaid,
+    )
+    from gds_viz import (
+        spec_to_mermaid as _spec_to_mermaid,
+    )
+    from gds_viz import (
+        system_to_mermaid as _system_to_mermaid,
+    )
+    from gds_viz import (
+        trace_to_mermaid as _trace_to_mermaid,
     )
 
     _model = model_dropdown.value
@@ -424,11 +443,11 @@ def render_cross_dsl_view(
         _label = "Double Integrator"
 
     _generators = {
-        "structural": lambda: system_to_mermaid(_system),
-        "canonical": lambda: canonical_to_mermaid(_canonical),
-        "role": lambda: spec_to_mermaid(_spec),
-        "params": lambda: params_to_mermaid(_spec),
-        "trace": lambda: trace_to_mermaid(_spec, _trace_entity, _trace_var),
+        "structural": lambda: _system_to_mermaid(_system),
+        "canonical": lambda: _canonical_to_mermaid(_canonical),
+        "role": lambda: _spec_to_mermaid(_spec),
+        "params": lambda: _params_to_mermaid(_spec),
+        "trace": lambda: _trace_to_mermaid(_spec, _trace_entity, _trace_var),
     }
 
     mo.vstack(
@@ -459,20 +478,20 @@ def canonical_comparison_header(mo):
 
 @app.cell
 def canonical_comparison(mo, sir_canonical, di_canonical):
-    from gds_viz import canonical_to_mermaid
+    from gds_viz import canonical_to_mermaid as _canonical_to_mermaid
 
     mo.hstack(
         [
             mo.vstack(
                 [
                     mo.md(f"**SIR Epidemic** — `{sir_canonical.formula()}`"),
-                    mo.mermaid(canonical_to_mermaid(sir_canonical)),
+                    mo.mermaid(_canonical_to_mermaid(sir_canonical)),
                 ]
             ),
             mo.vstack(
                 [
                     mo.md(f"**Double Integrator** — `{di_canonical.formula()}`"),
-                    mo.mermaid(canonical_to_mermaid(di_canonical)),
+                    mo.mermaid(_canonical_to_mermaid(di_canonical)),
                 ]
             ),
         ],
