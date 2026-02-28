@@ -1,93 +1,274 @@
-# CLAUDE.md
+# CLAUDE.md — gds-framework
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+## Package Identity
 
-## Project
+**This is NOT Neo4j GDS (Graph Data Science). This is NOT GDSFactory (photonics).**
 
-`gds-framework` — typed compositional specifications for complex systems, grounded in Generalized Dynamical Systems theory. Published on PyPI as `gds-framework`, imported as `gds`.
+`gds-framework` is a Python library for typed compositional specifications of complex systems, grounded in Generalized Dynamical Systems (GDS) theory. It provides a composition algebra for blocks with bidirectional typed interfaces, a specification registry, and formal verification.
 
-## Commands
+- **PyPI**: `pip install gds-framework` (or `uv add gds-framework`)
+- **Import**: `import gds` (not `gds_framework`)
+- **Repository**: `packages/gds-framework/` in the `gds-core` monorepo
+- **Theory**: [GDS (Roxin; Zargham & Shorish)](https://doi.org/10.57938/e8d456ea-d975-4111-ac41-052ce73cb0cc)
 
-```bash
-uv sync                                    # Install dependencies
-uv run pytest tests/ -v                    # Run all 336 tests
-uv run pytest tests/test_blocks.py -v      # Single test file
-uv run pytest tests/test_blocks.py::TestStackComposition::test_rshift_operator -v  # Single test
-uv build                                   # Build wheel (gds_framework-*.whl)
-uv run python -c "import gds; print(gds.__version__)"  # Verify install
+## Quick API Reference
+
+Every public symbol is importable from `gds`:
+
+```python
+from gds import (
+    # Composition algebra (Layer 0)
+    Block, AtomicBlock,                          # base block types
+    StackComposition, ParallelComposition,        # >> and | operators
+    FeedbackLoop, TemporalLoop,                   # .feedback() and .loop()
+    Wiring,                                       # explicit wiring between blocks
+    Interface, Port, port,                        # bidirectional typed interfaces
+
+    # Block roles
+    BoundaryAction,     # exogenous input (forward_in must be empty)
+    Policy,             # decision logic (maps signals to mechanism inputs)
+    Mechanism,          # state update (only block that writes state, no backward ports)
+    ControlAction,      # endogenous control (reads state, emits signals)
+    HasParams, HasConstraints, HasOptions,  # structural protocols
+
+    # Specification framework (Layer 1)
+    GDSSpec, SpecWiring, Wire,              # spec registry + wiring declarations
+    TypeDef,                                 # runtime-constrained type definition
+    Space, EMPTY, TERMINAL,                  # typed product spaces
+    Entity, StateVariable,                   # state model
+    ParameterDef, ParameterSchema,           # parameter space (Theta)
+    CanonicalGDS, project_canonical,         # h = f . g decomposition
+    Tagged,                                  # inert tag mixin
+
+    # Convenience helpers (preferred for new code)
+    typedef, space, entity, state_var,       # factory functions
+    interface,                               # Interface from port name strings
+
+    # Compiler (Layer 0 -> IR)
+    compile_system,                          # Block tree -> SystemIR
+    flatten_blocks, extract_wirings, extract_hierarchy,  # individual stages
+    StructuralWiring, WiringOrigin,          # compiler intermediates
+
+    # IR models
+    SystemIR, BlockIR, WiringIR,             # flat intermediate representation
+    HierarchyNodeIR, InputIR,                # hierarchy + inputs
+    CompositionType, FlowDirection,          # enums
+    sanitize_id,                             # name -> safe ID
+
+    # Serialization
+    IRDocument, IRMetadata, save_ir, load_ir,  # IR JSON persistence
+    spec_to_dict, spec_to_json,                # spec serialization
+
+    # Verification
+    verify,                                  # verify(system: SystemIR) -> VerificationReport
+    Finding, Severity, VerificationReport,   # verification results
+    check_completeness, check_determinism,   # semantic checks (SC-001..SC-007)
+    check_reachability, check_type_safety,
+    check_parameter_references,
+    check_canonical_wellformedness,
+
+    # Custom checks
+    gds_check, get_custom_checks, all_checks,  # decorator + registries
+
+    # Built-in TypeDefs
+    Probability, NonNegativeFloat, PositiveInt,  # constrained numeric types
+    TokenAmount, AgentID, Timestamp,
+
+    # Token system
+    tokenize, tokens_overlap, tokens_subset,  # port name matching
+
+    # Query engine
+    SpecQuery,                               # dependency analysis on GDSSpec
+
+    # Errors
+    GDSError, GDSTypeError, GDSCompositionError,
+)
+```
+
+## Constructor Signatures
+
+### Convenience helpers (recommended)
+
+```python
+def typedef(name: str, python_type: type, *, constraint: Callable | None = None,
+            description: str = "", units: str | None = None) -> TypeDef
+
+def space(name: str, *, description: str = "", **fields: TypeDef) -> Space
+
+def state_var(td: TypeDef, *, symbol: str = "", description: str = "") -> StateVariable
+
+def entity(name: str, *, description: str = "", **variables: StateVariable) -> Entity
+
+def interface(*, forward_in: list[str] | None = None, forward_out: list[str] | None = None,
+              backward_in: list[str] | None = None, backward_out: list[str] | None = None) -> Interface
+
+def compile_system(name: str, root: Block,
+                   block_compiler: Callable | None = None,
+                   wiring_emitter: Callable | None = None,
+                   composition_type: CompositionType = CompositionType.SEQUENTIAL,
+                   source: str = "", inputs: list[InputIR] | None = None) -> SystemIR
+
+def verify(system: SystemIR, checks: list[Callable] | None = None) -> VerificationReport
+```
+
+### Direct constructors
+
+```python
+TypeDef(name: str, python_type: type, description: str = "",
+        constraint: Callable | None = None, units: str | None = None)  # frozen
+
+Space(name: str, fields: dict[str, TypeDef] = {}, description: str = "")  # frozen
+
+StateVariable(name: str, typedef: TypeDef, description: str = "", symbol: str = "")  # frozen
+
+Entity(name: str, variables: dict[str, StateVariable] = {}, description: str = "")  # frozen
+
+GDSSpec(name: str, description: str = "")  # mutable registry
+# Methods: .register_type(t), .register_space(s), .register_entity(e),
+#          .register_block(b), .register_wiring(w), .register_parameter(p)
+#          .collect(*objects)  — bulk register TypeDef|Space|Entity|Block|ParameterDef
+#          .validate_spec() -> list[str]
+
+Wire(source: str, target: str, space: str = "", optional: bool = False)  # frozen
+SpecWiring(name: str, block_names: list[str] = [], wires: list[Wire] = [],
+           description: str = "")  # frozen
+
+ParameterDef(name: str, typedef: TypeDef, description: str = "",
+             bounds: tuple[Any, Any] | None = None)  # frozen
+```
+
+### Block roles
+
+```python
+# All roles take: name: str, interface: Interface, kind: str (auto-set)
+BoundaryAction(name=..., interface=interface(forward_out=["Signal"]))
+# Constraint: forward_in must be empty
+
+Policy(name=..., interface=interface(forward_in=["Signal"], forward_out=["Command"]))
+# No extra constraints
+
+Mechanism(name=..., interface=interface(forward_in=["Command"]),
+          updates=[("entity_name", "variable_name")])
+# Constraint: backward_in and backward_out must be empty
+
+ControlAction(name=..., interface=interface(forward_in=["State"], forward_out=["Control"]))
+# No extra constraints
+
+# All roles support: params_used: list[str], constraints: list[str]
+# BoundaryAction, Policy, ControlAction also support: options: list[str]
+```
+
+## Minimal Complete Example
+
+```python
+import gds
+
+# 1. Define types
+Temperature = gds.typedef("Temperature", float, units="celsius")
+HeaterCommand = gds.typedef("HeaterCommand", float)
+
+# 2. Define state
+temp_entity = gds.entity("Room", temperature=gds.state_var(Temperature))
+
+# 3. Define blocks
+sensor = gds.BoundaryAction(
+    name="Sensor",
+    interface=gds.interface(forward_out=["Temperature"]),
+)
+controller = gds.Policy(
+    name="Controller",
+    interface=gds.interface(forward_in=["Temperature"], forward_out=["Heater Command"]),
+)
+heater = gds.Mechanism(
+    name="Heater",
+    interface=gds.interface(forward_in=["Heater Command"]),
+    updates=[("Room", "temperature")],
+)
+
+# 4. Compose (>> auto-wires by token overlap)
+system = sensor >> controller >> heater
+
+# 5. Compile to IR
+system_ir = gds.compile_system("thermostat", system)
+
+# 6. Verify
+report = gds.verify(system_ir)
+assert report.passed
+
+# 7. Build spec (optional — for semantic analysis)
+spec = gds.GDSSpec(name="thermostat")
+spec.collect(Temperature, HeaterCommand, temp_entity, sensor, controller, heater)
+canonical = gds.project_canonical(spec)  # derives h = f . g
 ```
 
 ## Architecture
 
 ### Two-Layer Design
 
-**Layer 1 — Composition Algebra** (the engine):
-Blocks with bidirectional typed interfaces, composed via four operators (`>>`, `|`, `.feedback()`, `.loop()`). A 3-stage compiler flattens composition trees into flat IR (blocks + wirings + hierarchy). Six generic verification checks (G-001..G-006) validate structural properties on the IR.
+**Layer 0 — Composition Algebra** (`blocks/`, `compiler/`, `ir/`, `verification/generic_checks.py`):
+Domain-neutral engine. Blocks with bidirectional typed interfaces, composed via `>>`, `|`, `.feedback()`, `.loop()`. A 3-stage compiler flattens composition trees into flat IR. Six generic checks (G-001..G-006) validate structural properties.
 
-**Layer 2 — Specification Layer** (the framework):
-TypeDef with runtime constraints, typed Spaces, Entities with StateVariables, Block roles (BoundaryAction/Policy/Mechanism/ControlAction), GDSSpec registry, ParameterSchema (Θ), canonical projection (CanonicalGDS), Tagged mixin, semantic verification (SC-001..SC-007), SpecQuery for dependency analysis, and JSON serialization.
+**Layer 1 — Specification Framework** (`spec.py`, `canonical.py`, `state.py`, `spaces.py`, `types/`):
+GDS theory layer. `GDSSpec` registry for types, spaces, entities, blocks, wirings, parameters. `project_canonical()` derives formal `h = f . g` decomposition. Seven semantic checks (SC-001..SC-007) validate domain properties.
+
+Layers are loosely coupled: use the composition algebra without `GDSSpec`, or use `GDSSpec` without the compiler.
 
 ### Two Type Systems
 
-These coexist at different levels and serve different purposes:
+1. **Token-based** (`types/tokens.py`) — structural set matching at composition time. Port names auto-tokenize: `"Heater Command"` -> `{"heater", "command"}`. The `>>` operator auto-wires by token overlap.
 
-1. **Token-based** (`types/tokens.py`) — lightweight structural matching at composition/wiring time. Port names auto-tokenize; `tokens_subset()` and `tokens_overlap()` check set containment. Used by composition validators, auto-wiring, and G-001/G-005 checks.
-
-2. **TypeDef-based** (`types/typedef.py`) — rich runtime validation at the data level. TypeDef wraps a Python type + optional constraint predicate. Used by Spaces and Entities to validate actual data values.
+2. **TypeDef-based** (`types/typedef.py`) — runtime validation at the data level. Wraps Python type + optional constraint predicate. Used by Spaces and Entities. Never called during compilation.
 
 ### Compilation Pipeline
 
 ```
-Block tree  →  flatten()  →  list[AtomicBlock]  →  block_compiler()  →  list[BlockIR]
-            →  _walk_wirings()  →  list[WiringIR]  (explicit + auto-wired)
-            →  _extract_hierarchy()  →  HierarchyNodeIR tree  →  _flatten_sequential_chains()
-            =  SystemIR(blocks, wirings, hierarchy)
+Block tree -> flatten() -> list[AtomicBlock] -> block_compiler() -> list[BlockIR]
+           -> _walk_wirings() -> list[WiringIR] (explicit + auto-wired)
+           -> _extract_hierarchy() -> HierarchyNodeIR tree
+           = SystemIR(blocks, wirings, hierarchy)
 ```
 
-Auto-wiring for `>>` matches `forward_out` ports to `forward_in` ports by token overlap. Feedback marks `is_feedback=True`; temporal marks `is_temporal=True`.
+### Block Hierarchy (Sealed)
 
-### Block Hierarchy
-
-The composition algebra is **sealed** — only 5 concrete Block types exist:
-- `AtomicBlock` — leaf node (domain packages subclass this, never the composition operators)
+5 concrete Block types. Domain packages subclass `AtomicBlock` only:
+- `AtomicBlock` — leaf node
 - `StackComposition` (`>>`) — sequential, validates token overlap
-- `ParallelComposition` (`|`) — independent, no type validation
-- `FeedbackLoop` (`.feedback()`) — backward within timestep
-- `TemporalLoop` (`.loop()`) — forward across timesteps, enforces COVARIANT only
-
-Block roles (`BoundaryAction`, `Policy`, `Mechanism`, `ControlAction`) subclass `AtomicBlock` and add constraints: BoundaryAction enforces `forward_in=()`, Mechanism enforces `backward_in=()` and `backward_out=()`.
+- `ParallelComposition` (`|`) — independent
+- `FeedbackLoop` (`.feedback()`) — backward within timestep, CONTRAVARIANT
+- `TemporalLoop` (`.loop()`) — forward across timesteps, COVARIANT only
 
 ### Verification
 
-Pluggable: `verify(system, checks=None)` runs check functions against SystemIR. Each check is `Callable[[SystemIR], list[Finding]]`. Generic checks (G-001..G-006) validate IR topology. Semantic checks (SC-001..SC-007) validate GDSSpec properties (completeness, determinism, reachability, type safety, parameter references, canonical wellformedness).
+```python
+# Generic checks on SystemIR (structural topology)
+report = gds.verify(system_ir)  # runs G-001..G-006
 
-### Parameter System
+# Semantic checks on GDSSpec (domain properties)
+from gds import check_completeness, check_type_safety
+# SC-001..SC-007: completeness, determinism, reachability, type safety,
+#                 parameter references, canonical wellformedness
 
-`ParameterDef` + `ParameterSchema` define the configuration space Θ at the specification level. Parameters are structural metadata — GDS does not assign values or bind them. `GDSSpec.parameter_schema` holds the registry; blocks reference parameters via `params_used: list[str]`.
-
-### Canonical Projection
-
-`project_canonical(spec: GDSSpec) → CanonicalGDS` is a pure function that derives the formal GDS decomposition: X (state), U (input), D (decision), Θ (parameters), g (policy), f (mechanism). Operates on GDSSpec (not SystemIR) because SystemIR is flat and lacks role/entity info.
-
-### Tagged Mixin
-
-`Tagged` is a BaseModel mixin providing `tags: dict[str, str]` with `with_tag()`, `with_tags()`, `has_tag()`, `get_tag()`. Applied to Block, Entity, GDSSpec. Tags are inert — stripped at compile time (BlockIR/SystemIR have no tags field), never affect verification or composition.
+# Custom checks via decorator
+@gds.gds_check("CUSTOM-001", gds.Severity.WARNING)
+def my_check(system: gds.SystemIR) -> list[gds.Finding]: ...
+```
 
 ## Key Conventions
 
-- **All data models are Pydantic v2 `BaseModel`** — not dataclasses, not plain classes
-- **Frozen models** for value objects: Port, Interface, Wiring, Space, TypeDef, StateVariable, Wire, SpecWiring
-- **`@model_validator(mode="after")` returning `Self`** for construction-time validation (composition operators, role constraints)
-- **`ConfigDict(arbitrary_types_allowed=True)`** on models storing `type` or `Callable` fields (TypeDef, Space, StateVariable, GDSSpec)
-- **Absolute imports only** — always `from gds.blocks.base import ...`, never relative
-- **`TYPE_CHECKING` guard** in `blocks/base.py` to break circular dependency with `blocks/composition.py`
-- **`Field(default_factory=list)`** for mutable defaults, never bare `[]`
-- **`@property`** for computed attributes on models, not `computed_field()`
-- **String enums** (`str, Enum`) for JSON-friendly serialization (FlowDirection, CompositionType, Severity)
-- **Custom exceptions** inherit from `GDSError` base: `GDSTypeError` for port mismatches, `GDSCompositionError` for structural constraint violations
-- All public symbols re-exported through `gds/__init__.py` with explicit `__all__`
-- Package name on PyPI is `gds-framework`, import name is `gds` (mapped via `[tool.hatch.build.targets.wheel] packages = ["gds"]`)
+- All data models are Pydantic v2 `BaseModel` — frozen for value objects, mutable for registries
+- `@model_validator(mode="after")` returning `Self` for construction-time invariant enforcement
+- Absolute imports only (`from gds.blocks.base import ...`)
+- Tags (`Tagged` mixin) are inert — stripped at compile time, never affect verification
+- Parameters (Theta) are structural metadata — GDS never assigns values or binds them
+- `GDSSpec.collect()` type-dispatches TypeDef/Space/Entity/Block/ParameterDef
+- PyPI name is `gds-framework`, import name is `gds` (mapped via `[tool.hatch.build.targets.wheel]`)
 
-## Intellectual Lineage
+## Commands
 
-The design synthesizes: GDS theory (Roxin; Zargham & Shorish), MSML (BlockScience), BDP-lib, and categorical cybernetics (Ghani, Hedges). See `docs/gds_deepdive.md` for the full analysis and `docs/gds_improvement_plan.md` for the roadmap.
+```bash
+uv sync                                    # Install dependencies
+uv run pytest tests/ -v                    # Run all tests
+uv run pytest tests/test_blocks.py -v      # Single test file
+uv build                                   # Build wheel
+uv run python -c "import gds; print(gds.__version__)"  # Verify install
+```
