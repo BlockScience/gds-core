@@ -53,12 +53,6 @@ RecordCount = typedef(
     description="Running count of ingested records",
 )
 
-SuccessFlag = typedef(
-    "SuccessFlag",
-    bool,
-    description="Whether the record passed validation",
-)
-
 # ── Entity ─────────────────────────────────────────────────
 # State that persists across pipeline runs. The dataset is the
 # accumulator — every successful record increments the count.
@@ -72,7 +66,6 @@ dataset = entity(
 # Transient signals flowing through the pipeline within one run.
 
 raw_space = space("RawIngestion", payload=RawPayload)
-validated_space = space("ValidatedRecord", record=CleanRecord, valid=SuccessFlag)
 write_space = space("WriteCommand", record=CleanRecord)
 
 # ── Blocks ─────────────────────────────────────────────────
@@ -103,8 +96,8 @@ def build_etl_spec() -> GDSSpec:
     spec = GDSSpec(name="ETL Pipeline", description="Ingest → validate → persist")
 
     spec.collect(
-        RawPayload, CleanRecord, RecordCount, SuccessFlag,
-        raw_space, validated_space, write_space,
+        RawPayload, CleanRecord, RecordCount,
+        raw_space, write_space,
         dataset,
         ingest, validate_transform, persist_record,
     )

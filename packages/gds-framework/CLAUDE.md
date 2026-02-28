@@ -62,10 +62,14 @@ from gds import (
     # Verification
     verify,                                  # verify(system: SystemIR) -> VerificationReport
     Finding, Severity, VerificationReport,   # verification results
-    check_completeness, check_determinism,   # semantic checks (SC-001..SC-007)
-    check_reachability, check_type_safety,
-    check_parameter_references,
-    check_canonical_wellformedness,
+
+    # Semantic checks — these take GDSSpec, NOT SystemIR:
+    check_completeness,                      # (spec) -> list[Finding]  SC-001
+    check_determinism,                       # (spec) -> list[Finding]  SC-002
+    check_reachability,                      # (spec, from_block, to_block) -> list[Finding]  SC-003
+    check_type_safety,                       # (spec) -> list[Finding]  SC-004
+    check_parameter_references,              # (spec) -> list[Finding]  SC-005
+    check_canonical_wellformedness,          # (spec) -> list[Finding]  SC-006/SC-007
 
     # Custom checks
     gds_check, get_custom_checks, all_checks,  # decorator + registries
@@ -193,7 +197,7 @@ system_ir = gds.compile_system("thermostat", system)
 
 # 6. Verify
 report = gds.verify(system_ir)
-assert report.passed
+assert report.errors == 0
 
 # 7. Build spec (optional — for semantic analysis)
 spec = gds.GDSSpec(name="thermostat")
@@ -215,7 +219,7 @@ Layers are loosely coupled: use the composition algebra without `GDSSpec`, or us
 
 ### Two Type Systems
 
-1. **Token-based** (`types/tokens.py`) — structural set matching at composition time. Port names auto-tokenize: `"Heater Command"` -> `{"heater", "command"}`. The `>>` operator auto-wires by token overlap.
+1. **Token-based** (`types/tokens.py`) — structural set matching at composition time. Port names auto-tokenize by splitting on ` + ` and `, ` then lowercasing: `"Temperature + Setpoint"` -> `{"temperature", "setpoint"}`. Plain spaces are NOT delimiters: `"Heater Command"` -> `{"heater command"}` (one token). The `>>` operator auto-wires by token overlap.
 
 2. **TypeDef-based** (`types/typedef.py`) — runtime validation at the data level. Wraps Python type + optional constraint predicate. Used by Spaces and Entities. Never called during compilation.
 
@@ -267,8 +271,8 @@ def my_check(system: gds.SystemIR) -> list[gds.Finding]: ...
 
 ```bash
 uv sync                                    # Install dependencies
-uv run pytest tests/ -v                    # Run all tests
-uv run pytest tests/test_blocks.py -v      # Single test file
-uv build                                   # Build wheel
+uv run --package gds-framework pytest packages/gds-framework/tests -v  # Run all tests
+uv run --package gds-framework pytest packages/gds-framework/tests/test_blocks.py -v  # Single file
+uv build --package gds-framework           # Build wheel
 uv run python -c "import gds; print(gds.__version__)"  # Verify install
 ```
