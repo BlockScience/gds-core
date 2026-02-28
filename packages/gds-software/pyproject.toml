@@ -1,0 +1,87 @@
+[project]
+name = "gds-software"
+dynamic = ["version"]
+description = "Software architecture DSL over GDS semantics — DFDs, state machines, components, C4, ERDs, and dependency graphs with formal verification"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.12"
+authors = [
+    { name = "Rohan Mehta", email = "rohan@block.science" },
+]
+keywords = [
+    "software-architecture",
+    "data-flow-diagram",
+    "state-machine",
+    "component-diagram",
+    "c4-model",
+    "entity-relationship",
+    "dependency-graph",
+    "gds-framework",
+    "compositional-systems",
+    "dsl",
+    "verification",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+dependencies = [
+    "gds-framework>=0.2.3",
+    "pydantic>=2.10",
+]
+
+[tool.uv.sources]
+gds-framework = { workspace = true }
+
+[project.urls]
+Homepage = "https://github.com/BlockScience/gds-core"
+Repository = "https://github.com/BlockScience/gds-core"
+Documentation = "https://blockscience.github.io/gds-core"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "gds_software/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["gds_software"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--import-mode=importlib --cov=gds_software --cov-report=term-missing --no-header -q"
+
+[tool.coverage.run]
+source = ["gds_software"]
+omit = ["gds_software/__init__.py"]
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true
+exclude_lines = [
+    "if TYPE_CHECKING:",
+    "pragma: no cover",
+]
+
+[tool.ruff.lint]
+ignore = [
+    "TC001",  # Pydantic needs runtime imports for model fields
+    "TC003",  # Pydantic needs stdlib imports at runtime for model fields
+    "RUF022", # Allow semantically-grouped __all__ (not alphabetical)
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0",
+    "pytest-cov>=6.0",
+    "ruff>=0.8",
+]
