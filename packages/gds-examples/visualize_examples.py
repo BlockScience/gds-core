@@ -24,6 +24,7 @@ def main():
         ("Prisoner's Dilemma", "prisoners_dilemma.model"),
         ("Crosswalk Problem", "crosswalk.model"),
         ("Double Integrator", "double_integrator.model"),
+        ("Order Processing (DFD)", "software.order_processing.model"),
     ]
 
     for name, module_path in examples:
