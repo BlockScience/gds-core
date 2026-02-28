@@ -148,6 +148,7 @@ nav:
       - Getting Started: tutorials/getting-started.md
   - Guides:
       - Getting Started: guides/getting-started.md
+      - Real-World Patterns: guides/real-world-patterns.md
       - Rosetta Stone: guides/rosetta-stone.md
       - Verification: guides/verification.md
       - Visualization: guides/visualization.md
