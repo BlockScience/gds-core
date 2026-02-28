@@ -10,7 +10,7 @@ These operators are domain-neutral — they work identically whether you're comp
 |---|---|---|---|---|
 | **Stack** | `a >> b` | `StackComposition` | Token overlap (auto) or explicit wiring | Sequential data flow |
 | **Parallel** | `a \| b` | `ParallelComposition` | None | Independent side-by-side blocks |
-| **Feedback** | `a.feedback(wiring)` | `FeedbackLoop` | Wiring must be CONTRAVARIANT | Backward signals within a timestep |
+| **Feedback** | `a.feedback(wiring)` | `FeedbackLoop` | Wiring should be CONTRAVARIANT (not enforced) | Backward signals within a timestep |
 | **Temporal Loop** | `a.loop(wiring)` | `TemporalLoop` | Wiring must be COVARIANT | Forward signals across timesteps |
 
 All four operators return a new `Block`, so they can be chained and nested freely. The result is always a tree of composition nodes with `AtomicBlock` leaves.
@@ -66,16 +66,18 @@ graph LR
 
 When you use `>>` without explicit wiring, the validator checks that the first block's `forward_out` tokens overlap with the second block's `forward_in` tokens. This is the **auto-wiring** mechanism.
 
-Port names are tokenized by splitting on spaces, commas, and `+` signs, then lowercasing:
+Port names are tokenized by splitting on ` + ` (space-plus-space) and `, ` (comma-space), then lowercasing each part:
 
 | Port Name | Tokens |
 |---|---|
 | `"Temperature"` | `{"temperature"}` |
-| `"Heater Command"` | `{"heater", "command"}` |
+| `"Heater Command"` | `{"heater command"}` |
 | `"Temperature + Setpoint"` | `{"temperature", "setpoint"}` |
-| `"Command Signal"` | `{"command", "signal"}` |
+| `"Temperature, Pressure"` | `{"temperature", "pressure"}` |
 
-Two ports **match** when their token sets share at least one element. This means `"Heater Command"` auto-wires to `"Command Signal"` because they share the token `"command"`.
+Note that plain spaces are **not** delimiters — `"Heater Command"` is a single token `"heater command"`. Only ` + ` and `, ` split.
+
+Two ports **match** when their token sets share at least one element. This means `"Temperature + Setpoint"` auto-wires to `"Temperature"` because they share the token `"temperature"`.
 
 ```python
 from gds import AtomicBlock, interface
@@ -283,6 +285,9 @@ graph LR
 
 Feedback wirings carry signals **backward** — from outputs to inputs within the same timestep. The wiring direction should be `FlowDirection.CONTRAVARIANT` to reflect this backward flow.
 
+!!! note "Not enforced at construction"
+    Unlike `TemporalLoop` which **rejects** non-COVARIANT wirings at construction time, `FeedbackLoop` does not validate the direction. Using CONTRAVARIANT is a convention that correctly reflects the semantics, but passing COVARIANT will not raise an error.
+
 Feedback uses the `backward_out` and `backward_in` port slots:
 
 - The **source block** emits the feedback signal on its `backward_out` port
@@ -475,7 +480,10 @@ controller = Policy(
 # Tier 3: State update
 actuator = Mechanism(
     name="Update Room",
-    interface=interface(forward_in=["Heater Command"]),
+    interface=interface(
+        forward_in=["Heater Command"],
+        forward_out=["Room Temperature"],
+    ),
     updates=[("Room", "temperature")],
 )
 
@@ -483,7 +491,7 @@ actuator = Mechanism(
 system = (sensor >> controller >> actuator).loop([
     Wiring(
         source_block="Update Room",
-        source_port="Heater Command",
+        source_port="Room Temperature",
         target_block="Temperature Sensor",
         target_port="Temperature",
         direction=FlowDirection.COVARIANT,

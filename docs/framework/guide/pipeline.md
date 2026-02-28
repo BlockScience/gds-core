@@ -130,7 +130,7 @@ Compose blocks into a tree using four operators:
 root = sensor >> controller >> heater
 ```
 
-The `>>` operator auto-wires ports by **token overlap**: port names are tokenized (split on spaces, lowercased), and ports with overlapping tokens are connected automatically. For example, `"Measured Temperature"` auto-wires to `"Measured Temperature"` because the token sets are identical.
+The `>>` operator auto-wires ports by **token overlap**: port names are tokenized (split on ` + ` and `, `, then lowercased), and ports with overlapping tokens are connected automatically. For example, `"Temperature + Setpoint"` auto-wires to a block with `"Temperature"` because they share the token `"temperature"`.
 
 When auto-wiring is insufficient, use explicit `Wiring` declarations in a `StackComposition`. See the [Blocks & Roles](blocks.md) guide for details.
 
@@ -175,11 +175,14 @@ The output `SystemIR` is a flat, serializable model:
 ```python
 class SystemIR(BaseModel):
     name: str
-    blocks: list[BlockIR]        # All atomic blocks
-    wirings: list[WiringIR]      # All connections
-    inputs: list[InputIR]        # External inputs (domain-supplied)
-    hierarchy: HierarchyNodeIR   # Composition tree for visualization
+    blocks: list[BlockIR]                    # All atomic blocks
+    wirings: list[WiringIR]                  # All connections
+    inputs: list[InputIR]                    # External inputs (domain-supplied)
     composition_type: CompositionType
+    hierarchy: HierarchyNodeIR | None = None # Composition tree for visualization
+    source: str = ""                         # Origin identifier
+    metadata: dict[str, Any] = {}            # Domain-specific metadata
+    parameter_schema: ParameterSchema = ...  # Parameter space (Theta)
 ```
 
 `SystemIR` has no knowledge of types, spaces, entities, or roles. It is a purely structural graph of blocks and wires. This is by design -- it separates the compilation concern (structural topology) from the specification concern (domain semantics).
@@ -341,8 +344,7 @@ class VerificationReport(BaseModel):
 You can register custom verification checks with the `@gds_check` decorator:
 
 ```python
-from gds import gds_check, all_checks, Finding, Severity
-from gds.ir.models import SystemIR
+from gds import gds_check, all_checks, Finding, Severity, SystemIR
 
 @gds_check("CUSTOM-001", Severity.WARNING)
 def check_no_orphan_blocks(system: SystemIR) -> list[Finding]:
@@ -375,7 +377,8 @@ from gds import project_canonical
 canonical = project_canonical(spec)
 
 print(canonical.formula())
-# "h_theta : X -> X  (h = f_theta . g_theta, theta in Theta)"
+# "h_θ : X → X  (h = f_θ ∘ g_θ, θ ∈ Θ)"  (with parameters)
+# "h : X → X  (h = f ∘ g)"                  (without parameters)
 
 # State space X: entity variables
 print(f"|X| = {len(canonical.state_variables)}")

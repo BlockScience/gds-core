@@ -22,6 +22,7 @@ from gds_viz import (
     system_to_mermaid,
     canonical_to_mermaid,
     spec_to_mermaid,
+    block_to_mermaid,
     params_to_mermaid,
     trace_to_mermaid,
 )
@@ -29,6 +30,7 @@ from gds_viz import (
 system_to_mermaid(system, theme="neutral")
 canonical_to_mermaid(canonical, theme="dark")
 spec_to_mermaid(spec, theme="forest")
+block_to_mermaid(block, theme="neutral")
 params_to_mermaid(spec, theme="base")
 trace_to_mermaid(spec, "Entity", "var", theme="default")
 ```

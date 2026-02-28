@@ -54,6 +54,8 @@ from gds import (
 |---------|------|
 | **[gds-framework](framework/index.md)** | Core engine — blocks, composition algebra, compiler, verification |
 | **[gds-viz](viz/index.md)** | Mermaid diagram renderers for GDS specifications |
+| **gds-stockflow** | Declarative stock-flow DSL over GDS semantics |
+| **gds-control** | State-space control DSL over GDS semantics |
 | **[gds-games](games/index.md)** | Typed DSL for compositional game theory (Open Games) |
 | **[gds-examples](examples/index.md)** | Six tutorial models demonstrating every framework feature |
 

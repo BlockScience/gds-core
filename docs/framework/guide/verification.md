@@ -123,9 +123,9 @@ system = SystemIR(
 ```
 
 !!! note
-    Passing findings still have `severity=ERROR` — the severity indicates what
-    *would* be reported if the check failed, not the current status. Use the
-    `passed` field to distinguish pass from fail.
+    For generic checks (G-001..G-006), passing findings retain `severity=ERROR` — the severity
+    indicates what *would* be reported if the check failed. For semantic checks (SC-001..SC-007),
+    passing findings use `severity=INFO`. Use the `passed` field to distinguish pass from fail.
 
 ---
 
@@ -178,6 +178,10 @@ must not contradict each other:
 must be a token-subset of the source's `backward_out` (signature slot 3) or the
 target's `backward_in` (signature slot 2). This is the backward-flow counterpart
 of what G-001 does for covariant wirings.
+
+**C) Non-empty backward ports** — for `CONTRAVARIANT` wirings, at least one of
+`src_bwd_out` or `tgt_bwd_in` must be non-empty. If both are empty, G-003 emits
+`"CONTRAVARIANT but both backward ports are empty"` with `passed=False`.
 
 **Severity:** ERROR
 
@@ -275,7 +279,9 @@ G-005 enforces that the types are compatible on both ends of a sequential connec
 
 **Severity:** ERROR
 
-**Skips:** Temporal wirings (`is_temporal=True`) and contravariant wirings.
+**Skips:** Temporal wirings (`is_temporal=True`), contravariant wirings, and wirings where either endpoint is not in the block set (e.g., `InputIR` endpoints).
+
+**Additional failure mode:** If either `src_out` or `tgt_in` is empty (the block has no forward ports), G-001 emits `"Cannot verify domain/codomain: ..."` with `passed=False`.
 
 **Trigger example:**
 
@@ -633,8 +639,9 @@ Key points:
 
 - **`passed`** is the primary field — it tells you whether the check succeeded.
   A finding with `passed=True` is informational confirmation.
-- **`severity`** indicates the importance level *if the check fails*. Even passing
-  findings carry the severity that would apply on failure.
+- **`severity`** indicates the importance level. Generic checks (G-001..G-006)
+  retain their failure severity even on pass. Semantic checks (SC-001..SC-007)
+  emit `Severity.INFO` on pass.
 - **`source_elements`** names the blocks, variables, or wirings involved. Useful
   for tracing back to the specification.
 
