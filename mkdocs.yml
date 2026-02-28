@@ -70,6 +70,7 @@ nav:
           - Blocks & Roles: framework/guide/blocks.md
           - Composition Algebra: framework/guide/composition.md
           - Specification: framework/guide/spec.md
+          - Pipeline: framework/guide/pipeline.md
           - Verification: framework/guide/verification.md
           - Glossary: framework/guide/glossary.md
       - Design:
