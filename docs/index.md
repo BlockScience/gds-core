@@ -12,6 +12,7 @@ pip install gds-viz          # Visualization
 pip install gds-stockflow    # Stock-flow DSL
 pip install gds-control      # Control systems DSL
 pip install gds-games        # Game theory DSL
+pip install gds-software     # Software architecture DSL
 pip install gds-examples     # Tutorial models
 ```
 
@@ -26,6 +27,7 @@ pip install gds-examples     # Tutorial models
 | `gds-stockflow` | `stockflow` | Declarative stock-flow DSL over GDS semantics |
 | `gds-control` | `gds_control` | State-space control DSL over GDS semantics |
 | `gds-games` | `ogs` | Typed DSL for compositional game theory (Open Games) |
+| `gds-software` | `gds_software` | Software architecture DSL (DFD, state machine, C4, ERD, etc.) |
 | `gds-examples` | — | Tutorial models demonstrating framework features |
 
 ### For developers
@@ -57,6 +59,7 @@ from gds import (
 | **gds-stockflow** | Declarative stock-flow DSL over GDS semantics |
 | **gds-control** | State-space control DSL over GDS semantics |
 | **[gds-games](games/index.md)** | Typed DSL for compositional game theory (Open Games) |
+| **gds-software** | Software architecture DSL — DFD, state machine, component, C4, ERD, dependency |
 | **[gds-examples](examples/index.md)** | Six tutorial models demonstrating every framework feature |
 
 ## Guides
@@ -79,6 +82,7 @@ gds-viz        ←  visualization (depends on gds-framework)
 gds-games      ←  game theory DSL (depends on gds-framework)
 gds-stockflow  ←  stock-flow DSL (depends on gds-framework)
 gds-control    ←  control systems DSL (depends on gds-framework)
+gds-software   ←  software architecture DSL (depends on gds-framework)
     ↑
 gds-examples   ←  tutorials (depends on gds-framework + gds-viz)
 ```
