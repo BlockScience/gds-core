@@ -196,14 +196,16 @@ def fix_reverify_header(mo):
 
 @app.cell
 def fix_reverify_demo(mo):
-    from gds.verification.engine import verify
+    from gds.verification.engine import verify as _verify
     from guides.verification.broken_models import (
-        dangling_wiring_system,
+        dangling_wiring_system as _dangling_wiring_system,
+    )
+    from guides.verification.broken_models import (
         fixed_pipeline_system,
     )
 
-    _broken_report = verify(dangling_wiring_system())
-    _fixed_report = verify(fixed_pipeline_system())
+    _broken_report = _verify(_dangling_wiring_system())
+    _fixed_report = _verify(fixed_pipeline_system())
 
     _broken_failures = [f for f in _broken_report.findings if not f.passed]
     _fixed_failures = [f for f in _fixed_report.findings if not f.passed]
@@ -538,14 +540,16 @@ def combined_selector(mo):
 def run_combined(mo, combined_dropdown):
     from guides.verification.domain_checks_demo import (
         good_stockflow_model,
-        orphan_stock_model,
+    )
+    from guides.verification.domain_checks_demo import (
+        orphan_stock_model as _orphan_stock_model,
     )
     from stockflow.verification.engine import verify as sf_verify
 
     if combined_dropdown.value == "good":
         _model = good_stockflow_model()
     else:
-        _model = orphan_stock_model()
+        _model = _orphan_stock_model()
 
     _report = sf_verify(_model, include_gds_checks=True)
 
