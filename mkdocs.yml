@@ -58,6 +58,7 @@ nav:
   - Home: index.md
   - Framework:
       - Overview: framework/index.md
+      - Quick Reference: framework/quick-reference.md
       - Getting Started:
           - Installation: framework/getting-started/install.md
           - Quick Start: framework/getting-started/quickstart.md
