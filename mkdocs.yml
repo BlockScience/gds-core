@@ -132,6 +132,29 @@ nav:
           - ogs.viz: games/api/viz.md
           - ogs.reports: games/api/reports.md
           - ogs.cli: games/api/cli.md
+  - Business:
+      - Overview: business/index.md
+      - Getting Started: business/getting-started.md
+      - User Guide:
+          - Diagram Types: business/guide/diagram-types.md
+          - Verification: business/guide/verification.md
+      - API Reference:
+          - Overview: business/api/index.md
+          - gds_business: business/api/init.md
+          - gds_business.common: business/api/common.md
+          - gds_business.cld.elements: business/api/cld-elements.md
+          - gds_business.cld.model: business/api/cld-model.md
+          - gds_business.cld.compile: business/api/cld-compile.md
+          - gds_business.cld.checks: business/api/cld-checks.md
+          - gds_business.supplychain.elements: business/api/scn-elements.md
+          - gds_business.supplychain.model: business/api/scn-model.md
+          - gds_business.supplychain.compile: business/api/scn-compile.md
+          - gds_business.supplychain.checks: business/api/scn-checks.md
+          - gds_business.vsm.elements: business/api/vsm-elements.md
+          - gds_business.vsm.model: business/api/vsm-model.md
+          - gds_business.vsm.compile: business/api/vsm-compile.md
+          - gds_business.vsm.checks: business/api/vsm-checks.md
+          - gds_business.verification: business/api/verification.md
   - Examples:
       - Overview: examples/index.md
       - Learning Path: examples/learning-path.md
