@@ -5,7 +5,17 @@ A progressive 5-stage tutorial that teaches GDS fundamentals using a **thermosta
 ## Prerequisites
 
 - Python 3.12+
-- `gds-framework`, `gds-viz`, and `gds-control` installed (`uv sync --all-packages` from the repo root)
+- Install the required packages:
+
+```bash
+pip install gds-framework gds-viz gds-control
+```
+
+Or, if working from the monorepo:
+
+```bash
+uv sync --all-packages
+```
 
 ## Learning Path
 
