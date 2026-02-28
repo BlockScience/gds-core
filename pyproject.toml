@@ -31,6 +31,7 @@ dependencies = [
     "gds-stockflow>=0.1.0",
     "gds-control>=0.1.0",
     "gds-software>=0.1.0",
+    "gds-business>=0.1.0",
     "gds-examples>=0.1.0",
 ]
 
@@ -53,6 +54,7 @@ gds-games = { workspace = true }
 gds-stockflow = { workspace = true }
 gds-control = { workspace = true }
 gds-software = { workspace = true }
+gds-business = { workspace = true }
 gds-examples = { workspace = true }
 
 [tool.uv.workspace]
@@ -70,7 +72,7 @@ select = ["E", "W", "F", "I", "UP", "B", "SIM", "TCH", "RUF"]
 "packages/gds-examples/prisoners_dilemma/visualize.py" = ["E501"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["gds", "gds_viz", "ogs", "stockflow", "gds_control", "gds_software"]
+known-first-party = ["gds", "gds_viz", "ogs", "stockflow", "gds_control", "gds_software", "gds_business"]
 
 [dependency-groups]
 docs = [
