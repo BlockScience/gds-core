@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-`gds-core` — monorepo for the Generalized Dynamical Systems ecosystem. Typed compositional specifications for complex systems, grounded in [GDS theory](https://doi.org/10.57938/e8d456ea-d975-4111-ac41-052ce73cb0cc). Six packages managed as a uv workspace.
+`gds-core` — monorepo for the Generalized Dynamical Systems ecosystem. Typed compositional specifications for complex systems, grounded in [GDS theory](https://doi.org/10.57938/e8d456ea-d975-4111-ac41-052ce73cb0cc). Seven packages managed as a uv workspace.
 
 ## Packages
 
@@ -15,6 +15,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | gds-games | `ogs` | `packages/gds-games/` |
 | gds-stockflow | `stockflow` | `packages/gds-stockflow/` |
 | gds-control | `gds_control` | `packages/gds-control/` |
+| gds-software | `gds_software` | `packages/gds-software/` |
 | gds-examples | — | `packages/gds-examples/` |
 
 ## Commands
@@ -29,13 +30,14 @@ uv run --package gds-viz pytest packages/gds-viz/tests -v
 uv run --package gds-games pytest packages/gds-games/tests -v
 uv run --package gds-stockflow pytest packages/gds-stockflow/tests -v
 uv run --package gds-control pytest packages/gds-control/tests -v
+uv run --package gds-software pytest packages/gds-software/tests -v
 uv run --package gds-examples pytest packages/gds-examples -v
 
 # Run a single test
 uv run --package gds-framework pytest packages/gds-framework/tests/test_blocks.py::TestStackComposition::test_rshift_operator -v
 
 # Run all tests across all packages
-uv run --package gds-framework pytest packages/gds-framework/tests packages/gds-viz/tests packages/gds-games/tests packages/gds-stockflow/tests packages/gds-control/tests packages/gds-examples -v
+uv run --package gds-framework pytest packages/gds-framework/tests packages/gds-viz/tests packages/gds-games/tests packages/gds-stockflow/tests packages/gds-control/tests packages/gds-software/tests packages/gds-examples -v
 
 # Lint & format
 uv run ruff check packages/
@@ -63,6 +65,7 @@ gds-viz        ←  visualization (depends on gds-framework)
 gds-games      ←  game theory DSL (depends on gds-framework)
 gds-stockflow  ←  stock-flow DSL (depends on gds-framework)
 gds-control    ←  control systems DSL (depends on gds-framework)
+gds-software   ←  software architecture DSL (depends on gds-framework)
     ↑
 gds-examples   ←  tutorials (depends on gds-framework + gds-viz)
 ```
@@ -79,7 +82,7 @@ These layers are loosely coupled — you can use the composition algebra without
 
 ### Domain DSL Pattern
 
-Three domain DSLs (stockflow, control, games) compile to GDS. The stockflow and control packages follow a shared pattern:
+Four domain DSLs (stockflow, control, games, software) compile to GDS. The stockflow, control, and software packages follow a shared pattern:
 
 1. **Elements** — frozen Pydantic models for user-facing declarations (not GDS blocks)
 2. **Model** — mutable container with `@model_validator` construction-time validation

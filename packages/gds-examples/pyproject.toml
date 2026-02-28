@@ -34,6 +34,7 @@ dependencies = [
     "gds-control>=0.1.0",
     "gds-stockflow>=0.1.0",
     "gds-games>=0.3.0",
+    "gds-software>=0.1.0",
 ]
 
 [project.urls]
@@ -47,6 +48,7 @@ gds-viz = { workspace = true }
 gds-control = { workspace = true }
 gds-stockflow = { workspace = true }
 gds-games = { workspace = true }
+gds-software = { workspace = true }
 
 [build-system]
 requires = ["hatchling"]
@@ -69,6 +71,7 @@ only-include = [
     "thermostat",
     "thermostat_dsl",
     "double_integrator",
+    "software",
     "guides",
 ]
 
@@ -94,11 +97,12 @@ files = [
     "thermostat_dsl",
     "double_integrator",
     "guides",
+    "software",
     "visualize_examples.py",
 ]
 
 [[tool.mypy.overrides]]
-module = ["gds_viz.*", "gds_control.*", "stockflow.*", "ogs.*", "pytest"]
+module = ["gds_viz.*", "gds_control.*", "stockflow.*", "ogs.*", "gds_software.*", "pytest"]
 ignore_missing_imports = true
 
 [project.optional-dependencies]
