@@ -68,7 +68,7 @@ nav:
           - Spaces: framework/guide/spaces.md
           - State & Entities: framework/guide/state.md
           - Blocks & Roles: framework/guide/blocks.md
-          - Composition: framework/guide/composition.md
+          - Composition Algebra: framework/guide/composition.md
           - Specification: framework/guide/spec.md
           - Verification: framework/guide/verification.md
           - Glossary: framework/guide/glossary.md
