@@ -40,6 +40,12 @@ The canonical GDS example from BlockScience. Demonstrates mechanism design with 
 
 **New:** mechanism design, governance parameters, discrete state
 
+### 7. [Evolution of Trust](examples/evolution-of-trust.md) — OGS + Simulation
+
+Bridges specification and computation. Uses the OGS game theory DSL to define an iterated Prisoner's Dilemma, then projects the specification into a tournament simulator with 8 strategies and evolutionary dynamics.
+
+**New:** OGS DSL, `DecisionGame`/`CovariantFunction`, `Strategy` protocol, interoperability pattern
+
 ## Prerequisites
 
 - Python 3.12+
