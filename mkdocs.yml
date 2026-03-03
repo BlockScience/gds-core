@@ -44,55 +44,69 @@ plugins:
         compile to the same GDS IR, validating it as a universal transition calculus.
       full_output: llms-full.txt
       sections:
-        Framework:
-          - index.md
-          - framework/index.md
-          - framework/quick-reference.md
-          - framework/getting-started/install.md
-          - framework/getting-started/quickstart.md
+        Framework (gds-framework):
+          - {index.md: "Monorepo landing page — package overview, install, architecture"}
+          - {framework/index.md: "Core engine — blocks, composition algebra, compiler, verification"}
+          - {framework/quick-reference.md: "Cheat sheet for types, blocks, composition, and verification"}
+          - {framework/getting-started/install.md: "Installation for users and developers"}
+          - {framework/getting-started/quickstart.md: "Build a thermostat spec in 5 minutes"}
           - framework/guide/*.md
-          - framework/design/*.md
           - framework/api/*.md
-        Visualization:
-          - viz/index.md
-          - viz/getting-started.md
+        Visualization (gds-viz):
+          - {viz/index.md: "Mermaid diagram renderers for GDS specifications"}
+          - {viz/getting-started.md: "First diagram in 3 lines of code"}
           - viz/guide/*.md
           - viz/api/*.md
-        Games:
-          - games/index.md
-          - games/getting-started.md
+        Games (gds-games / ogs):
+          - {games/index.md: "Typed DSL for compositional game theory (Open Games)"}
+          - {games/getting-started.md: "Model a Prisoner's Dilemma game"}
           - games/guide/*.md
           - games/design/*.md
           - games/api/*.md
-        Business:
-          - business/index.md
-          - business/getting-started.md
+        Business (gds-business):
+          - {business/index.md: "Business dynamics DSL — CLD, supply chain, value stream map"}
+          - {business/getting-started.md: "Model a causal loop diagram"}
           - business/guide/*.md
           - business/api/*.md
-        Stock-Flow:
-          - stockflow/index.md
-          - stockflow/getting-started.md
+        Stock-Flow (gds-stockflow):
+          - {stockflow/index.md: "Declarative stock-flow DSL over GDS semantics"}
+          - {stockflow/getting-started.md: "Model an SIR epidemic as stocks and flows"}
           - stockflow/guide/*.md
           - stockflow/api/*.md
-        Control:
-          - control/index.md
-          - control/getting-started.md
+        Control (gds-control):
+          - {control/index.md: "State-space control systems DSL over GDS semantics"}
+          - {control/getting-started.md: "Model a PID thermostat controller"}
           - control/guide/*.md
           - control/api/*.md
-        Software:
-          - software/index.md
-          - software/getting-started.md
+        Software (gds-software):
+          - {software/index.md: "Software architecture DSL — DFD, state machine, C4, ERD, component, dependency"}
+          - {software/getting-started.md: "Model a data flow diagram"}
           - software/guide/*.md
           - software/api/*.md
         Examples:
-          - examples/*.md
+          - {examples/index.md: "Six tutorial models demonstrating every framework feature"}
+          - {examples/learning-path.md: "Recommended order for working through examples"}
+          - examples/building-models.md
+          - examples/feature-matrix.md
           - examples/examples/*.md
         Tutorials:
           - tutorials/*.md
         Guides:
-          - guides/*.md
+          - {guides/getting-started.md: "Build a thermostat model in 5 progressive stages"}
+          - {guides/choosing-a-dsl.md: "Decision guide for picking the right DSL"}
+          - {guides/best-practices.md: "Patterns and anti-patterns for GDS modeling"}
+          - {guides/rosetta-stone.md: "Same problem modeled with stockflow, control, and games"}
+          - {guides/verification.md: "All 3 verification layers with deliberately broken models"}
+          - {guides/visualization.md: "6 view types, 5 themes, cross-DSL rendering"}
+          - guides/real-world-patterns.md
+          - guides/troubleshooting.md
+          - guides/interoperability.md
+          - guides/architecture-milestone-layer0.md
+          - guides/dsl-roadmap.md
+          - guides/research-boundaries.md
+          - guides/view-stratification.md
         Ecosystem:
-          - framework/ecosystem.md
+          - {framework/ecosystem.md: "All packages, their imports, and dependency relationships"}
 
 markdown_extensions:
   - admonition
@@ -131,11 +145,6 @@ nav:
           - Pipeline: framework/guide/pipeline.md
           - Verification: framework/guide/verification.md
           - Glossary: framework/guide/glossary.md
-      - Design:
-          - GDS Deep Dive: framework/design/gds-deepdive.md
-          - v0.2 Design: framework/design/v0.2-design.md
-          - Proposals:
-              - Entity Redesign: framework/design/proposals/entity-redesign.md
       - API Reference:
           - Overview: framework/api/index.md
           - gds: framework/api/init.md
