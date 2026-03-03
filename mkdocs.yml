@@ -171,10 +171,13 @@ nav:
       - Getting Started: tutorials/getting-started.md
   - Guides:
       - Getting Started: guides/getting-started.md
+      - Choosing a DSL: guides/choosing-a-dsl.md
+      - Best Practices: guides/best-practices.md
       - Real-World Patterns: guides/real-world-patterns.md
       - Rosetta Stone: guides/rosetta-stone.md
       - Verification: guides/verification.md
       - Visualization: guides/visualization.md
+      - Troubleshooting: guides/troubleshooting.md
       - Interoperability: guides/interoperability.md
       - Design Notes:
           - Layer 0 Milestone: guides/architecture-milestone-layer0.md
