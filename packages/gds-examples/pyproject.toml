@@ -66,6 +66,8 @@ only-include = [
     "lotka_volterra_dsl",
     "prisoners_dilemma",
     "prisoners_dilemma_dsl",
+    "prisoners_dilemma_nash",
+    "evolution_of_trust",
     "sir_epidemic",
     "sir_epidemic_dsl",
     "thermostat",
@@ -91,6 +93,8 @@ files = [
     "lotka_volterra_dsl",
     "prisoners_dilemma",
     "prisoners_dilemma_dsl",
+    "prisoners_dilemma_nash",
+    "evolution_of_trust",
     "sir_epidemic",
     "sir_epidemic_dsl",
     "thermostat",
@@ -107,6 +111,8 @@ ignore_missing_imports = true
 
 [project.optional-dependencies]
 notebooks = ["marimo>=0.20.0"]
+nash = ["nashpy>=0.0.41"]
+evolution = ["plotly>=5.0"]
 
 [dependency-groups]
 dev = [
@@ -115,4 +121,6 @@ dev = [
     "pyright>=1.1.408",
     "pytest>=9.0.2",
     "ruff>=0.8",
+    "nashpy>=0.0.41",
+    "plotly>=5.0",
 ]
