@@ -4,7 +4,7 @@
 [![Python](https://img.shields.io/pypi/pyversions/gds-examples)](https://pypi.org/project/gds-examples/)
 [![License](https://img.shields.io/github/license/BlockScience/gds-examples)](https://github.com/BlockScience/gds-examples/blob/main/LICENSE)
 
-**Six complete domain models** demonstrating every [gds-framework](https://blockscience.github.io/gds-framework) feature. Each `model.py` is written as a tutorial chapter with inline GDS theory commentary — read them in order.
+**Seven example models** demonstrating every [gds-framework](https://blockscience.github.io/gds-framework) feature. The first six are GDS framework tutorials with inline theory commentary. The seventh uses the OGS game theory DSL with tournament simulation.
 
 ## Quick Start
 
@@ -29,8 +29,9 @@ uv run python examples/sir_epidemic/generate_views.py --save
 | 4 | [Prisoner's Dilemma](examples/prisoners-dilemma.md) | Nested `\|`, multi-entity X, complex trees | `\|` `>>` `.loop()` |
 | 5 | [Insurance Contract](examples/insurance.md) | ControlAction role, complete 4-role taxonomy | `>>` |
 | 6 | [Crosswalk Problem](examples/crosswalk.md) | Mechanism design, discrete Markov transitions | `>>` |
+| 7 | [Evolution of Trust](examples/evolution-of-trust.md) | OGS iterated PD, strategies, tournament simulation | OGS feedback |
 
-Start with SIR Epidemic and work down — each introduces one new concept.
+Start with SIR Epidemic and work down — each introduces one new concept. The Evolution of Trust example uses gds-games (OGS) rather than gds-framework directly.
 
 ## File Structure
 
