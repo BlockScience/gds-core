@@ -35,6 +35,64 @@ plugins:
             show_bases: true
             members_order: source
             docstring_style: google
+  - llmstxt:
+      markdown_description: |
+        GDS (Generalized Dynamical Systems) is a typed compositional specification
+        framework for complex systems. It provides a composition algebra (stack,
+        parallel, feedback, loop), a 3-stage compiler to flat IR, and a verification
+        engine. Five domain DSLs (games, control, stock-flow, software, business)
+        compile to the same GDS IR, validating it as a universal transition calculus.
+      full_output: llms-full.txt
+      sections:
+        Framework:
+          - index.md
+          - framework/index.md
+          - framework/quick-reference.md
+          - framework/getting-started/install.md
+          - framework/getting-started/quickstart.md
+          - framework/guide/*.md
+          - framework/design/*.md
+          - framework/api/*.md
+        Visualization:
+          - viz/index.md
+          - viz/getting-started.md
+          - viz/guide/*.md
+          - viz/api/*.md
+        Games:
+          - games/index.md
+          - games/getting-started.md
+          - games/guide/*.md
+          - games/design/*.md
+          - games/api/*.md
+        Business:
+          - business/index.md
+          - business/getting-started.md
+          - business/guide/*.md
+          - business/api/*.md
+        Stock-Flow:
+          - stockflow/index.md
+          - stockflow/getting-started.md
+          - stockflow/guide/*.md
+          - stockflow/api/*.md
+        Control:
+          - control/index.md
+          - control/getting-started.md
+          - control/guide/*.md
+          - control/api/*.md
+        Software:
+          - software/index.md
+          - software/getting-started.md
+          - software/guide/*.md
+          - software/api/*.md
+        Examples:
+          - examples/*.md
+          - examples/examples/*.md
+        Tutorials:
+          - tutorials/*.md
+        Guides:
+          - guides/*.md
+        Ecosystem:
+          - framework/ecosystem.md
 
 markdown_extensions:
   - admonition
