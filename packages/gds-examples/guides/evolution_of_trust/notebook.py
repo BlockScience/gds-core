@@ -388,7 +388,7 @@ def head_to_head_result(
             line=dict(color=_color_a, width=3),
             marker=dict(size=8, color=_color_a),
             fill="tozeroy",
-            fillcolor=_color_a + "20",
+            fillcolor=f"rgba({int(_color_a[1:3], 16)}, {int(_color_a[3:5], 16)}, {int(_color_a[5:7], 16)}, 0.13)",
         )
     )
     _fig.add_trace(
@@ -400,7 +400,7 @@ def head_to_head_result(
             line=dict(color=_color_b, width=3),
             marker=dict(size=8, color=_color_b),
             fill="tozeroy",
-            fillcolor=_color_b + "20",
+            fillcolor=f"rgba({int(_color_b[1:3], 16)}, {int(_color_b[3:5], 16)}, {int(_color_b[5:7], 16)}, 0.13)",
         )
     )
     _fig.update_layout(
@@ -637,7 +637,7 @@ def evolution_result(
                 name=_name,
                 line=dict(width=0.5, color=_c),
                 stackgroup="one",
-                fillcolor=_c + "CC",
+                fillcolor=f"rgba({int(_c[1:3], 16)}, {int(_c[3:5], 16)}, {int(_c[5:7], 16)}, 0.8)",
                 hovertemplate=(
                     f"<b>{_name}</b><br>Gen %{{x}}: %{{y}} members<extra></extra>"
                 ),
