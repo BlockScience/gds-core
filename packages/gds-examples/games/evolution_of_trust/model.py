@@ -40,10 +40,10 @@ from ogs.ir.models import PatternIR
 # Payoff parameters — Nicky Case's version: T > R > P > S, 2R > T + S
 # ======================================================================
 
-R = 2   # Reward (mutual cooperation)
-T = 3   # Temptation (defect while other cooperates)
+R = 2  # Reward (mutual cooperation)
+T = 3  # Temptation (defect while other cooperates)
 S = -1  # Sucker (cooperate while other defects)
-P = 0   # Punishment (mutual defection)
+P = 0  # Punishment (mutual defection)
 
 # ======================================================================
 # Atomic Games — OGS primitives

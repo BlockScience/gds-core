@@ -99,8 +99,7 @@ class GrimTrigger:
 
     name = "Grim Trigger"
     description = (
-        "Cooperates until opponent defects once, "
-        "then defects forever. Unforgiving."
+        "Cooperates until opponent defects once, then defects forever. Unforgiving."
     )
 
     def __init__(self) -> None:
@@ -134,7 +133,10 @@ class Detective:
     )
 
     _probe_sequence: ClassVar[list[str]] = [
-        COOPERATE, DEFECT, COOPERATE, COOPERATE,
+        COOPERATE,
+        DEFECT,
+        COOPERATE,
+        COOPERATE,
     ]
 
     def __init__(self) -> None:
