@@ -175,6 +175,7 @@ nav:
       - Rosetta Stone: guides/rosetta-stone.md
       - Verification: guides/verification.md
       - Visualization: guides/visualization.md
+      - Interoperability: guides/interoperability.md
       - Design Notes:
           - Layer 0 Milestone: guides/architecture-milestone-layer0.md
           - DSL Roadmap: guides/dsl-roadmap.md
