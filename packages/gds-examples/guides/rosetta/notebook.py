@@ -2,7 +2,7 @@
 
 Compares the same resource-pool scenario across three DSL views
 (Stock-Flow, Control, Game Theory), showing how they all map to
-the GDS canonical form h = f . g.
+the GDS canonical form.
 
 Run with: marimo run guides/rosetta/notebook.py
 """
