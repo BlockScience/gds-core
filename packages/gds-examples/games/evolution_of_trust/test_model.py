@@ -319,8 +319,11 @@ class TestPlayMatch:
 
         rng = _random.Random(42)
         result = play_match(
-            AlwaysCooperate(), AlwaysCooperate(),
-            rounds=10, noise=1.0, rng=rng,
+            AlwaysCooperate(),
+            AlwaysCooperate(),
+            rounds=10,
+            noise=1.0,
+            rng=rng,
         )
         # With noise=1.0, cooperate flips to defect
         defects = sum(1 for a, b in result.history if a == DEFECT or b == DEFECT)
