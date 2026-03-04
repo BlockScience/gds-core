@@ -16,7 +16,7 @@ from gds_control.verification.checks import ALL_CS_CHECKS
 
 def verify(
     model: ControlModel,
-    cs_checks: list[Callable[[ControlModel], list[Finding]]] | None = None,
+    domain_checks: list[Callable[[ControlModel], list[Finding]]] | None = None,
     include_gds_checks: bool = True,
 ) -> VerificationReport:
     """Run verification checks on a ControlModel.
@@ -26,10 +26,10 @@ def verify(
 
     Args:
         model: The control system model to verify.
-        cs_checks: Optional subset of CS checks. Defaults to all.
+        domain_checks: Optional subset of CS checks. Defaults to all.
         include_gds_checks: Whether to compile and run GDS generic checks.
     """
-    checks = cs_checks or ALL_CS_CHECKS
+    checks = domain_checks or ALL_CS_CHECKS
     findings: list[Finding] = []
 
     # Phase 1: CS checks on model

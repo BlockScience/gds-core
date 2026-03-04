@@ -16,7 +16,7 @@ from stockflow.verification.checks import ALL_SF_CHECKS
 
 def verify(
     model: StockFlowModel,
-    sf_checks: list[Callable[[StockFlowModel], list[Finding]]] | None = None,
+    domain_checks: list[Callable[[StockFlowModel], list[Finding]]] | None = None,
     include_gds_checks: bool = True,
 ) -> VerificationReport:
     """Run verification checks on a StockFlowModel.
@@ -26,10 +26,10 @@ def verify(
 
     Args:
         model: The stock-flow model to verify.
-        sf_checks: Optional subset of SF checks. Defaults to all.
+        domain_checks: Optional subset of SF checks. Defaults to all.
         include_gds_checks: Whether to compile and run GDS generic checks.
     """
-    checks = sf_checks or ALL_SF_CHECKS
+    checks = domain_checks or ALL_SF_CHECKS
     findings: list[Finding] = []
 
     # Phase 1: SF checks on model

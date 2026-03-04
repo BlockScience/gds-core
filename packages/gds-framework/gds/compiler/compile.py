@@ -208,6 +208,7 @@ def _default_block_compiler(block: AtomicBlock) -> BlockIR:
     """Default block compiler — extracts name and interface slots."""
     return BlockIR(
         name=block.name,
+        block_type=getattr(block, "kind", ""),
         signature=(
             _ports_to_sig(block.interface.forward_in),
             _ports_to_sig(block.interface.forward_out),

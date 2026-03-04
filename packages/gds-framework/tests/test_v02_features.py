@@ -123,6 +123,26 @@ class TestParameterDef:
         p = ParameterDef(name="rate", typedef=float_type)
         assert p.check_value(999.0) is True
 
+    def test_bounds_inverted_raises(self, float_type):
+        """Inverted bounds (low > high) should fail at construction."""
+        with pytest.raises(ValidationError, match="exceeds upper bound"):
+            ParameterDef(name="rate", typedef=float_type, bounds=(1.0, 0.0))
+
+    def test_bounds_non_comparable_raises(self, float_type):
+        """Non-comparable bounds should fail at construction."""
+        with pytest.raises(ValidationError, match="not comparable"):
+            ParameterDef(name="rate", typedef=float_type, bounds=("a", 1))
+
+    def test_bounds_equal_is_valid(self, float_type):
+        """Equal bounds (low == high) should be allowed."""
+        p = ParameterDef(name="rate", typedef=float_type, bounds=(0.5, 0.5))
+        assert p.bounds == (0.5, 0.5)
+
+    def test_bounds_none_is_valid(self, float_type):
+        """None bounds should be allowed (no validation)."""
+        p = ParameterDef(name="rate", typedef=float_type, bounds=None)
+        assert p.bounds is None
+
 
 class TestParameterSchema:
     def test_empty_schema(self):

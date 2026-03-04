@@ -65,13 +65,20 @@ def check_g001_domain_codomain_matching(system: SystemIR) -> list[Finding]:
 def check_g002_signature_completeness(system: SystemIR) -> list[Finding]:
     """G-002: Every block must have at least one non-empty input slot
     and at least one non-empty output slot.
+
+    BoundaryAction blocks (block_type == "boundary") are exempt from the
+    input requirement — they have no inputs by design, since they model
+    exogenous signals entering the system from outside.
     """
     findings = []
     for block in system.blocks:
         fwd_in, fwd_out, bwd_in, bwd_out = block.signature
         has_input = bool(fwd_in) or bool(bwd_in)
         has_output = bool(fwd_out) or bool(bwd_out)
-        has_required = has_input and has_output
+
+        # BoundaryAction blocks have no inputs by design — only check outputs
+        is_boundary = block.block_type == "boundary"
+        has_required = has_output if is_boundary else has_input and has_output
 
         missing = []
         if not has_input:
