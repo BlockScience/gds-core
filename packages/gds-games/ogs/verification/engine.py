@@ -56,14 +56,14 @@ ALL_CHECKS: list[Callable[[PatternIR], list[Finding]]] = OGS_CHECKS
 
 def verify(
     pattern: PatternIR,
-    checks: list[Callable[[PatternIR], list[Finding]]] | None = None,
+    domain_checks: list[Callable[[PatternIR], list[Finding]]] | None = None,
     include_gds_checks: bool = True,
 ) -> VerificationReport:
     """Run verification checks against a PatternIR.
 
     Args:
         pattern: The pattern to verify.
-        checks: Optional subset of OGS domain checks to run. Defaults to
+        domain_checks: Optional subset of OGS domain checks to run. Defaults to
             ``ALL_CHECKS`` (8 OGS-specific checks).
         include_gds_checks: Run GDS generic checks (G-001..G-006) via
             ``to_system_ir()`` projection. Defaults to True.
@@ -71,7 +71,7 @@ def verify(
     Returns:
         A VerificationReport with all findings.
     """
-    checks = checks or ALL_CHECKS
+    checks = domain_checks or ALL_CHECKS
     findings: list[Finding] = []
     for check_fn in checks:
         findings.extend(check_fn(pattern))
