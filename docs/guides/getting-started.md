@@ -422,9 +422,15 @@ You have built a complete GDS specification for a thermostat system, progressing
 
 From here, explore the [example models](../examples/index.md) or the [Rosetta Stone](rosetta-stone.md) guide to see the same system through different DSL lenses.
 
-## Running Interactively
+## Interactive Notebook
 
-The guide includes a [marimo notebook](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/guides/getting_started/notebook.py) for interactive exploration:
+/// marimo-embed-file
+    filepath: packages/gds-examples/guides/getting_started/notebook.py
+    height: 800px
+    mode: read
+///
+
+To run the notebook locally:
 
 ```bash
 uv run marimo run packages/gds-examples/guides/getting_started/notebook.py

@@ -232,31 +232,47 @@ This validates GDS as an **interoperability substrate**, not just a modeling fra
 
 ## Running the Examples
 
-### Nash equilibrium analysis
+### Nash Equilibrium Analysis
+
+/// marimo-embed-file
+    filepath: packages/gds-examples/guides/nash_equilibrium/notebook.py
+    height: 800px
+    mode: read
+///
+
+To run locally:
 
 ```bash
-# Install dependencies
 uv sync --all-packages --extra nash
-
-# Run tests (22 tests)
-uv run --package gds-examples pytest \
-    packages/gds-examples/games/prisoners_dilemma_nash/ -v
-
-# Interactive notebook
 cd packages/gds-examples && \
     uv run marimo run guides/nash_equilibrium/notebook.py
 ```
 
-### Evolution of Trust simulation
+```bash
+# Run tests (22 tests)
+uv run --package gds-examples pytest \
+    packages/gds-examples/games/prisoners_dilemma_nash/ -v
+```
+
+### Evolution of Trust Simulation
+
+/// marimo-embed-file
+    filepath: packages/gds-examples/guides/evolution_of_trust/notebook.py
+    height: 800px
+    mode: read
+///
+
+To run locally:
+
+```bash
+cd packages/gds-examples && \
+    uv run marimo run guides/evolution_of_trust/notebook.py
+```
 
 ```bash
 # Run tests (71 tests)
 uv run --package gds-examples pytest \
     packages/gds-examples/games/evolution_of_trust/ -v
-
-# Interactive notebook (with plotly charts)
-cd packages/gds-examples && \
-    uv run marimo run guides/evolution_of_trust/notebook.py
 ```
 
 ### Source files
