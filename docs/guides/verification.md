@@ -12,6 +12,12 @@ A hands-on walkthrough of the three verification layers in GDS, using deliberate
 
 Each layer operates on a different representation, and the layers are complementary: a model can pass all generic checks but fail semantic checks (and vice versa).
 
+### What Verification Does Not Cover
+
+All three layers check **structural consistency** — does the model obey the rules of its own declared categories? They do not check whether those categories were chosen well. A stock-flow model where "customer satisfaction" is declared as a Stock will pass every check — whether satisfaction actually accumulates like a stock is a judgment call that no formal check can answer.
+
+This is the boundary between **verification** (automated, structural) and **validation** (human, domain-specific). Verification asks: "Given the roles and state variables you declared, is the model internally consistent?" Validation asks: "Did you declare the right roles and state variables for this problem?" GDS owns the first question. The modeler owns the second.
+
 ---
 
 ## Layer 1: Generic Checks (G-series)

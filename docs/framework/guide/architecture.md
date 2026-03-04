@@ -10,6 +10,14 @@ Blocks with bidirectional typed interfaces, composed via four operators (`>>`, `
 
 TypeDef with runtime constraints, typed Spaces, Entities with StateVariables, Block roles (BoundaryAction/Policy/Mechanism/ControlAction), GDSSpec registry, ParameterSchema (Θ), canonical projection (CanonicalGDS), Tagged mixin, semantic verification (SC-001..SC-007), SpecQuery for dependency analysis, and JSON serialization.
 
+### Why Two Layers?
+
+Layer 0 is domain-neutral by design. It knows about blocks with typed ports, four composition operators, and structural topology — nothing about games, stocks, or controllers. This neutrality is what allows five different DSLs to compile to the same IR.
+
+Domain judgment enters at Layer 1: when a modeler decides "this is a Mechanism, not a Policy" or "this variable is part of the system state." Layer 0 cannot make these decisions because they require knowledge of the problem being modeled. The three-stage compiler (flatten, wire, extract hierarchy) is pure algebra. The role annotations (BoundaryAction, Policy, Mechanism) are domain commitments.
+
+This separation means Layer 0 specifications stay verifiable without knowing anything about the domain — they can be composed and checked formally. Layer 1 adds the meaning that makes a specification useful for a particular problem.
+
 ## Foundation + Domain Packages
 
 ```
