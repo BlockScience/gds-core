@@ -203,9 +203,15 @@ mermaid_str = system_to_mermaid(system, theme="dark")
 # Paste into GitHub markdown, mermaid.live, or mo.mermaid()
 ```
 
-## Running Interactively
+## Interactive Notebook
 
-The guide includes a [marimo notebook](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/guides/visualization/notebook.py) with interactive dropdowns for selecting views, themes, and models:
+/// marimo-embed-file
+    filepath: packages/gds-examples/guides/visualization/notebook.py
+    height: 800px
+    mode: read
+///
+
+To run the notebook locally:
 
 ```bash
 uv run marimo run packages/gds-examples/guides/visualization/notebook.py

@@ -251,15 +251,46 @@ class TestCanonicalGDS:
         with pytest.raises(ValidationError):
             c.state_variables = (("x", "y"),)  # type: ignore[misc]
 
-    def test_formula_without_params(self):
+    def test_formula_empty(self):
+        """Empty canonical has h = id (no policy or mechanism blocks)."""
         c = CanonicalGDS()
+        assert c.formula() == "h : X → X  (h = id)"
+
+    def test_formula_full_decomposition(self):
+        """With both policy and mechanism blocks, formula is h = f ∘ g."""
+        c = CanonicalGDS(
+            policy_blocks=("p1",),
+            mechanism_blocks=("m1",),
+        )
         assert c.formula() == "h : X → X  (h = f ∘ g)"
+
+    def test_formula_policy_only(self):
+        """With only policy blocks, formula is h = g (no f)."""
+        c = CanonicalGDS(policy_blocks=("p1",))
+        assert c.formula() == "h : X → X  (h = g)"
+
+    def test_formula_mechanism_only(self):
+        """With only mechanism blocks, formula is h = f (no g)."""
+        c = CanonicalGDS(mechanism_blocks=("m1",))
+        assert c.formula() == "h : X → X  (h = f)"
 
     def test_formula_with_params(self, float_type):
         schema = ParameterSchema().add(ParameterDef(name="a", typedef=float_type))
-        c = CanonicalGDS(parameter_schema=schema)
-        assert "θ" in c.formula()
-        assert "Θ" in c.formula()
+        c = CanonicalGDS(
+            parameter_schema=schema,
+            policy_blocks=("p1",),
+            mechanism_blocks=("m1",),
+        )
+        assert c.formula() == "h_θ : X → X  (h = f_θ ∘ g_θ, θ ∈ Θ)"
+
+    def test_formula_with_params_policy_only(self, float_type):
+        """Parameterized policy-only formula: h_θ = g_θ."""
+        schema = ParameterSchema().add(ParameterDef(name="a", typedef=float_type))
+        c = CanonicalGDS(
+            parameter_schema=schema,
+            policy_blocks=("p1",),
+        )
+        assert c.formula() == "h_θ : X → X  (h = g_θ, θ ∈ Θ)"
 
     def test_has_parameters(self, float_type):
         c_empty = CanonicalGDS()

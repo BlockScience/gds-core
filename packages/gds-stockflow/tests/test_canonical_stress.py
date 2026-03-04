@@ -378,7 +378,7 @@ class TestOrphanStockCanonical:
         assert len(canonical.mechanism_blocks) == 1
 
     def test_formula_is_simple(self, canonical):
-        assert canonical.formula() == "h : X → X  (h = f ∘ g)"
+        assert canonical.formula() == "h : X → X  (h = f)"
 
 
 # ═══════════════════════════════════════════════════════════════

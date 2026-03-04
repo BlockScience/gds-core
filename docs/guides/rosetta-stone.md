@@ -313,9 +313,15 @@ from guides.rosetta.comparison import canonical_spectrum_table
 print(canonical_spectrum_table())
 ```
 
-## Running Interactively
+## Interactive Notebook
 
-The guide includes a [marimo notebook](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/guides/rosetta/notebook.py) for interactive exploration with live Mermaid rendering and dropdown selectors:
+/// marimo-embed-file
+    filepath: packages/gds-examples/guides/rosetta/notebook.py
+    height: 800px
+    mode: read
+///
+
+To run the notebook locally:
 
 ```bash
 uv run marimo run packages/gds-examples/guides/rosetta/notebook.py

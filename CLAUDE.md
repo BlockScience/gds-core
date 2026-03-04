@@ -16,6 +16,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | gds-stockflow | `stockflow` | `packages/gds-stockflow/` |
 | gds-control | `gds_control` | `packages/gds-control/` |
 | gds-software | `gds_software` | `packages/gds-software/` |
+| gds-sim | `gds_sim` | `packages/gds-sim/` |
 | gds-examples | — | `packages/gds-examples/` |
 
 ## Commands
@@ -32,12 +33,13 @@ uv run --package gds-stockflow pytest packages/gds-stockflow/tests -v
 uv run --package gds-control pytest packages/gds-control/tests -v
 uv run --package gds-software pytest packages/gds-software/tests -v
 uv run --package gds-examples pytest packages/gds-examples -v
+uv run --package gds-sim pytest packages/gds-sim/tests -v
 
 # Run a single test
 uv run --package gds-framework pytest packages/gds-framework/tests/test_blocks.py::TestStackComposition::test_rshift_operator -v
 
 # Run all tests across all packages
-uv run --package gds-framework pytest packages/gds-framework/tests packages/gds-viz/tests packages/gds-games/tests packages/gds-stockflow/tests packages/gds-control/tests packages/gds-software/tests packages/gds-examples -v
+uv run --package gds-framework pytest packages/gds-framework/tests packages/gds-viz/tests packages/gds-games/tests packages/gds-stockflow/tests packages/gds-control/tests packages/gds-software/tests packages/gds-examples packages/gds-sim/tests -v
 
 # Lint & format
 uv run ruff check packages/
@@ -68,6 +70,8 @@ gds-control    ←  control systems DSL (depends on gds-framework)
 gds-software   ←  software architecture DSL (depends on gds-framework)
     ↑
 gds-examples   ←  tutorials (depends on gds-framework + gds-viz)
+
+gds-sim        ←  simulation engine (standalone — no gds-framework dep, only pydantic)
 ```
 
 ### gds-framework: Two-Layer Design
