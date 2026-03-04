@@ -64,13 +64,11 @@ class SupplyChainModel(BaseModel):
         for s in self.shipments:
             if s.source not in node_names:
                 errors.append(
-                    f"Shipment {s.name!r} source {s.source!r} "
-                    f"is not a declared node"
+                    f"Shipment {s.name!r} source {s.source!r} is not a declared node"
                 )
             if s.target not in node_names:
                 errors.append(
-                    f"Shipment {s.name!r} target {s.target!r} "
-                    f"is not a declared node"
+                    f"Shipment {s.name!r} target {s.target!r} is not a declared node"
                 )
 
         # 4. Demand target references a declared node
