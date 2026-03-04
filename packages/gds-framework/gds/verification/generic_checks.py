@@ -78,10 +78,7 @@ def check_g002_signature_completeness(system: SystemIR) -> list[Finding]:
 
         # BoundaryAction blocks have no inputs by design — only check outputs
         is_boundary = block.block_type == "boundary"
-        if is_boundary:
-            has_required = has_output
-        else:
-            has_required = has_input and has_output
+        has_required = has_output if is_boundary else has_input and has_output
 
         missing = []
         if not has_input:
