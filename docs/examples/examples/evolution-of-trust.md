@@ -22,13 +22,13 @@ system = pipeline.feedback([payoff -> decisions])
 
 ```mermaid
 flowchart TD
-    subgraph Simultaneous Decisions
+    subgraph Decisions[Simultaneous Decisions]
         Alice[Alice Decision]
         Bob[Bob Decision]
     end
-    Simultaneous Decisions --> Payoff[[Payoff Computation]]
-    Payoff -.Alice Payoff.-> Alice
-    Payoff -.Bob Payoff.-> Bob
+    Decisions --> Payoff[[Payoff Computation]]
+    Payoff -. Alice Payoff .-> Alice
+    Payoff -. Bob Payoff .-> Bob
 ```
 
 ## What You'll Learn

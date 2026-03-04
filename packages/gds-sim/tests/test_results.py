@@ -37,7 +37,7 @@ class TestResults:
         assert len(r) == 4
 
     def test_to_dataframe(self) -> None:
-        import pandas as pd
+        pd = __import__("pytest").importorskip("pandas")
 
         r = gds_sim.Results(["val"])
         r.append({"val": 100}, timestep=0, substep=0, run=0, subset=0)
@@ -74,7 +74,7 @@ class TestResults:
 
 class TestResultsFromSimulation:
     def test_to_dataframe_from_sim(self, simple_model: gds_sim.Model) -> None:
-        import pandas as pd
+        pd = __import__("pytest").importorskip("pandas")
 
         sim = gds_sim.Simulation(model=simple_model, timesteps=5)
         df = sim.run().to_dataframe()
