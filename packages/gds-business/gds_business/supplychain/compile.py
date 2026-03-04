@@ -124,7 +124,7 @@ def _build_policy_block(policy: OrderPolicy, model: SupplyChainModel) -> Policy:
 
     # Demand signals targeting this policy's node
     for d in model.demand_sources:
-        if d.target_node == policy.node:
+        if d.target == policy.node:
             in_ports.append(port(_signal_port_name(d.name)))
 
     # Inventory signals from observed nodes
@@ -286,7 +286,7 @@ def compile_scn(model: SupplyChainModel) -> GDSSpec:
     # Demand -> Policy wires
     for d in model.demand_sources:
         for p in model.order_policies:
-            if p.node == d.target_node:
+            if p.node == d.target:
                 wires.append(
                     Wire(source=d.name, target=p.name, space="SCN DemandSpace")
                 )

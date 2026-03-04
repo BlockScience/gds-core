@@ -63,8 +63,8 @@ Self-loops (a variable causing itself) are structurally invalid:
 | ID | Name | Severity | What it checks |
 |----|------|----------|----------------|
 | SCN-001 | Network connectivity | WARNING | All nodes reachable via BFS from demand/supply paths |
-| SCN-002 | Shipment node validity | ERROR | source_node and target_node exist |
-| SCN-003 | Demand target validity | ERROR | target_node exists |
+| SCN-002 | Shipment node validity | ERROR | source and target exist |
+| SCN-003 | Demand target validity | ERROR | target exists |
 | SCN-004 | No orphan nodes | WARNING | Every node in at least one shipment or demand |
 
 ### SCN-001: Network Connectivity
