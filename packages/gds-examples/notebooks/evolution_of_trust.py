@@ -5,11 +5,19 @@ Demonstrates 8 strategies, round-robin tournaments, and evolutionary dynamics
 built on an OGS game structure.
 
 Run interactively:
-    uv run marimo edit guides/evolution_of_trust/notebook.py
+    uv run marimo edit notebooks/evolution_of_trust.py
 
 Run as read-only app:
-    uv run marimo run guides/evolution_of_trust/notebook.py
+    uv run marimo run notebooks/evolution_of_trust.py
 """
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [
+#     "gds-examples",
+#     "plotly>=5.0",
+#     "marimo>=0.20.0",
+# ]
+# ///
 
 import marimo
 
@@ -35,7 +43,7 @@ def model_setup():
     import sys
     from pathlib import Path
 
-    _examples_root = Path(__file__).resolve().parent.parent.parent
+    _examples_root = Path(__file__).resolve().parent.parent
     _games_path = str(_examples_root / "games")
     if _games_path not in sys.path:
         sys.path.insert(0, _games_path)

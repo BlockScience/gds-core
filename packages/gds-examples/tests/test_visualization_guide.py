@@ -9,8 +9,7 @@ import importlib.util
 from pathlib import Path
 
 import pytest
-
-from guides.visualization.all_views_demo import (
+from gds_examples.visualization.all_views_demo import (
     generate_all_views,
     view_1_structural,
     view_2_canonical,
@@ -19,12 +18,12 @@ from guides.visualization.all_views_demo import (
     view_5_parameter_influence,
     view_6_traceability,
 )
-from guides.visualization.cross_dsl_views import (
+from gds_examples.visualization.cross_dsl_views import (
     double_integrator_views,
     generate_cross_dsl_views,
     sir_views,
 )
-from guides.visualization.theme_customization import (
+from gds_examples.visualization.theme_customization import (
     ALL_THEMES,
     demo_all_themes,
     demo_default_vs_dark,
@@ -257,7 +256,7 @@ class TestViewConsistency:
 
 # ── Marimo Notebook ──────────────────────────────────────────
 
-_NOTEBOOK_PATH = Path(__file__).parent / "notebook.py"
+_NOTEBOOK_PATH = Path(__file__).parent.parent / "notebooks" / "visualization.py"
 
 
 class TestMarimoNotebook:

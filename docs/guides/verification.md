@@ -118,7 +118,7 @@ The core workflow: build a broken model, run checks, inspect findings, fix error
 
 ```python
 from gds.verification.engine import verify
-from guides.verification.broken_models import (
+from gds_examples.verification.broken_models import (
     dangling_wiring_system,
     fixed_pipeline_system,
 )
@@ -375,7 +375,7 @@ for finding in report.findings:
 ## Interactive Notebook
 
 /// marimo-embed-file
-    filepath: packages/gds-examples/guides/verification/notebook.py
+    filepath: packages/gds-examples/notebooks/verification.py
     height: 800px
     mode: read
 ///
@@ -383,20 +383,20 @@ for finding in report.findings:
 To run the notebook locally:
 
 ```bash
-uv run marimo run packages/gds-examples/guides/verification/notebook.py
+uv run marimo run packages/gds-examples/notebooks/verification.py
 ```
 
 Run the test suite:
 
 ```bash
-uv run --package gds-examples pytest packages/gds-examples/guides/verification/ -v
+uv run --package gds-examples pytest packages/gds-examples/tests/test_verification_guide.py -v
 ```
 
 ## Source Files
 
 | File | Purpose |
 |------|---------|
-| [`broken_models.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/guides/verification/broken_models.py) | Deliberately broken models for each check |
-| [`verification_demo.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/guides/verification/verification_demo.py) | Generic and semantic check demos |
-| [`domain_checks_demo.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/guides/verification/domain_checks_demo.py) | StockFlow domain check demos |
-| [`notebook.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/guides/verification/notebook.py) | Interactive marimo notebook |
+| [`broken_models.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/gds_examples/verification/broken_models.py) | Deliberately broken models for each check |
+| [`verification_demo.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/gds_examples/verification/verification_demo.py) | Generic and semantic check demos |
+| [`domain_checks_demo.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/gds_examples/verification/domain_checks_demo.py) | StockFlow domain check demos |
+| [`notebook.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/notebooks/verification.py) | Interactive marimo notebook |

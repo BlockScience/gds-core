@@ -16,9 +16,9 @@ the resource management problem differently:
 """
 
 from gds.canonical import CanonicalGDS, project_canonical
-from guides.rosetta.control_view import build_spec as build_control_spec
-from guides.rosetta.game_view import build_spec as build_game_spec
-from guides.rosetta.stockflow_view import build_spec as build_sf_spec
+from gds_examples.rosetta.control_view import build_spec as build_control_spec
+from gds_examples.rosetta.game_view import build_spec as build_game_spec
+from gds_examples.rosetta.stockflow_view import build_spec as build_sf_spec
 
 
 def build_all_canonicals() -> dict[str, CanonicalGDS]:
