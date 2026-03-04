@@ -103,10 +103,10 @@ model = SupplyChainModel(
         SupplyNode(name="Retail", initial_inventory=50),
     ],
     shipments=[
-        Shipment(name="W->R", source_node="Warehouse", target_node="Retail", lead_time=2.0),
+        Shipment(name="W->R", source="Warehouse", target="Retail", lead_time=2.0),
     ],
     demand_sources=[
-        DemandSource(name="Customer Demand", target_node="Retail"),
+        DemandSource(name="Customer Demand", target="Retail"),
     ],
     order_policies=[
         OrderPolicy(name="Retail Reorder", node="Retail", inputs=["Retail"]),

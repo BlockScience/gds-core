@@ -29,12 +29,12 @@ def _beer_game() -> SupplyChainModel:
             SupplyNode(name="Retailer", initial_inventory=100),
         ],
         shipments=[
-            Shipment(name="F->D", source_node="Factory", target_node="Distributor"),
-            Shipment(name="D->W", source_node="Distributor", target_node="Wholesaler"),
-            Shipment(name="W->R", source_node="Wholesaler", target_node="Retailer"),
+            Shipment(name="F->D", source="Factory", target="Distributor"),
+            Shipment(name="D->W", source="Distributor", target="Wholesaler"),
+            Shipment(name="W->R", source="Wholesaler", target="Retailer"),
         ],
         demand_sources=[
-            DemandSource(name="Customer Demand", target_node="Retailer"),
+            DemandSource(name="Customer Demand", target="Retailer"),
         ],
         order_policies=[
             OrderPolicy(name="Retailer Policy", node="Retailer", inputs=["Retailer"]),
@@ -57,8 +57,8 @@ def _simple_model() -> SupplyChainModel:
     return SupplyChainModel(
         name="Simple SCN",
         nodes=[SupplyNode(name="W1"), SupplyNode(name="W2")],
-        shipments=[Shipment(name="S1", source_node="W1", target_node="W2")],
-        demand_sources=[DemandSource(name="D1", target_node="W2")],
+        shipments=[Shipment(name="S1", source="W1", target="W2")],
+        demand_sources=[DemandSource(name="D1", target="W2")],
         order_policies=[OrderPolicy(name="OP1", node="W2", inputs=["W1"])],
     )
 

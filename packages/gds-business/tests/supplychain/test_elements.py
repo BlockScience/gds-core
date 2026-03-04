@@ -36,31 +36,31 @@ class TestSupplyNode:
 
 class TestShipment:
     def test_create(self):
-        s = Shipment(name="S1", source_node="A", target_node="B")
-        assert s.source_node == "A"
-        assert s.target_node == "B"
+        s = Shipment(name="S1", source="A", target="B")
+        assert s.source == "A"
+        assert s.target == "B"
         assert s.lead_time == 1.0
 
     def test_with_lead_time(self):
-        s = Shipment(name="S1", source_node="A", target_node="B", lead_time=3.0)
+        s = Shipment(name="S1", source="A", target="B", lead_time=3.0)
         assert s.lead_time == 3.0
 
     def test_frozen(self):
-        s = Shipment(name="S1", source_node="A", target_node="B")
+        s = Shipment(name="S1", source="A", target="B")
         with pytest.raises(ValidationError):
-            s.source_node = "C"
+            s.source = "C"
 
 
 class TestDemandSource:
     def test_create(self):
-        d = DemandSource(name="D1", target_node="Retail")
+        d = DemandSource(name="D1", target="Retail")
         assert d.name == "D1"
-        assert d.target_node == "Retail"
+        assert d.target == "Retail"
 
     def test_frozen(self):
-        d = DemandSource(name="D1", target_node="Retail")
+        d = DemandSource(name="D1", target="Retail")
         with pytest.raises(ValidationError):
-            d.target_node = "Other"
+            d.target = "Other"
 
 
 class TestOrderPolicy:

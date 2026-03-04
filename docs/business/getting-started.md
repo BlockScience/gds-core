@@ -68,11 +68,11 @@ model = SupplyChainModel(
         SupplyNode(name="Retailer", initial_inventory=100),
     ],
     shipments=[
-        Shipment(name="F->D", source_node="Factory", target_node="Distributor"),
-        Shipment(name="D->R", source_node="Distributor", target_node="Retailer"),
+        Shipment(name="F->D", source="Factory", target="Distributor"),
+        Shipment(name="D->R", source="Distributor", target="Retailer"),
     ],
     demand_sources=[
-        DemandSource(name="Customer", target_node="Retailer"),
+        DemandSource(name="Customer", target="Retailer"),
     ],
     order_policies=[
         OrderPolicy(name="Retailer Policy", node="Retailer", inputs=["Retailer"]),
