@@ -82,6 +82,57 @@ class TestG002:
         failed = [f for f in findings if not f.passed]
         assert len(failed) >= 1
 
+    def test_boundary_action_no_inputs_passes(self):
+        """BoundaryAction blocks have no inputs by design — G-002 should pass."""
+        sys = SystemIR(
+            name="Test",
+            blocks=[
+                BlockIR(
+                    name="Sensor",
+                    block_type="boundary",
+                    signature=("", "Temperature", "", ""),
+                ),
+            ],
+            wirings=[],
+        )
+        findings = check_g002_signature_completeness(sys)
+        assert len(findings) == 1
+        assert findings[0].passed
+
+    def test_boundary_action_no_outputs_still_fails(self):
+        """BoundaryAction with no outputs should still fail G-002."""
+        sys = SystemIR(
+            name="Test",
+            blocks=[
+                BlockIR(
+                    name="BadBoundary",
+                    block_type="boundary",
+                    signature=("", "", "", ""),
+                ),
+            ],
+            wirings=[],
+        )
+        findings = check_g002_signature_completeness(sys)
+        assert len(findings) == 1
+        assert not findings[0].passed
+
+    def test_non_boundary_no_inputs_still_fails(self):
+        """Non-boundary blocks without inputs should still fail G-002."""
+        sys = SystemIR(
+            name="Test",
+            blocks=[
+                BlockIR(
+                    name="Orphan",
+                    block_type="policy",
+                    signature=("", "Signal", "", ""),
+                ),
+            ],
+            wirings=[],
+        )
+        findings = check_g002_signature_completeness(sys)
+        assert len(findings) == 1
+        assert not findings[0].passed
+
 
 # ── G-003: Direction consistency ─────────────────────────────
 
