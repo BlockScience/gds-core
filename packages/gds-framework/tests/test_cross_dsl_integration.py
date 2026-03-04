@@ -5,15 +5,28 @@ Tests the GDS universal substrate claim: every DSL compiles to GDSSpec,
 produces valid SystemIR, passes verification, and yields correct canonical
 h = f . g decomposition.
 
+These tests require all DSL packages to be installed. When run in isolation
+(e.g. ``--package gds-framework``), the entire module is skipped.
+
 Run with:
     uv run pytest packages/gds-framework/tests/test_cross_dsl_integration.py -v
 """
+
+import importlib
 
 import pytest
 
 from gds.canonical import project_canonical
 from gds.ir.models import SystemIR
 from gds.spec import GDSSpec
+
+# Skip entire module if any DSL package is missing (CI runs per-package)
+_REQUIRED = ["stockflow", "gds_control", "ogs", "gds_software", "gds_business"]
+_missing = [m for m in _REQUIRED if importlib.util.find_spec(m) is None]
+pytestmark = pytest.mark.skipif(
+    len(_missing) > 0,
+    reason=f"Cross-DSL tests require all DSL packages; missing: {_missing}",
+)
 
 # ════════════════════════════════════════════════════════════════
 # StockFlow DSL
@@ -117,7 +130,6 @@ class TestStockFlowRoundTrip:
 # Control DSL
 # ════════════════════════════════════════════════════════════════
 
-
 class TestControlRoundTrip:
     """Control: declare → compile → verify → canonical."""
 
@@ -212,7 +224,6 @@ class TestControlRoundTrip:
 # ════════════════════════════════════════════════════════════════
 # OGS (Games) DSL
 # ════════════════════════════════════════════════════════════════
-
 
 class TestOGSRoundTrip:
     """OGS: Pattern → compile_pattern_to_spec → canonical."""
@@ -317,7 +328,6 @@ class TestOGSRoundTrip:
 # Software DSL
 # ════════════════════════════════════════════════════════════════
 
-
 class TestSoftwareRoundTrip:
     """Software: each diagram type compiles through GDS pipeline."""
 
@@ -411,7 +421,6 @@ class TestSoftwareRoundTrip:
 # Business DSL
 # ════════════════════════════════════════════════════════════════
 
-
 class TestBusinessRoundTrip:
     """Business: CLD, SCN, VSM compile through GDS pipeline."""
 
@@ -446,10 +455,10 @@ class TestBusinessRoundTrip:
                 SupplyNode(name="Retailer"),
             ],
             shipments=[
-                Shipment(name="F->R", source_node="Factory", target_node="Retailer"),
+                Shipment(name="F->R", source="Factory", target="Retailer"),
             ],
             demand_sources=[
-                DemandSource(name="Customer", target_node="Retailer"),
+                DemandSource(name="Customer", target="Retailer"),
             ],
             order_policies=[
                 OrderPolicy(name="Reorder", node="Retailer", inputs=["Retailer"]),
