@@ -37,8 +37,11 @@ class ParameterDef(BaseModel):
         if not self.typedef.check_value(value):
             return False
         if self.bounds is not None:
-            low, high = self.bounds
-            if not (low <= value <= high):
+            try:
+                low, high = self.bounds
+                if not (low <= value <= high):
+                    return False
+            except Exception:
                 return False
         return True
 

@@ -32,7 +32,12 @@ class TypeDef(BaseModel):
         """Check if a value satisfies this type definition."""
         if not isinstance(value, self.python_type):
             return False
-        return self.constraint is None or self.constraint(value)
+        if self.constraint is None:
+            return True
+        try:
+            return bool(self.constraint(value))
+        except Exception:
+            return False
 
 
 # ── Built-in types ──────────────────────────────────────────
