@@ -311,10 +311,9 @@ nav:
               - gds_software.dependency.compile: software/api/dep-compile.md
               - gds_software.dependency.checks: software/api/dep-checks.md
               - gds_software.verification: software/api/verification.md
-      - Ecosystem: framework/ecosystem.md
   - Design & Research:
       - Layer 0 Milestone: guides/architecture-milestone-layer0.md
       - DSL Roadmap: guides/dsl-roadmap.md
       - Research Boundaries: guides/research-boundaries.md
       - View Stratification: guides/view-stratification.md
-      - Examples Overview: examples/index.md
+      - Ecosystem: framework/ecosystem.md
