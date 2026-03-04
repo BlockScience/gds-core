@@ -45,6 +45,35 @@ class TestTokenize:
     def test_case_normalization(self):
         assert tokenize("TEMPERATURE") == frozenset({"temperature"})
 
+    def test_unicode_nfc_normalization(self):
+        """NFC and NFD forms of the same character produce identical tokens."""
+        import unicodedata
+
+        nfc = unicodedata.normalize("NFC", "Température")  # precomposed é
+        nfd = unicodedata.normalize("NFD", "Température")  # base e + combining accent
+        assert nfc != nfd  # different byte sequences
+        assert tokenize(nfc) == tokenize(nfd)
+
+    def test_unicode_accented_overlap(self):
+        """Accented tokens match across NFC/NFD encodings in overlap checks."""
+        import unicodedata
+
+        nfc = unicodedata.normalize("NFC", "Vélocité")
+        nfd = unicodedata.normalize("NFD", "Vélocité")
+        assert tokens_overlap(nfc, nfd) is True
+
+    def test_unicode_accented_subset(self):
+        """Accented tokens match across NFC/NFD encodings in subset checks."""
+        import unicodedata
+
+        nfc = unicodedata.normalize("NFC", "Résistance")
+        nfd = unicodedata.normalize("NFD", "Résistance + Capacitance")
+        assert tokens_subset(nfc, nfd) is True
+
+    def test_unicode_plain_ascii_unaffected(self):
+        """NFC normalization is a no-op for plain ASCII strings."""
+        assert tokenize("Temperature") == frozenset({"temperature"})
+
 
 # ── tokens_subset() ─────────────────────────────────────────
 
@@ -179,6 +208,34 @@ class TestTypeDef:
         t = TypeDef(name="Prob", python_type=float)
         with pytest.raises(ValidationError):
             t.name = "Other"  # type: ignore[misc]
+
+    def test_constraint_exception_returns_false(self):
+        """Constraint that raises should return False, not propagate."""
+        t = TypeDef(
+            name="Bad",
+            python_type=float,
+            constraint=lambda x: 1 / 0,  # ZeroDivisionError
+        )
+        assert t.check_value(1.0) is False
+
+    def test_constraint_type_error_returns_false(self):
+        """Constraint that raises TypeError should return False."""
+        t = TypeDef(
+            name="Bad",
+            python_type=float,
+            constraint=lambda x: x > "not a number",  # TypeError
+        )
+        assert t.check_value(1.0) is False
+
+    def test_constraint_returns_truthy_non_bool(self):
+        """Constraint returning truthy non-bool value should work."""
+        t = TypeDef(
+            name="Truthy",
+            python_type=str,
+            constraint=lambda x: x,  # non-empty string is truthy
+        )
+        assert t.check_value("hello") is True
+        assert t.check_value("") is False
 
 
 # ── Built-in types ───────────────────────────────────────────

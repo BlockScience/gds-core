@@ -23,6 +23,10 @@ Domain Model (Pattern, StockFlowModel, ControlModel)
 | **GDSSpec / CanonicalGDS** | Semantic (GDS theory) | Role classification (Policy/Mechanism/BoundaryAction), state variables, canonical decomposition h = f ∘ g, update map, decision/input ports |
 | **SystemIR** | Structural (topology) | Block graph, wiring connections, hierarchy tree, composition operators |
 
+### Why Three Representations?
+
+None of these representations is the system itself — each is a map that hides something by design. Domain IR hides composition structure. GDSSpec hides domain vocabulary. SystemIR hides roles and state. Keeping them separate is not duplication. Each answers a different class of question, and a view that tries to answer one layer's question using another layer's data is working from the wrong map.
+
 ## Authority Rules
 
 ### CanonicalGDS is the semantic authority

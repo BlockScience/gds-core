@@ -133,7 +133,7 @@ class TestVerifyEngine:
     def test_verify_specific_checks(self, good_model):
         report = verify(
             good_model,
-            sf_checks=[check_sf001_orphan_stocks],
+            domain_checks=[check_sf001_orphan_stocks],
             include_gds_checks=False,
         )
         assert all(f.check_id == "SF-001" for f in report.findings)

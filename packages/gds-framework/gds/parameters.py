@@ -11,9 +11,9 @@ Key distinction:
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Self
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from gds.types.typedef import TypeDef  # noqa: TC001
 
@@ -32,13 +32,36 @@ class ParameterDef(BaseModel):
     description: str = ""
     bounds: tuple[Any, Any] | None = None
 
+    @model_validator(mode="after")
+    def _validate_bounds(self) -> Self:
+        """Validate that bounds are comparable and correctly ordered."""
+        if self.bounds is None:
+            return self
+        low, high = self.bounds
+        try:
+            result = low <= high
+        except TypeError as e:
+            raise ValueError(
+                f"ParameterDef '{self.name}': bounds ({low!r}, {high!r}) "
+                f"are not comparable: {e}"
+            ) from None
+        if not result:
+            raise ValueError(
+                f"ParameterDef '{self.name}': lower bound {low!r} "
+                f"exceeds upper bound {high!r}"
+            )
+        return self
+
     def check_value(self, value: Any) -> bool:
         """Check if a value satisfies this parameter's type and constraints."""
         if not self.typedef.check_value(value):
             return False
         if self.bounds is not None:
-            low, high = self.bounds
-            if not (low <= value <= high):
+            try:
+                low, high = self.bounds
+                if not (low <= value <= high):
+                    return False
+            except Exception:
                 return False
         return True
 

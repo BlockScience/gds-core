@@ -21,21 +21,21 @@ def check_scn001_network_connectivity(model: SupplyChainModel) -> list[Finding]:
     # Build undirected adjacency from shipments
     adj: dict[str, set[str]] = {n.name: set() for n in model.nodes}
     for s in model.shipments:
-        if s.source_node in adj and s.target_node in adj:
-            adj[s.source_node].add(s.target_node)
-            adj[s.target_node].add(s.source_node)
+        if s.source in adj and s.target in adj:
+            adj[s.source].add(s.target)
+            adj[s.target].add(s.source)
 
     # Also connect demand source targets
     for d in model.demand_sources:
-        if d.target_node in adj:
-            adj[d.target_node].add(f"__demand_{d.name}")
+        if d.target in adj:
+            adj[d.target].add(f"__demand_{d.name}")
 
     # BFS from each demand target
     reachable: set[str] = set()
     for d in model.demand_sources:
-        if d.target_node not in adj:
+        if d.target not in adj:
             continue
-        queue = [d.target_node]
+        queue = [d.target]
         visited: set[str] = set()
         while queue:
             node = queue.pop(0)
@@ -76,32 +76,32 @@ def check_scn001_network_connectivity(model: SupplyChainModel) -> list[Finding]:
 
 
 def check_scn002_shipment_node_validity(model: SupplyChainModel) -> list[Finding]:
-    """SCN-002: Shipment source_node and target_node exist."""
+    """SCN-002: Shipment source and target exist."""
     findings: list[Finding] = []
     for s in model.shipments:
-        src_valid = s.source_node in model.node_names
+        src_valid = s.source in model.node_names
         findings.append(
             Finding(
                 check_id="SCN-002",
                 severity=Severity.ERROR,
                 message=(
-                    f"Shipment {s.name!r} source_node {s.source_node!r} "
+                    f"Shipment {s.name!r} source {s.source!r} "
                     f"{'is' if src_valid else 'is NOT'} a declared node"
                 ),
-                source_elements=[s.name, s.source_node],
+                source_elements=[s.name, s.source],
                 passed=src_valid,
             )
         )
-        tgt_valid = s.target_node in model.node_names
+        tgt_valid = s.target in model.node_names
         findings.append(
             Finding(
                 check_id="SCN-002",
                 severity=Severity.ERROR,
                 message=(
-                    f"Shipment {s.name!r} target_node {s.target_node!r} "
+                    f"Shipment {s.name!r} target {s.target!r} "
                     f"{'is' if tgt_valid else 'is NOT'} a declared node"
                 ),
-                source_elements=[s.name, s.target_node],
+                source_elements=[s.name, s.target],
                 passed=tgt_valid,
             )
         )
@@ -109,19 +109,19 @@ def check_scn002_shipment_node_validity(model: SupplyChainModel) -> list[Finding
 
 
 def check_scn003_demand_target_validity(model: SupplyChainModel) -> list[Finding]:
-    """SCN-003: Demand target_node exists."""
+    """SCN-003: Demand target exists."""
     findings: list[Finding] = []
     for d in model.demand_sources:
-        valid = d.target_node in model.node_names
+        valid = d.target in model.node_names
         findings.append(
             Finding(
                 check_id="SCN-003",
                 severity=Severity.ERROR,
                 message=(
-                    f"DemandSource {d.name!r} target_node {d.target_node!r} "
+                    f"DemandSource {d.name!r} target {d.target!r} "
                     f"{'is' if valid else 'is NOT'} a declared node"
                 ),
-                source_elements=[d.name, d.target_node],
+                source_elements=[d.name, d.target],
                 passed=valid,
             )
         )
@@ -133,10 +133,10 @@ def check_scn004_no_orphan_nodes(model: SupplyChainModel) -> list[Finding]:
     findings: list[Finding] = []
     connected: set[str] = set()
     for s in model.shipments:
-        connected.add(s.source_node)
-        connected.add(s.target_node)
+        connected.add(s.source)
+        connected.add(s.target)
     for d in model.demand_sources:
-        connected.add(d.target_node)
+        connected.add(d.target)
 
     for node in model.nodes:
         is_connected = node.name in connected

@@ -22,8 +22,8 @@ class TestSupplyChainModelConstruction:
         m = SupplyChainModel(
             name="test",
             nodes=[SupplyNode(name="W1"), SupplyNode(name="W2")],
-            shipments=[Shipment(name="S1", source_node="W1", target_node="W2")],
-            demand_sources=[DemandSource(name="D1", target_node="W2")],
+            shipments=[Shipment(name="S1", source="W1", target="W2")],
+            demand_sources=[DemandSource(name="D1", target="W2")],
             order_policies=[OrderPolicy(name="OP1", node="W2", inputs=["W1"])],
         )
         assert len(m.shipments) == 1
@@ -42,27 +42,27 @@ class TestSupplyChainModelConstruction:
             )
 
     def test_shipment_source_invalid_fails(self):
-        with pytest.raises(BizValidationError, match="source_node.*not a declared"):
+        with pytest.raises(BizValidationError, match="source.*not a declared"):
             SupplyChainModel(
                 name="test",
                 nodes=[SupplyNode(name="W1")],
-                shipments=[Shipment(name="S1", source_node="Z", target_node="W1")],
+                shipments=[Shipment(name="S1", source="Z", target="W1")],
             )
 
     def test_shipment_target_invalid_fails(self):
-        with pytest.raises(BizValidationError, match="target_node.*not a declared"):
+        with pytest.raises(BizValidationError, match="target.*not a declared"):
             SupplyChainModel(
                 name="test",
                 nodes=[SupplyNode(name="W1")],
-                shipments=[Shipment(name="S1", source_node="W1", target_node="Z")],
+                shipments=[Shipment(name="S1", source="W1", target="Z")],
             )
 
     def test_demand_target_invalid_fails(self):
-        with pytest.raises(BizValidationError, match="target_node.*not a declared"):
+        with pytest.raises(BizValidationError, match="target.*not a declared"):
             SupplyChainModel(
                 name="test",
                 nodes=[SupplyNode(name="W1")],
-                demand_sources=[DemandSource(name="D1", target_node="Z")],
+                demand_sources=[DemandSource(name="D1", target="Z")],
             )
 
     def test_order_policy_node_invalid_fails(self):

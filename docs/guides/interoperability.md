@@ -235,7 +235,7 @@ This validates GDS as an **interoperability substrate**, not just a modeling fra
 ### Nash Equilibrium Analysis
 
 /// marimo-embed-file
-    filepath: packages/gds-examples/guides/nash_equilibrium/notebook.py
+    filepath: packages/gds-examples/notebooks/nash_equilibrium.py
     height: 800px
     mode: read
 ///
@@ -244,8 +244,7 @@ To run locally:
 
 ```bash
 uv sync --all-packages --extra nash
-cd packages/gds-examples && \
-    uv run marimo run guides/nash_equilibrium/notebook.py
+uv run marimo run packages/gds-examples/notebooks/nash_equilibrium.py
 ```
 
 ```bash
@@ -257,7 +256,7 @@ uv run --package gds-examples pytest \
 ### Evolution of Trust Simulation
 
 /// marimo-embed-file
-    filepath: packages/gds-examples/guides/evolution_of_trust/notebook.py
+    filepath: packages/gds-examples/notebooks/evolution_of_trust.py
     height: 800px
     mode: read
 ///
@@ -265,8 +264,7 @@ uv run --package gds-examples pytest \
 To run locally:
 
 ```bash
-cd packages/gds-examples && \
-    uv run marimo run guides/evolution_of_trust/notebook.py
+uv run marimo run packages/gds-examples/notebooks/evolution_of_trust.py
 ```
 
 ```bash
@@ -283,8 +281,8 @@ uv run --package gds-examples pytest \
 | `games/evolution_of_trust/model.py` | OGS structure with Nicky Case payoffs |
 | `games/evolution_of_trust/strategies.py` | 8 strategy implementations |
 | `games/evolution_of_trust/tournament.py` | Match, tournament, evolutionary dynamics |
-| `guides/nash_equilibrium/notebook.py` | Interactive Nash analysis notebook |
-| `guides/evolution_of_trust/notebook.py` | Interactive simulation notebook |
+| `notebooks/nash_equilibrium.py` | Interactive Nash analysis notebook |
+| `notebooks/evolution_of_trust.py` | Interactive simulation notebook |
 
 All paths relative to `packages/gds-examples/`.
 

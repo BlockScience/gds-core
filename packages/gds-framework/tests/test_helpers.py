@@ -20,6 +20,7 @@ from gds import (
 )
 from gds.helpers import (
     _CUSTOM_CHECKS,
+    _CUSTOM_CHECKS_LOCK,
     all_checks,
     entity,
     gds_check,
@@ -245,11 +246,13 @@ class TestCollect:
 class TestGdsCheck:
     def setup_method(self):
         """Clear custom check registry before each test."""
-        _CUSTOM_CHECKS.clear()
+        with _CUSTOM_CHECKS_LOCK:
+            _CUSTOM_CHECKS.clear()
 
     def teardown_method(self):
         """Clear custom check registry after each test."""
-        _CUSTOM_CHECKS.clear()
+        with _CUSTOM_CHECKS_LOCK:
+            _CUSTOM_CHECKS.clear()
 
     def test_registers_check(self):
         @gds_check("TEST-001", Severity.WARNING)
@@ -309,3 +312,36 @@ class TestGdsCheck:
         assert len(checks) == 2
         assert checks[0] is check_a
         assert checks[1] is check_b
+
+    def test_concurrent_registration(self):
+        """Register checks from multiple threads; all must appear."""
+        import threading
+
+        num_threads = 20
+        barrier = threading.Barrier(num_threads)
+        errors: list[Exception] = []
+
+        def register_check(index: int) -> None:
+            try:
+                barrier.wait(timeout=5)
+
+                @gds_check(f"THREAD-{index:03d}")
+                def _check(system: SystemIR) -> list[Finding]:
+                    return []
+            except Exception as exc:
+                errors.append(exc)
+
+        threads = [
+            threading.Thread(target=register_check, args=(i,))
+            for i in range(num_threads)
+        ]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join(timeout=10)
+
+        assert not errors, f"Thread errors: {errors}"
+        checks = get_custom_checks()
+        assert len(checks) == num_threads
+        check_ids = {c.check_id for c in checks}  # type: ignore[attr-defined]
+        assert check_ids == {f"THREAD-{i:03d}" for i in range(num_threads)}
