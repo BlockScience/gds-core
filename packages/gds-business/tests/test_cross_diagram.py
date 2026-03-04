@@ -51,10 +51,10 @@ def _scn() -> SupplyChainModel:
             SupplyNode(name="Retailer"),
         ],
         shipments=[
-            Shipment(name="F->R", source_node="Factory", target_node="Retailer"),
+            Shipment(name="F->R", source="Factory", target="Retailer"),
         ],
         demand_sources=[
-            DemandSource(name="Customer", target_node="Retailer"),
+            DemandSource(name="Customer", target="Retailer"),
         ],
         order_policies=[
             OrderPolicy(name="Reorder", node="Retailer", inputs=["Retailer"]),
