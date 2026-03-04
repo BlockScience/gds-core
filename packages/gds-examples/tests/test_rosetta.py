@@ -7,6 +7,44 @@ verification, and produces the expected canonical decomposition.
 
 from pathlib import Path
 
+from gds_examples.rosetta.comparison import (
+    build_all_canonicals,
+    canonical_spectrum_table,
+)
+from gds_examples.rosetta.control_view import (
+    build_canonical as build_control_canonical,
+)
+from gds_examples.rosetta.control_view import (
+    build_model as build_control_model,
+)
+from gds_examples.rosetta.control_view import (
+    build_spec as build_control_spec,
+)
+from gds_examples.rosetta.control_view import (
+    build_system as build_control_system,
+)
+from gds_examples.rosetta.game_view import (
+    build_canonical as build_game_canonical,
+)
+from gds_examples.rosetta.game_view import (
+    build_pattern,
+)
+from gds_examples.rosetta.game_view import (
+    build_spec as build_game_spec,
+)
+from gds_examples.rosetta.stockflow_view import (
+    build_canonical as build_sf_canonical,
+)
+from gds_examples.rosetta.stockflow_view import (
+    build_model as build_sf_model,
+)
+from gds_examples.rosetta.stockflow_view import (
+    build_spec as build_sf_spec,
+)
+from gds_examples.rosetta.stockflow_view import (
+    build_system as build_sf_system,
+)
+
 from gds.blocks.roles import BoundaryAction, Mechanism, Policy
 from gds.ir.models import FlowDirection
 from gds.verification.engine import verify
@@ -21,40 +59,6 @@ from gds.verification.spec_checks import (
     check_completeness,
     check_determinism,
     check_type_safety,
-)
-from guides.rosetta.comparison import build_all_canonicals, canonical_spectrum_table
-from guides.rosetta.control_view import (
-    build_canonical as build_control_canonical,
-)
-from guides.rosetta.control_view import (
-    build_model as build_control_model,
-)
-from guides.rosetta.control_view import (
-    build_spec as build_control_spec,
-)
-from guides.rosetta.control_view import (
-    build_system as build_control_system,
-)
-from guides.rosetta.game_view import (
-    build_canonical as build_game_canonical,
-)
-from guides.rosetta.game_view import (
-    build_pattern,
-)
-from guides.rosetta.game_view import (
-    build_spec as build_game_spec,
-)
-from guides.rosetta.stockflow_view import (
-    build_canonical as build_sf_canonical,
-)
-from guides.rosetta.stockflow_view import (
-    build_model as build_sf_model,
-)
-from guides.rosetta.stockflow_view import (
-    build_spec as build_sf_spec,
-)
-from guides.rosetta.stockflow_view import (
-    build_system as build_sf_system,
 )
 
 # ── Stock-Flow View ──────────────────────────────────────────────
@@ -459,7 +463,7 @@ class TestComparison:
 class TestMarimoNotebook:
     """Validate the interactive marimo notebook for the Rosetta Stone guide."""
 
-    NOTEBOOK = Path(__file__).resolve().parent / "notebook.py"
+    NOTEBOOK = Path(__file__).resolve().parent.parent / "notebooks" / "rosetta.py"
 
     def test_file_exists(self):
         assert self.NOTEBOOK.exists(), f"Notebook not found: {self.NOTEBOOK}"

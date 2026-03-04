@@ -308,7 +308,7 @@ h_theta : X -> X    where h = f . g
 This is the "Rosetta Stone" -- the same mathematical structure expressed in different domain languages, all grounded in GDS theory.
 
 ```python
-from guides.rosetta.comparison import canonical_spectrum_table
+from gds_examples.rosetta.comparison import canonical_spectrum_table
 
 print(canonical_spectrum_table())
 ```
@@ -316,7 +316,7 @@ print(canonical_spectrum_table())
 ## Interactive Notebook
 
 /// marimo-embed-file
-    filepath: packages/gds-examples/guides/rosetta/notebook.py
+    filepath: packages/gds-examples/notebooks/rosetta.py
     height: 800px
     mode: read
 ///
@@ -324,21 +324,21 @@ print(canonical_spectrum_table())
 To run the notebook locally:
 
 ```bash
-uv run marimo run packages/gds-examples/guides/rosetta/notebook.py
+uv run marimo run packages/gds-examples/notebooks/rosetta.py
 ```
 
 Run the test suite:
 
 ```bash
-uv run --package gds-examples pytest packages/gds-examples/guides/rosetta/ -v
+uv run --package gds-examples pytest packages/gds-examples/tests/test_rosetta.py -v
 ```
 
 ## Source Files
 
 | File | Purpose |
 |------|---------|
-| [`stockflow_view.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/guides/rosetta/stockflow_view.py) | Stock-flow DSL model |
-| [`control_view.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/guides/rosetta/control_view.py) | Control DSL model |
-| [`game_view.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/guides/rosetta/game_view.py) | Game theory DSL model |
-| [`comparison.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/guides/rosetta/comparison.py) | Cross-domain canonical comparison |
-| [`notebook.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/guides/rosetta/notebook.py) | Interactive marimo notebook |
+| [`stockflow_view.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/gds_examples/rosetta/stockflow_view.py) | Stock-flow DSL model |
+| [`control_view.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/gds_examples/rosetta/control_view.py) | Control DSL model |
+| [`game_view.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/gds_examples/rosetta/game_view.py) | Game theory DSL model |
+| [`comparison.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/gds_examples/rosetta/comparison.py) | Cross-domain canonical comparison |
+| [`rosetta.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/notebooks/rosetta.py) | Interactive marimo notebook |

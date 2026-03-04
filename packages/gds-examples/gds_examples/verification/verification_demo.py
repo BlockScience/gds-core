@@ -29,7 +29,7 @@ from gds.verification.spec_checks import (
     check_completeness,
     check_determinism,
 )
-from guides.verification.broken_models import (
+from gds_examples.verification.broken_models import (
     covariant_cycle_system,
     dangling_wiring_system,
     empty_canonical_spec,
