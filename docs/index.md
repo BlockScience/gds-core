@@ -38,29 +38,6 @@ Key guides include embedded [marimo](https://marimo.io) notebooks — run code, 
 | `gds-business` | `gds_business` | Business dynamics DSL (CLD, supply chain, value stream map) |
 | `gds-examples` | — | Tutorial models demonstrating framework features |
 
-## Installation
-
-Install individual packages from PyPI as needed:
-
-```bash
-pip install gds-framework    # Core library
-pip install gds-viz          # Visualization
-pip install gds-stockflow    # Stock-flow DSL
-pip install gds-control      # Control systems DSL
-pip install gds-games        # Game theory DSL
-pip install gds-software     # Software architecture DSL
-pip install gds-business     # Business dynamics DSL
-pip install gds-examples     # Tutorial models
-```
-
-For development (all packages linked locally):
-
-```bash
-git clone https://github.com/BlockScience/gds-core.git
-cd gds-core
-uv sync --all-packages
-```
-
 ## Architecture
 
 ```
