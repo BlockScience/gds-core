@@ -130,6 +130,7 @@ class TestStockFlowRoundTrip:
 # Control DSL
 # ════════════════════════════════════════════════════════════════
 
+
 class TestControlRoundTrip:
     """Control: declare → compile → verify → canonical."""
 
@@ -224,6 +225,7 @@ class TestControlRoundTrip:
 # ════════════════════════════════════════════════════════════════
 # OGS (Games) DSL
 # ════════════════════════════════════════════════════════════════
+
 
 class TestOGSRoundTrip:
     """OGS: Pattern → compile_pattern_to_spec → canonical."""
@@ -328,6 +330,7 @@ class TestOGSRoundTrip:
 # Software DSL
 # ════════════════════════════════════════════════════════════════
 
+
 class TestSoftwareRoundTrip:
     """Software: each diagram type compiles through GDS pipeline."""
 
@@ -420,6 +423,7 @@ class TestSoftwareRoundTrip:
 # ════════════════════════════════════════════════════════════════
 # Business DSL
 # ════════════════════════════════════════════════════════════════
+
 
 class TestBusinessRoundTrip:
     """Business: CLD, SCN, VSM compile through GDS pipeline."""
