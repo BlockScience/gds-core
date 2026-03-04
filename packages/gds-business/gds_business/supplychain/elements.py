@@ -26,8 +26,8 @@ class Shipment(BaseModel, frozen=True):
     """
 
     name: str
-    source_node: str
-    target_node: str
+    source: str
+    target: str
     lead_time: float = 1.0
 
 
@@ -38,7 +38,7 @@ class DemandSource(BaseModel, frozen=True):
     """
 
     name: str
-    target_node: str
+    target: str
     description: str = ""
 
 

@@ -21,8 +21,8 @@ def _connected_model() -> SupplyChainModel:
     return SupplyChainModel(
         name="Connected",
         nodes=[SupplyNode(name="A"), SupplyNode(name="B")],
-        shipments=[Shipment(name="S1", source_node="A", target_node="B")],
-        demand_sources=[DemandSource(name="D1", target_node="B")],
+        shipments=[Shipment(name="S1", source="A", target="B")],
+        demand_sources=[DemandSource(name="D1", target="B")],
     )
 
 
@@ -34,8 +34,8 @@ def _disconnected_model() -> SupplyChainModel:
             SupplyNode(name="B"),
             SupplyNode(name="C"),
         ],
-        shipments=[Shipment(name="S1", source_node="A", target_node="B")],
-        demand_sources=[DemandSource(name="D1", target_node="B")],
+        shipments=[Shipment(name="S1", source="A", target="B")],
+        demand_sources=[DemandSource(name="D1", target="B")],
     )
 
 
@@ -47,7 +47,7 @@ def _orphan_model() -> SupplyChainModel:
             SupplyNode(name="B"),
             SupplyNode(name="C"),
         ],
-        shipments=[Shipment(name="S1", source_node="A", target_node="B")],
+        shipments=[Shipment(name="S1", source="A", target="B")],
     )
 
 
@@ -55,7 +55,7 @@ def _no_shipments_model() -> SupplyChainModel:
     return SupplyChainModel(
         name="NoShipments",
         nodes=[SupplyNode(name="A")],
-        demand_sources=[DemandSource(name="D1", target_node="A")],
+        demand_sources=[DemandSource(name="D1", target="A")],
     )
 
 
