@@ -4,8 +4,15 @@ Compares the same resource-pool scenario across three DSL views
 (Stock-Flow, Control, Game Theory), showing how they all map to
 the GDS canonical form.
 
-Run with: marimo run guides/rosetta/notebook.py
+Run with: marimo run notebooks/rosetta.py
 """
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [
+#     "gds-examples",
+#     "marimo>=0.20.0",
+# ]
+# ///
 
 import marimo
 
@@ -322,10 +329,11 @@ def _():
 
 @app.cell
 def _():
+    from gds_examples.rosetta import comparison, game_view
+    from gds_examples.rosetta import control_view as ctrl_view
+    from gds_examples.rosetta import stockflow_view as sf_view
+
     import gds_viz
-    from guides.rosetta import comparison, game_view
-    from guides.rosetta import control_view as ctrl_view
-    from guides.rosetta import stockflow_view as sf_view
 
     return comparison, ctrl_view, game_view, gds_viz, sf_view
 

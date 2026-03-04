@@ -74,7 +74,7 @@ only-include = [
     "thermostat_dsl",
     "double_integrator",
     "software",
-    "guides",
+    "gds_examples",
 ]
 
 [tool.pytest.ini_options]
@@ -100,7 +100,7 @@ files = [
     "thermostat",
     "thermostat_dsl",
     "double_integrator",
-    "guides",
+    "gds_examples",
     "software",
     "visualize_examples.py",
 ]

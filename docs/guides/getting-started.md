@@ -425,7 +425,7 @@ From here, explore the [example models](../examples/index.md) or the [Rosetta St
 ## Interactive Notebook
 
 /// marimo-embed-file
-    filepath: packages/gds-examples/guides/getting_started/notebook.py
+    filepath: packages/gds-examples/notebooks/getting_started.py
     height: 800px
     mode: read
 ///
@@ -433,22 +433,22 @@ From here, explore the [example models](../examples/index.md) or the [Rosetta St
 To run the notebook locally:
 
 ```bash
-uv run marimo run packages/gds-examples/guides/getting_started/notebook.py
+uv run marimo run packages/gds-examples/notebooks/getting_started.py
 ```
 
 Run the test suite:
 
 ```bash
-uv run --package gds-examples pytest packages/gds-examples/guides/getting_started/ -v
+uv run --package gds-examples pytest packages/gds-examples/tests/test_getting_started.py -v
 ```
 
 ## Source Files
 
 | File | Purpose |
 |------|---------|
-| [`stage1_minimal.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/guides/getting_started/stage1_minimal.py) | Minimal heater model |
-| [`stage2_feedback.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/guides/getting_started/stage2_feedback.py) | Feedback loop with policies |
-| [`stage3_dsl.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/guides/getting_started/stage3_dsl.py) | gds-control DSL version |
-| [`stage4_verify_viz.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/guides/getting_started/stage4_verify_viz.py) | Verification and visualization |
-| [`stage5_query.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/guides/getting_started/stage5_query.py) | SpecQuery API |
-| [`notebook.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/guides/getting_started/notebook.py) | Interactive marimo notebook |
+| [`stage1_minimal.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/gds_examples/getting_started/stage1_minimal.py) | Minimal heater model |
+| [`stage2_feedback.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/gds_examples/getting_started/stage2_feedback.py) | Feedback loop with policies |
+| [`stage3_dsl.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/gds_examples/getting_started/stage3_dsl.py) | gds-control DSL version |
+| [`stage4_verify_viz.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/gds_examples/getting_started/stage4_verify_viz.py) | Verification and visualization |
+| [`stage5_query.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/gds_examples/getting_started/stage5_query.py) | SpecQuery API |
+| [`getting_started.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/notebooks/getting_started.py) | Interactive marimo notebook |

@@ -206,7 +206,7 @@ mermaid_str = system_to_mermaid(system, theme="dark")
 ## Interactive Notebook
 
 /// marimo-embed-file
-    filepath: packages/gds-examples/guides/visualization/notebook.py
+    filepath: packages/gds-examples/notebooks/visualization.py
     height: 800px
     mode: read
 ///
@@ -214,20 +214,20 @@ mermaid_str = system_to_mermaid(system, theme="dark")
 To run the notebook locally:
 
 ```bash
-uv run marimo run packages/gds-examples/guides/visualization/notebook.py
+uv run marimo run packages/gds-examples/notebooks/visualization.py
 ```
 
 Run the test suite:
 
 ```bash
-uv run --package gds-examples pytest packages/gds-examples/guides/visualization/ -v
+uv run --package gds-examples pytest packages/gds-examples/tests/test_visualization_guide.py -v
 ```
 
 ## Source Files
 
 | File | Purpose |
 |------|---------|
-| [`all_views_demo.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/guides/visualization/all_views_demo.py) | All 6 view types on the SIR model |
-| [`theme_customization.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/guides/visualization/theme_customization.py) | 5 built-in theme demos |
-| [`cross_dsl_views.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/guides/visualization/cross_dsl_views.py) | Cross-DSL visualization comparison |
-| [`notebook.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/guides/visualization/notebook.py) | Interactive marimo notebook |
+| [`all_views_demo.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/gds_examples/visualization/all_views_demo.py) | All 6 view types on the SIR model |
+| [`theme_customization.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/gds_examples/visualization/theme_customization.py) | 5 built-in theme demos |
+| [`cross_dsl_views.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/gds_examples/visualization/cross_dsl_views.py) | Cross-DSL visualization comparison |
+| [`visualization.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/notebooks/visualization.py) | Interactive marimo notebook |
