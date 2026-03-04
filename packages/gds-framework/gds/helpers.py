@@ -7,6 +7,7 @@ helpers are opt-in sugar.
 
 from __future__ import annotations
 
+import threading
 from collections.abc import Callable
 from typing import Any
 
@@ -168,6 +169,7 @@ def interface(
 CheckFn = Callable[[SystemIR], list[Finding]]
 
 _CUSTOM_CHECKS: list[CheckFn] = []
+_CUSTOM_CHECKS_LOCK = threading.Lock()
 
 
 def gds_check(
@@ -177,7 +179,8 @@ def gds_check(
     """Decorator that registers a verification check function.
 
     Attaches ``check_id`` and ``severity`` as function attributes and
-    adds it to the module-level custom check registry.
+    adds it to the module-level custom check registry. Registration is
+    thread-safe.
 
     Usage::
 
@@ -189,19 +192,25 @@ def gds_check(
     def decorator(fn: CheckFn) -> CheckFn:
         fn.check_id = check_id  # type: ignore[attr-defined]
         fn.severity = severity  # type: ignore[attr-defined]
-        _CUSTOM_CHECKS.append(fn)
+        with _CUSTOM_CHECKS_LOCK:
+            _CUSTOM_CHECKS.append(fn)
         return fn
 
     return decorator
 
 
 def get_custom_checks() -> list[CheckFn]:
-    """Return all check functions registered via ``@gds_check``."""
-    return list(_CUSTOM_CHECKS)
+    """Return a snapshot of all check functions registered via ``@gds_check``.
+
+    Returns a copy so callers cannot mutate the internal registry.
+    """
+    with _CUSTOM_CHECKS_LOCK:
+        return list(_CUSTOM_CHECKS)
 
 
 def all_checks() -> list[CheckFn]:
     """Return built-in generic checks + all custom-registered checks."""
     from gds.verification.engine import ALL_CHECKS
 
-    return list(ALL_CHECKS) + list(_CUSTOM_CHECKS)
+    with _CUSTOM_CHECKS_LOCK:
+        return list(ALL_CHECKS) + list(_CUSTOM_CHECKS)
