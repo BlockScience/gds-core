@@ -7,18 +7,23 @@ signatures into normalized tokens and checks set relationships.
 
 from __future__ import annotations
 
+import unicodedata
+
 
 def tokenize(signature: str) -> frozenset[str]:
     """Tokenize a signature string into a normalized frozen set of tokens.
 
     Splitting rules (applied in order):
-    1. Split on ' + ' (the compound-type joiner).
-    2. Split each part on ', ' (comma-space).
-    3. Strip whitespace and lowercase each token.
-    4. Discard empty strings.
+    1. Apply Unicode NFC normalization (so that e.g. é as base+combining
+       matches precomposed é).
+    2. Split on ' + ' (the compound-type joiner).
+    3. Split each part on ', ' (comma-space).
+    4. Strip whitespace and lowercase each token.
+    5. Discard empty strings.
     """
     if not signature:
         return frozenset()
+    signature = unicodedata.normalize("NFC", signature)
     tokens: set[str] = set()
     for plus_part in signature.split(" + "):
         for comma_part in plus_part.split(", "):

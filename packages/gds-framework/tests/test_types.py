@@ -45,6 +45,35 @@ class TestTokenize:
     def test_case_normalization(self):
         assert tokenize("TEMPERATURE") == frozenset({"temperature"})
 
+    def test_unicode_nfc_normalization(self):
+        """NFC and NFD forms of the same character produce identical tokens."""
+        import unicodedata
+
+        nfc = unicodedata.normalize("NFC", "Température")  # precomposed é
+        nfd = unicodedata.normalize("NFD", "Température")  # base e + combining accent
+        assert nfc != nfd  # different byte sequences
+        assert tokenize(nfc) == tokenize(nfd)
+
+    def test_unicode_accented_overlap(self):
+        """Accented tokens match across NFC/NFD encodings in overlap checks."""
+        import unicodedata
+
+        nfc = unicodedata.normalize("NFC", "Vélocité")
+        nfd = unicodedata.normalize("NFD", "Vélocité")
+        assert tokens_overlap(nfc, nfd) is True
+
+    def test_unicode_accented_subset(self):
+        """Accented tokens match across NFC/NFD encodings in subset checks."""
+        import unicodedata
+
+        nfc = unicodedata.normalize("NFC", "Résistance")
+        nfd = unicodedata.normalize("NFD", "Résistance + Capacitance")
+        assert tokens_subset(nfc, nfd) is True
+
+    def test_unicode_plain_ascii_unaffected(self):
+        """NFC normalization is a no-op for plain ASCII strings."""
+        assert tokenize("Temperature") == frozenset({"temperature"})
+
 
 # ── tokens_subset() ─────────────────────────────────────────
 
