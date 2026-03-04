@@ -66,9 +66,22 @@ class CanonicalGDS(BaseModel):
 
     def formula(self) -> str:
         """Render as mathematical formula string."""
+        has_f = len(self.mechanism_blocks) > 0
+        has_g = len(self.policy_blocks) > 0
+
+        if has_f and has_g:
+            decomp = "f ∘ g"
+        elif has_g:
+            decomp = "g"
+        elif has_f:
+            decomp = "f"
+        else:
+            decomp = "id"
+
         if self.has_parameters:
-            return "h_θ : X → X  (h = f_θ ∘ g_θ, θ ∈ Θ)"
-        return "h : X → X  (h = f ∘ g)"
+            decomp_theta = decomp.replace("f", "f_θ").replace("g", "g_θ")
+            return f"h_θ : X → X  (h = {decomp_theta}, θ ∈ Θ)"
+        return f"h : X → X  (h = {decomp})"
 
 
 def project_canonical(spec: GDSSpec) -> CanonicalGDS:
