@@ -25,7 +25,7 @@ classifiers = [
     "Topic :: Scientific/Engineering",
 ]
 dependencies = [
-    "gds-framework>=0.2.0",
+    "gds-framework>=0.2.3",
     "gds-viz>=0.1.0",
     "gds-games>=0.1.0",
     "gds-stockflow>=0.1.0",
