@@ -4,6 +4,16 @@ Five domain-specific languages compile to the same GDS core. This guide helps yo
 
 ---
 
+## Starting from the Problem
+
+The Decision Matrix below is a technical reference — it assumes you already know your primitives. In practice, most modelers start earlier: with a domain question.
+
+The same system can often be modeled with more than one DSL. An epidemic could be stockflow (if you care about accumulation rates) or raw framework (if you just need a state transition). A supply chain could be stockflow (stocks and flows), CLD (causal influences), or SCN (inventory and topology). The DSL choice depends on **what you want to verify**, not just what domain you are in.
+
+The natural workflow is: **Problem → What do I want to check? → DSL**. Once you pick a DSL, roles and block structure follow more naturally because the DSL embeds domain conventions about what matters.
+
+---
+
 ## Decision Matrix
 
 | If your system has... | Use | Package | Why |

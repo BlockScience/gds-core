@@ -49,6 +49,20 @@ Policy(name="Process", ...)
 
 ---
 
+## Modeling Decisions
+
+Before writing any composition, three choices shape the entire specification:
+
+**Role assignment.** Which processes become BoundaryActions (exogenous inputs), Policies (decision/observation logic), or Mechanisms (state updates)? This determines the canonical decomposition `h = f . g`. A temperature sensor could be a BoundaryAction (external data arrives) or a Policy (compute reading from state) — the right answer depends on what you want to verify, not on the physics alone.
+
+**State identification.** Which quantities are state variables and which are derived? An SIR model with three state variables (S, I, R) produces a different canonical form than one that derives R = N - S - I and tracks only two. Finer state identification lets SC-001 catch orphan variables; coarser identification creates fewer obligations.
+
+**Block granularity.** One large block or several small ones? The algebra composes anything with compatible ports, but finer granularity makes the [hierarchy tree](../framework/guide/composition.md) more informative and gives verification more to check. A single-block model passes all structural checks trivially.
+
+These are design choices, not discoveries. Different choices lead to different verifiable specifications — neither is "wrong." Start from the question you want to answer ("Does this system avoid write conflicts on state?") and design roles backward from there.
+
+---
+
 ## Composition Patterns
 
 ### The Three-Tier Pipeline
