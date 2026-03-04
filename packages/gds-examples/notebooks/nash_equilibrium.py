@@ -4,11 +4,19 @@ Demonstrates the full pipeline: OGS game structure -> payoff matrices ->
 Nash equilibrium computation -> dominance and Pareto analysis.
 
 Run interactively:
-    uv run marimo edit guides/nash_equilibrium/notebook.py
+    uv run marimo edit notebooks/nash_equilibrium.py
 
 Run as read-only app:
-    uv run marimo run guides/nash_equilibrium/notebook.py
+    uv run marimo run notebooks/nash_equilibrium.py
 """
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [
+#     "gds-examples",
+#     "nashpy>=0.0.41",
+#     "marimo>=0.20.0",
+# ]
+# ///
 
 import marimo
 
@@ -34,7 +42,7 @@ def model_setup():
     import sys
     from pathlib import Path
 
-    _examples_root = Path(__file__).resolve().parent.parent.parent
+    _examples_root = Path(__file__).resolve().parent.parent
     _games_path = str(_examples_root / "games")
     if _games_path not in sys.path:
         sys.path.insert(0, _games_path)

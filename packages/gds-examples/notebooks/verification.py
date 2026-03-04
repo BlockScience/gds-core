@@ -5,11 +5,18 @@ deliberately broken models, inspecting findings, and watching the
 fix-and-reverify workflow in action.
 
 Run interactively:
-    uv run marimo edit guides/verification/notebook.py
+    uv run marimo edit notebooks/verification.py
 
 Run as read-only app:
-    uv run marimo run guides/verification/notebook.py
+    uv run marimo run notebooks/verification.py
 """
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [
+#     "gds-examples",
+#     "marimo>=0.20.0",
+# ]
+# ///
 
 import marimo
 
@@ -88,6 +95,14 @@ def generic_selector(mo):
 
 @app.cell
 def run_generic_check(mo, generic_dropdown):
+    from gds_examples.verification.broken_models import (
+        covariant_cycle_system,
+        dangling_wiring_system,
+        direction_contradiction_system,
+        incomplete_signature_system,
+        type_mismatch_system,
+    )
+
     from gds.verification.engine import verify
     from gds.verification.generic_checks import (
         check_g001_domain_codomain_matching,
@@ -96,13 +111,6 @@ def run_generic_check(mo, generic_dropdown):
         check_g004_dangling_wirings,
         check_g005_sequential_type_compatibility,
         check_g006_covariant_acyclicity,
-    )
-    from guides.verification.broken_models import (
-        covariant_cycle_system,
-        dangling_wiring_system,
-        direction_contradiction_system,
-        incomplete_signature_system,
-        type_mismatch_system,
     )
 
     _models = {
@@ -196,13 +204,14 @@ def fix_reverify_header(mo):
 
 @app.cell
 def fix_reverify_demo(mo):
-    from gds.verification.engine import verify as _verify
-    from guides.verification.broken_models import (
+    from gds_examples.verification.broken_models import (
         dangling_wiring_system as _dangling_wiring_system,
     )
-    from guides.verification.broken_models import (
+    from gds_examples.verification.broken_models import (
         fixed_pipeline_system,
     )
+
+    from gds.verification.engine import verify as _verify
 
     _broken_report = _verify(_dangling_wiring_system())
     _fixed_report = _verify(fixed_pipeline_system())
@@ -289,15 +298,16 @@ def semantic_selector(mo):
 
 @app.cell
 def run_semantic_check(mo, semantic_dropdown):
+    from gds_examples.verification.broken_models import (
+        empty_canonical_spec,
+        orphan_state_spec,
+        write_conflict_spec,
+    )
+
     from gds.verification.spec_checks import (
         check_canonical_wellformedness,
         check_completeness,
         check_determinism,
-    )
-    from guides.verification.broken_models import (
-        empty_canonical_spec,
-        orphan_state_spec,
-        write_conflict_spec,
     )
 
     _specs = {
@@ -370,7 +380,7 @@ def comparison_header(mo):
 
 @app.cell
 def comparison_demo(mo):
-    from guides.verification.verification_demo import (
+    from gds_examples.verification.verification_demo import (
         demo_generic_vs_semantic,
     )
 
@@ -444,11 +454,12 @@ def domain_selector(mo):
 
 @app.cell
 def run_domain_check(mo, domain_dropdown):
-    from guides.verification.domain_checks_demo import (
+    from gds_examples.verification.domain_checks_demo import (
         cyclic_auxiliary_model,
         orphan_stock_model,
         unused_converter_model,
     )
+
     from stockflow.verification.checks import (
         check_sf001_orphan_stocks,
         check_sf003_auxiliary_acyclicity,
@@ -538,12 +549,13 @@ def combined_selector(mo):
 
 @app.cell
 def run_combined(mo, combined_dropdown):
-    from guides.verification.domain_checks_demo import (
+    from gds_examples.verification.domain_checks_demo import (
         good_stockflow_model,
     )
-    from guides.verification.domain_checks_demo import (
+    from gds_examples.verification.domain_checks_demo import (
         orphan_stock_model as _orphan_stock_model,
     )
+
     from stockflow.verification.engine import verify as sf_verify
 
     if combined_dropdown.value == "good":

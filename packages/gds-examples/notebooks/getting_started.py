@@ -1,8 +1,15 @@
 """Interactive Getting Started guide for GDS — marimo notebook.
 
 A progressive 5-stage tutorial that teaches GDS fundamentals using a
-thermostat control system. Run with: marimo run notebook.py
+thermostat control system. Run with: marimo run notebooks/getting_started.py
 """
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [
+#     "gds-examples",
+#     "marimo>=0.20.0",
+# ]
+# ///
 
 import marimo
 
@@ -84,8 +91,10 @@ def _(mo):
 
 @app.cell
 def _(mo):
-    from guides.getting_started.stage1_minimal import build_spec as _build_spec_s1
-    from guides.getting_started.stage1_minimal import build_system as _build_system_s1
+    from gds_examples.getting_started.stage1_minimal import build_spec as _build_spec_s1
+    from gds_examples.getting_started.stage1_minimal import (
+        build_system as _build_system_s1,
+    )
 
     _spec_s1 = _build_spec_s1()
     _system_s1 = _build_system_s1()
@@ -146,10 +155,10 @@ def _(mo):
 
 @app.cell
 def _(mo):
-    from guides.getting_started.stage2_feedback import (
+    from gds_examples.getting_started.stage2_feedback import (
         build_spec as _build_spec_s2,
     )
-    from guides.getting_started.stage2_feedback import (
+    from gds_examples.getting_started.stage2_feedback import (
         build_system as _build_system_s2,
     )
 
@@ -211,13 +220,13 @@ def _(mo):
 
 @app.cell
 def _(mo):
-    from guides.getting_started.stage3_dsl import (
+    from gds_examples.getting_started.stage3_dsl import (
         build_canonical as _build_canonical_s3,
     )
-    from guides.getting_started.stage3_dsl import (
+    from gds_examples.getting_started.stage3_dsl import (
         build_spec as _build_spec_s3,
     )
-    from guides.getting_started.stage3_dsl import (
+    from gds_examples.getting_started.stage3_dsl import (
         build_system as _build_system_s3,
     )
 
@@ -287,25 +296,25 @@ def _(mo):
 
 @app.cell
 def _(mo):
-    from guides.getting_started.stage3_dsl import (
+    from gds_examples.getting_started.stage3_dsl import (
         build_spec as _build_spec_s4,
     )
-    from guides.getting_started.stage3_dsl import (
+    from gds_examples.getting_started.stage3_dsl import (
         build_system as _build_system_s4,
     )
-    from guides.getting_started.stage4_verify_viz import (
+    from gds_examples.getting_started.stage4_verify_viz import (
         generate_architecture_view as _gen_arch,
     )
-    from guides.getting_started.stage4_verify_viz import (
+    from gds_examples.getting_started.stage4_verify_viz import (
         generate_canonical_view as _gen_canon,
     )
-    from guides.getting_started.stage4_verify_viz import (
+    from gds_examples.getting_started.stage4_verify_viz import (
         generate_structural_view as _gen_struct,
     )
-    from guides.getting_started.stage4_verify_viz import (
+    from gds_examples.getting_started.stage4_verify_viz import (
         run_generic_checks as _run_generic,
     )
-    from guides.getting_started.stage4_verify_viz import (
+    from gds_examples.getting_started.stage4_verify_viz import (
         run_semantic_checks as _run_semantic,
     )
 
@@ -383,22 +392,22 @@ def _(mo):
 
 @app.cell
 def _(mo):
-    from guides.getting_started.stage5_query import (
+    from gds_examples.getting_started.stage5_query import (
         build_query as _build_query,
     )
-    from guides.getting_started.stage5_query import (
+    from gds_examples.getting_started.stage5_query import (
         show_blocks_by_role as _show_blocks_by_role,
     )
-    from guides.getting_started.stage5_query import (
+    from gds_examples.getting_started.stage5_query import (
         show_causal_chain as _show_causal_chain,
     )
-    from guides.getting_started.stage5_query import (
+    from gds_examples.getting_started.stage5_query import (
         show_dependency_graph as _show_dep_graph,
     )
-    from guides.getting_started.stage5_query import (
+    from gds_examples.getting_started.stage5_query import (
         show_entity_updates as _show_entity_updates,
     )
-    from guides.getting_started.stage5_query import (
+    from gds_examples.getting_started.stage5_query import (
         show_param_influence as _show_param_influence,
     )
 

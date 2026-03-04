@@ -131,7 +131,7 @@ def generate_canonical_view(spec: GDSSpec) -> str:
 
 
 if __name__ == "__main__":
-    from guides.getting_started.stage3_dsl import build_spec, build_system
+    from gds_examples.getting_started.stage3_dsl import build_spec, build_system
 
     spec = build_spec()
     system = build_system()

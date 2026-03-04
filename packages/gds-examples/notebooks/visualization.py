@@ -5,11 +5,18 @@ visualization using interactive controls. Every diagram renders live
 as you change selections.
 
 Run interactively:
-    uv run marimo edit guides/visualization/notebook.py
+    uv run marimo edit notebooks/visualization.py
 
 Run as read-only app:
-    uv run marimo run guides/visualization/notebook.py
+    uv run marimo run notebooks/visualization.py
 """
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [
+#     "gds-examples",
+#     "marimo>=0.20.0",
+# ]
+# ///
 
 import marimo
 
@@ -59,7 +66,7 @@ def build_sir():
     from pathlib import Path
 
     # Add stockflow/ and control/ to path for model imports
-    _examples_root = Path(__file__).resolve().parent.parent.parent
+    _examples_root = Path(__file__).resolve().parent.parent
     for _subdir in ("stockflow", "control"):
         _path = str(_examples_root / _subdir)
         if _path not in sys.path:

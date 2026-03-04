@@ -11,6 +11,41 @@ Verifies that:
 import importlib.util
 from pathlib import Path
 
+from gds_examples.verification.broken_models import (
+    covariant_cycle_system,
+    dangling_wiring_system,
+    direction_contradiction_system,
+    empty_canonical_spec,
+    fixed_pipeline_system,
+    fixed_spec,
+    incomplete_signature_system,
+    orphan_state_spec,
+    type_mismatch_system,
+    write_conflict_spec,
+)
+from gds_examples.verification.domain_checks_demo import (
+    cyclic_auxiliary_model,
+    demo_broken_domain_full_verification,
+    demo_cyclic_auxiliaries,
+    demo_domain_plus_gds_checks,
+    demo_orphan_stock,
+    demo_unused_converter,
+    good_stockflow_model,
+    orphan_stock_model,
+    unused_converter_model,
+)
+from gds_examples.verification.verification_demo import (
+    demo_covariant_cycle,
+    demo_dangling_wiring,
+    demo_empty_canonical,
+    demo_fix_and_reverify,
+    demo_full_verification_broken,
+    demo_generic_vs_semantic,
+    demo_orphan_state,
+    demo_type_mismatch,
+    demo_write_conflict,
+)
+
 from gds.verification.engine import verify
 from gds.verification.findings import Severity
 from gds.verification.generic_checks import (
@@ -25,40 +60,6 @@ from gds.verification.spec_checks import (
     check_canonical_wellformedness,
     check_completeness,
     check_determinism,
-)
-from guides.verification.broken_models import (
-    covariant_cycle_system,
-    dangling_wiring_system,
-    direction_contradiction_system,
-    empty_canonical_spec,
-    fixed_pipeline_system,
-    fixed_spec,
-    incomplete_signature_system,
-    orphan_state_spec,
-    type_mismatch_system,
-    write_conflict_spec,
-)
-from guides.verification.domain_checks_demo import (
-    cyclic_auxiliary_model,
-    demo_broken_domain_full_verification,
-    demo_cyclic_auxiliaries,
-    demo_domain_plus_gds_checks,
-    demo_orphan_stock,
-    demo_unused_converter,
-    good_stockflow_model,
-    orphan_stock_model,
-    unused_converter_model,
-)
-from guides.verification.verification_demo import (
-    demo_covariant_cycle,
-    demo_dangling_wiring,
-    demo_empty_canonical,
-    demo_fix_and_reverify,
-    demo_full_verification_broken,
-    demo_generic_vs_semantic,
-    demo_orphan_state,
-    demo_type_mismatch,
-    demo_write_conflict,
 )
 from stockflow.verification.checks import (
     check_sf001_orphan_stocks,
@@ -402,7 +403,7 @@ class TestVerificationReportStructure:
 # Marimo Notebook tests
 # ══════════════════════════════════════════════════════════════════
 
-_NOTEBOOK_PATH = Path(__file__).parent / "notebook.py"
+_NOTEBOOK_PATH = Path(__file__).parent.parent / "notebooks" / "verification.py"
 
 
 class TestMarimoNotebook:
