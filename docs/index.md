@@ -6,41 +6,12 @@ GDS gives you a composition algebra for modeling complex systems — from epidem
 
 ## Where to Start
 
-<div class="grid cards" markdown>
-
--   :material-rocket-launch:{ .lg .middle } **New to GDS?**
-
-    ---
-
-    Follow the hands-on tutorial to build your first model in minutes.
-
-    [:octicons-arrow-right-24: Start Here](tutorials/getting-started.md)
-
--   :material-map-marker-path:{ .lg .middle } **Guided Learning Path**
-
-    ---
-
-    Work through seven example models in recommended order, from simple to complex.
-
-    [:octicons-arrow-right-24: Learning Path](examples/learning-path.md)
-
--   :material-swap-horizontal:{ .lg .middle } **Which DSL Should I Use?**
-
-    ---
-
-    Compare all seven domain DSLs and pick the right one for your problem.
-
-    [:octicons-arrow-right-24: Choosing a DSL](guides/choosing-a-dsl.md)
-
--   :material-translate:{ .lg .middle } **Rosetta Stone**
-
-    ---
-
-    See the same problem modeled with stockflow, control, and game theory DSLs side by side.
-
-    [:octicons-arrow-right-24: Rosetta Stone](guides/rosetta-stone.md)
-
-</div>
+| | |
+|---|---|
+| **[Start Here](tutorials/getting-started.md)** | New to GDS? Follow the hands-on tutorial to build your first model in minutes. |
+| **[Learning Path](examples/learning-path.md)** | Work through seven example models in recommended order, from simple to complex. |
+| **[Choosing a DSL](guides/choosing-a-dsl.md)** | Compare all seven domain DSLs and pick the right one for your problem. |
+| **[Rosetta Stone](guides/rosetta-stone.md)** | See the same problem modeled with stockflow, control, and game theory DSLs side by side. |
 
 ## Interactive Notebooks
 
