@@ -27,6 +27,7 @@ theme:
 
 plugins:
   - search
+  - marimo
   - mkdocstrings:
       handlers:
         python:

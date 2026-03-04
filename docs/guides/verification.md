@@ -372,9 +372,15 @@ for finding in report.findings:
     print(f"{finding.check_id}: {finding.message}")
 ```
 
-## Running Interactively
+## Interactive Notebook
 
-The guide includes a [marimo notebook](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/guides/verification/notebook.py) with interactive dropdowns for selecting broken models and watching checks in real time:
+/// marimo-embed-file
+    filepath: packages/gds-examples/guides/verification/notebook.py
+    height: 800px
+    mode: read
+///
+
+To run the notebook locally:
 
 ```bash
 uv run marimo run packages/gds-examples/guides/verification/notebook.py
