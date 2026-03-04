@@ -3,6 +3,11 @@ top-level Pattern that wraps a game tree with external metadata.
 """
 
 from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from gds.ir.models import SystemIR
+    from gds.spec import GDSSpec
 
 from pydantic import BaseModel, Field
 
@@ -140,3 +145,17 @@ class Pattern(BaseModel):
             else self.initializations,
             source=source if source is not None else self.source,
         )
+
+    # ── Compilation ─────────────────────────────────────────
+
+    def compile(self) -> GDSSpec:
+        """Compile this pattern to a GDS specification."""
+        from ogs.dsl.spec_bridge import compile_pattern_to_spec
+
+        return compile_pattern_to_spec(self)
+
+    def compile_system(self) -> SystemIR:
+        """Compile this pattern to a flat SystemIR for verification + visualization."""
+        from ogs.dsl.compile import compile_to_ir
+
+        return compile_to_ir(self).to_system_ir()
