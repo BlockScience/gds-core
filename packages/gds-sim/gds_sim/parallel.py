@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import multiprocessing as mp
 from concurrent.futures import ProcessPoolExecutor
 from typing import TYPE_CHECKING
 
@@ -38,7 +39,8 @@ def _parallel_simulation(sim: Simulation, max_workers: int | None) -> Results:
     ]
 
     partial_results: list[Results] = []
-    with ProcessPoolExecutor(max_workers=max_workers) as pool:
+    ctx = mp.get_context("fork")
+    with ProcessPoolExecutor(max_workers=max_workers, mp_context=ctx) as pool:
         futures = [pool.submit(_run_single, *job) for job in jobs]
         for f in futures:
             partial_results.append(f.result())
