@@ -180,6 +180,34 @@ class TestTypeDef:
         with pytest.raises(ValidationError):
             t.name = "Other"  # type: ignore[misc]
 
+    def test_constraint_exception_returns_false(self):
+        """Constraint that raises should return False, not propagate."""
+        t = TypeDef(
+            name="Bad",
+            python_type=float,
+            constraint=lambda x: 1 / 0,  # ZeroDivisionError
+        )
+        assert t.check_value(1.0) is False
+
+    def test_constraint_type_error_returns_false(self):
+        """Constraint that raises TypeError should return False."""
+        t = TypeDef(
+            name="Bad",
+            python_type=float,
+            constraint=lambda x: x > "not a number",  # TypeError
+        )
+        assert t.check_value(1.0) is False
+
+    def test_constraint_returns_truthy_non_bool(self):
+        """Constraint returning truthy non-bool value should work."""
+        t = TypeDef(
+            name="Truthy",
+            python_type=str,
+            constraint=lambda x: x,  # non-empty string is truthy
+        )
+        assert t.check_value("hello") is True
+        assert t.check_value("") is False
+
 
 # ── Built-in types ───────────────────────────────────────────
 
