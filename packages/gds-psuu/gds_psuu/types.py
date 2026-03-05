@@ -13,5 +13,11 @@ ParamPoint = dict[str, Any]
 KPIFn = Callable[[Results], float]
 """Computes a scalar KPI score from simulation results (all Monte Carlo runs)."""
 
+MetricFn = Callable[[Results, int], float]
+"""Computes a scalar from a single run. Args: results, run_number."""
+
+AggregationFn = Callable[[list[float]], float]
+"""Combines per-run metric values into a single scalar."""
+
 KPIScores = dict[str, float]
 """Maps KPI names to their computed scalar scores."""

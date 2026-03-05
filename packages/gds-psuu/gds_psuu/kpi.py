@@ -2,10 +2,17 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, model_validator
 
+from gds_psuu.errors import PsuuValidationError
+from gds_psuu.metric import (
+    Aggregation,
+    Metric,
+    _extract_run_ids,
+    mean_agg,
+)
 from gds_psuu.types import KPIFn  # noqa: TC001
 
 if TYPE_CHECKING:
@@ -13,12 +20,58 @@ if TYPE_CHECKING:
 
 
 class KPI(BaseModel):
-    """Named KPI backed by a scoring function."""
+    """Named KPI backed by either a legacy fn or a Metric + Aggregation pair.
+
+    Legacy usage (backwards compatible)::
+
+        KPI(name="avg_pop", fn=lambda r: final_state_mean(r, "population"))
+
+    Composable usage::
+
+        KPI(name="avg_pop", metric=final_value("population"), aggregation=mean_agg)
+    """
 
     model_config = ConfigDict(arbitrary_types_allowed=True, frozen=True)
 
     name: str
-    fn: KPIFn
+    fn: KPIFn | None = None
+    metric: Metric | None = None
+    aggregation: Aggregation | None = None
+
+    @model_validator(mode="after")
+    def _validate_specification(self) -> Self:
+        has_fn = self.fn is not None
+        has_metric = self.metric is not None
+        if not has_fn and not has_metric:
+            raise PsuuValidationError("KPI must have either 'fn' or 'metric' specified")
+        if has_fn and has_metric:
+            raise PsuuValidationError(
+                "KPI cannot have both 'fn' and 'metric' specified"
+            )
+        return self
+
+    def compute(self, results: Results) -> float:
+        """Compute the aggregated KPI score from results."""
+        if self.fn is not None:
+            return self.fn(results)
+        assert self.metric is not None
+        agg = self.aggregation or mean_agg
+        per_run = self.per_run(results)
+        return agg.fn(per_run)
+
+    def per_run(self, results: Results) -> list[float]:
+        """Compute per-run metric values. Only available for metric-based KPIs."""
+        if self.metric is None:
+            raise PsuuValidationError(
+                "per_run() requires a metric-based KPI, not a legacy fn-based KPI"
+            )
+        run_ids = _extract_run_ids(results)
+        return [self.metric.fn(results, r) for r in run_ids]
+
+
+# ---------------------------------------------------------------------------
+# Legacy helper functions (backwards compatible)
+# ---------------------------------------------------------------------------
 
 
 def final_state_mean(results: Results, key: str) -> float:

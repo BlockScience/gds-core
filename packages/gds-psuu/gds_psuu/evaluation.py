@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 from gds_sim import Model, Results, Simulation
@@ -20,6 +20,8 @@ class EvaluationResult:
     scores: KPIScores
     results: Results
     run_count: int
+    distributions: dict[str, list[float]] = field(default_factory=dict)
+    """Per-run metric values for metric-based KPIs."""
 
 
 class Evaluator(BaseModel):
@@ -36,7 +38,8 @@ class Evaluator(BaseModel):
         """Evaluate a single parameter point.
 
         Injects params as singleton lists into the model, runs the simulation,
-        and computes KPI scores.
+        and computes KPI scores. For metric-based KPIs, also records per-run
+        distributions.
         """
         # Build params dict: each value as a singleton list for gds-sim
         sim_params: dict[str, list[Any]] = {k: [v] for k, v in params.items()}
@@ -51,11 +54,18 @@ class Evaluator(BaseModel):
         sim = Simulation(model=model, timesteps=self.timesteps, runs=self.runs)
         results = sim.run()
 
-        scores: KPIScores = {kpi.name: kpi.fn(results) for kpi in self.kpis}
+        scores: KPIScores = {}
+        distributions: dict[str, list[float]] = {}
+
+        for kpi in self.kpis:
+            scores[kpi.name] = kpi.compute(results)
+            if kpi.metric is not None:
+                distributions[kpi.name] = kpi.per_run(results)
 
         return EvaluationResult(
             params=params,
             scores=scores,
             results=results,
             run_count=self.runs,
+            distributions=distributions,
         )
