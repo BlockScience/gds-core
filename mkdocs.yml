@@ -109,6 +109,11 @@ plugins:
           - guides/dsl-roadmap.md
           - guides/research-boundaries.md
           - guides/view-stratification.md
+        PSUU (gds-psuu):
+          - {psuu/index.md: "Parameter space search under uncertainty for gds-sim"}
+          - {psuu/getting-started.md: "Installation + first parameter sweep"}
+          - psuu/guide/*.md
+          - psuu/api/*.md
         Ecosystem:
           - {framework/ecosystem.md: "All packages, their imports, and dependency relationships"}
 
@@ -311,6 +316,22 @@ nav:
               - gds_software.dependency.compile: software/api/dep-compile.md
               - gds_software.dependency.checks: software/api/dep-checks.md
               - gds_software.verification: software/api/verification.md
+      - PSUU:
+          - Overview: psuu/index.md
+          - Getting Started: psuu/getting-started.md
+          - User Guide:
+              - Concepts: psuu/guide/concepts.md
+              - Parameter Spaces: psuu/guide/spaces.md
+              - Optimizers: psuu/guide/optimizers.md
+          - API Reference:
+              - gds_psuu: psuu/api/init.md
+              - gds_psuu.metric: psuu/api/metric.md
+              - gds_psuu.kpi: psuu/api/kpi.md
+              - gds_psuu.evaluation: psuu/api/evaluation.md
+              - gds_psuu.space: psuu/api/space.md
+              - gds_psuu.optimizers: psuu/api/optimizers.md
+              - gds_psuu.sweep: psuu/api/sweep.md
+              - gds_psuu.results: psuu/api/results.md
   - Design & Research:
       - Layer 0 Milestone: guides/architecture-milestone-layer0.md
       - DSL Roadmap: guides/dsl-roadmap.md
