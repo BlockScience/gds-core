@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from pydantic import BaseModel, ConfigDict
 
 from gds_psuu.evaluation import EvaluationResult  # noqa: TC001
 from gds_psuu.types import KPIScores, ParamPoint  # noqa: TC001
+
+if TYPE_CHECKING:
+    from gds_psuu.objective import Objective
 
 
 class EvaluationSummary(BaseModel):
@@ -51,6 +54,21 @@ class SweepResults(BaseModel):
         best_eval = max(
             self.evaluations,
             key=lambda e: e.scores[kpi] if maximize else -e.scores[kpi],
+        )
+        return EvaluationSummary(params=best_eval.params, scores=best_eval.scores)
+
+    def best_by_objective(self, objective: Objective) -> EvaluationSummary:
+        """Return the evaluation with the best objective score.
+
+        The objective reduces multiple KPI scores to a single scalar.
+        Higher is better.
+        """
+        if not self.evaluations:
+            raise ValueError("No evaluations to search")
+
+        best_eval = max(
+            self.evaluations,
+            key=lambda e: objective.score(e.scores),
         )
         return EvaluationSummary(params=best_eval.params, scores=best_eval.scores)
 

@@ -7,6 +7,7 @@ from pydantic import BaseModel, ConfigDict
 
 from gds_psuu.evaluation import EvaluationResult, Evaluator
 from gds_psuu.kpi import KPI  # noqa: TC001
+from gds_psuu.objective import Objective  # noqa: TC001
 from gds_psuu.optimizers.base import Optimizer  # noqa: TC001
 from gds_psuu.results import SweepResults
 from gds_psuu.space import ParameterSpace  # noqa: TC001
@@ -25,6 +26,7 @@ class Sweep(BaseModel):
     space: ParameterSpace
     kpis: list[KPI]
     optimizer: Optimizer
+    objective: Objective | None = None
     timesteps: int = 100
     runs: int = 1
 
