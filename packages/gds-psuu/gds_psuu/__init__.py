@@ -43,6 +43,7 @@ from gds_psuu.sweep import Sweep
 from gds_psuu.types import AggregationFn, KPIFn, KPIScores, MetricFn, ParamPoint
 
 __all__ = [
+    "KPI",
     "Aggregation",
     "AggregationFn",
     "Analyzer",
@@ -56,7 +57,6 @@ __all__ = [
     "FunctionalConstraint",
     "GridSearchOptimizer",
     "Integer",
-    "KPI",
     "KPIFn",
     "KPIScores",
     "LinearConstraint",
