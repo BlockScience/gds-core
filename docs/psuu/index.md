@@ -89,4 +89,4 @@ See [Getting Started](getting-started.md) for a full walkthrough.
 
 ## Credits
 
-Built on [gds-sim](../sim/index.md) by [BlockScience](https://block.science).
+Built on gds-sim by [BlockScience](https://block.science).
