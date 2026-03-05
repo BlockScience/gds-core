@@ -1,6 +1,6 @@
 """gds-psuu: Parameter space search under uncertainty for the GDS ecosystem."""
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 from gds_psuu.errors import PsuuError, PsuuSearchError, PsuuValidationError
 from gds_psuu.evaluation import EvaluationResult, Evaluator
