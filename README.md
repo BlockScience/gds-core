@@ -16,7 +16,7 @@ Monorepo for the **Generalized Dynamical Systems** ecosystem — typed compositi
 | [gds-control](packages/gds-control/) | [![PyPI](https://img.shields.io/pypi/v/gds-control)](https://pypi.org/project/gds-control/) | State-space control DSL over GDS semantics |
 | [gds-software](packages/gds-software/) | [![PyPI](https://img.shields.io/pypi/v/gds-software)](https://pypi.org/project/gds-software/) | Software architecture DSL (DFD, SM, C4, ERD, Dependency) |
 | [gds-sim](packages/gds-sim/) | [![PyPI](https://img.shields.io/pypi/v/gds-sim)](https://pypi.org/project/gds-sim/) | Simulation engine for GDS models |
-| [gds-psuu](packages/gds-psuu/) | [![PyPI](https://img.shields.io/pypi/v/gds-psuu)](https://pypi.org/project/gds-psuu/) | Parameter space search under uncertainty |
+| [gds-psuu](packages/gds-psuu/) | [![PyPI](https://img.shields.io/pypi/v/gds-psuu)](https://pypi.org/project/gds-psuu/) | Parameter search under uncertainty — composable KPIs, constraints, sensitivity analysis |
 | [gds-examples](packages/gds-examples/) | [![PyPI](https://img.shields.io/pypi/v/gds-examples)](https://pypi.org/project/gds-examples/) | Tutorial models demonstrating framework features |
 
 ## Quick Start
