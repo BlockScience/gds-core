@@ -11,6 +11,12 @@ from gds_psuu.optimizers.bayesian import BayesianOptimizer
 from gds_psuu.optimizers.grid import GridSearchOptimizer
 from gds_psuu.optimizers.random import RandomSearchOptimizer
 from gds_psuu.results import EvaluationSummary, SweepResults
+from gds_psuu.sensitivity import (
+    Analyzer,
+    MorrisAnalyzer,
+    OATAnalyzer,
+    SensitivityResult,
+)
 from gds_psuu.space import (
     Constraint,
     Continuous,
@@ -24,6 +30,7 @@ from gds_psuu.sweep import Sweep
 from gds_psuu.types import KPIFn, KPIScores, ParamPoint
 
 __all__ = [
+    "Analyzer",
     "BayesianOptimizer",
     "Constraint",
     "Continuous",
@@ -38,6 +45,8 @@ __all__ = [
     "KPIFn",
     "KPIScores",
     "LinearConstraint",
+    "MorrisAnalyzer",
+    "OATAnalyzer",
     "Objective",
     "Optimizer",
     "ParamPoint",
@@ -46,6 +55,7 @@ __all__ = [
     "PsuuSearchError",
     "PsuuValidationError",
     "RandomSearchOptimizer",
+    "SensitivityResult",
     "SingleKPI",
     "Sweep",
     "SweepResults",
