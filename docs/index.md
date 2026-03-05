@@ -36,6 +36,8 @@ Key guides include embedded [marimo](https://marimo.io) notebooks — run code, 
 | `gds-games` | `ogs` | Typed DSL for compositional game theory (Open Games) |
 | `gds-software` | `gds_software` | Software architecture DSL (DFD, state machine, C4, ERD, etc.) |
 | `gds-business` | `gds_business` | Business dynamics DSL (CLD, supply chain, value stream map) |
+| `gds-sim` | `gds_sim` | Simulation engine — Model, Simulation, Results |
+| `gds-psuu` | `gds_psuu` | Parameter space search under uncertainty for gds-sim |
 | `gds-examples` | — | Tutorial models demonstrating framework features |
 
 ## Architecture
@@ -51,6 +53,10 @@ gds-software   ←  software architecture DSL (depends on gds-framework)
 gds-business   ←  business dynamics DSL (depends on gds-framework)
     ↑
 gds-examples   ←  tutorials (depends on gds-framework + gds-viz)
+
+gds-sim        ←  simulation engine (standalone — no gds-framework dep)
+    ↑
+gds-psuu       ←  parameter search under uncertainty (depends on gds-sim)
 ```
 
 ## License
