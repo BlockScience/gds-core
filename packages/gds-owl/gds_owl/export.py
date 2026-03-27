@@ -337,6 +337,78 @@ def spec_to_graph(
         w_uri = _wiring_to_rdf(g, ns, w, block_uris, space_uris)
         g.add((spec_uri, GDS_CORE["hasWiring"], w_uri))
 
+    # Admissibility constraints
+    for ac_name, ac in spec.admissibility_constraints.items():
+        ac_uri = _uri(ns, "admissibility", ac_name)
+        g.add((ac_uri, RDF.type, GDS_CORE["AdmissibleInputConstraint"]))
+        g.add((ac_uri, GDS_CORE["name"], Literal(ac_name)))
+        g.add(
+            (
+                ac_uri,
+                GDS_CORE["constraintBoundaryBlock"],
+                Literal(ac.boundary_block),
+            )
+        )
+        if ac.boundary_block in block_uris:
+            g.add(
+                (
+                    ac_uri,
+                    GDS_CORE["constrainsBoundary"],
+                    block_uris[ac.boundary_block],
+                )
+            )
+        g.add(
+            (
+                ac_uri,
+                GDS_CORE["admissibilityHasConstraint"],
+                Literal(ac.constraint is not None, datatype=XSD.boolean),
+            )
+        )
+        g.add((ac_uri, GDS_CORE["description"], Literal(ac.description)))
+        for entity_name, var_name in ac.depends_on:
+            dep = BNode()
+            g.add((dep, RDF.type, GDS_CORE["AdmissibilityDep"]))
+            g.add((dep, GDS_CORE["depEntity"], Literal(entity_name)))
+            g.add((dep, GDS_CORE["depVariable"], Literal(var_name)))
+            g.add((ac_uri, GDS_CORE["hasDependency"], dep))
+        g.add(
+            (spec_uri, GDS_CORE["hasAdmissibilityConstraint"], ac_uri)
+        )
+
+    # Transition signatures
+    for mname, ts in spec.transition_signatures.items():
+        ts_uri = _uri(ns, "transition_sig", mname)
+        g.add((ts_uri, RDF.type, GDS_CORE["TransitionSignature"]))
+        g.add((ts_uri, GDS_CORE["name"], Literal(mname)))
+        g.add(
+            (ts_uri, GDS_CORE["signatureMechanism"], Literal(ts.mechanism))
+        )
+        if ts.mechanism in block_uris:
+            g.add(
+                (
+                    ts_uri,
+                    GDS_CORE["signatureForMechanism"],
+                    block_uris[ts.mechanism],
+                )
+            )
+        for bname in ts.depends_on_blocks:
+            g.add((ts_uri, GDS_CORE["dependsOnBlock"], Literal(bname)))
+        if ts.preserves_invariant:
+            g.add(
+                (
+                    ts_uri,
+                    GDS_CORE["preservesInvariant"],
+                    Literal(ts.preserves_invariant),
+                )
+            )
+        for entity_name, var_name in ts.reads:
+            entry = BNode()
+            g.add((entry, RDF.type, GDS_CORE["TransitionReadEntry"]))
+            g.add((entry, GDS_CORE["readEntity"], Literal(entity_name)))
+            g.add((entry, GDS_CORE["readVariable"], Literal(var_name)))
+            g.add((ts_uri, GDS_CORE["hasReadEntry"], entry))
+        g.add((spec_uri, GDS_CORE["hasTransitionSignature"], ts_uri))
+
     return g
 
 

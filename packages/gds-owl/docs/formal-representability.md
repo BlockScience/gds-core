@@ -67,6 +67,8 @@ The same pattern recurs at every level of GDS:
 | Wired connections | The auto-wiring process that discovers them |
 | Constraint bounds (0 <= x <= 1) | Arbitrary `Callable[[Any], bool]` constraints |
 | Update map (M updates E.V) | Transition function (how V changes) |
+| Read map (M reads E.V) | Actual data flow at runtime |
+| Admissibility deps (B depends on E.V) | Admissibility predicate (is input legal given state?) |
 | Equilibrium structure (which games compose how) | Equilibrium computation (finding Nash equilibria) |
 | Wiring graph topology (can A reach B?) | Signal propagation (does A's output actually affect B?) |
 
@@ -91,8 +93,8 @@ R1/R2/R3 tier system in this document maps directly onto this stack.
 
 ### Architectural consequences
 
-1. **RDF is a viable structural interchange format.** Of 13 verification
-   checks, 4 are SHACL-expressible, 6 more with SPARQL, only 2 genuinely
+1. **RDF is a viable structural interchange format.** Of 15 verification
+   checks, 6 are SHACL-expressible, 6 more with SPARQL, only 2 genuinely
    need Python. The structural skeleton carries the vast majority of system
    information.
 
@@ -157,35 +159,41 @@ Token overlap is the auto-wiring predicate:
 compatible(p1, p2) := tokenize(p1.name) ∩ tokenize(p2.name) != empty
 ```
 
-**Definition 1.3 (GDSSpec).** A specification is a 6-tuple:
+**Definition 1.3 (GDSSpec).** A specification is an 8-tuple:
 
 ```
-S = (T, Sp, E, B, W, Theta)
+S = (T, Sp, E, B, W, Theta, A, Sig)
 
-T     : Name -> TypeDef           (type registry)
-Sp    : Name -> Space             (typed product spaces)
-E     : Name -> Entity            (state holders with typed variables)
-B     : Name -> Block             (typed compositional blocks)
-W     : Name -> SpecWiring        (named compositions with explicit wires)
-Theta : Name -> ParameterDef      (configuration space)
+T     : Name -> TypeDef                     (type registry)
+Sp    : Name -> Space                       (typed product spaces)
+E     : Name -> Entity                      (state holders with typed variables)
+B     : Name -> Block                       (typed compositional blocks)
+W     : Name -> SpecWiring                  (named compositions with explicit wires)
+Theta : Name -> ParameterDef                (configuration space)
+A     : Name -> AdmissibleInputConstraint   (state-dependent input constraints)
+Sig   : MechName -> TransitionSignature     (mechanism read dependencies)
 ```
 
-While presented as a 6-tuple, these components are cross-referencing:
-blocks reference types, wirings reference blocks, entities reference types.
+While presented as an 8-tuple, these components are cross-referencing:
+blocks reference types, wirings reference blocks, entities reference types,
+admissibility constraints reference boundary blocks and entity variables,
+transition signatures reference mechanisms and entity variables.
 GDSSpec is more precisely a labeled graph of registries with typed edges.
 
 **Definition 1.4 (Canonical Decomposition).** The projection
 pi : GDSSpec -> CanonicalGDS yields:
 
 ```
-C = (X, U, D, Theta, g, f, h)
+C = (X, U, D, Theta, g, f, h, A_deps, R_deps)
 
-X = product_{(e,v) in E} TypeDef(e.variables[v])    state space
-U = {(b, p) : b in B_boundary, p in b.forward_out}  input space
-D = {(b, p) : b in B_policy, p in b.forward_out}    decision space
-g : X x U -> D                                       policy mapping
-f : X x D -> X                                       state transition
-h_theta : X -> X  where  h = f ∘ g                   composed transition
+X      = product_{(e,v) in E} TypeDef(e.variables[v])    state space
+U      = {(b, p) : b in B_boundary, p in b.forward_out}  input space
+D      = {(b, p) : b in B_policy, p in b.forward_out}    decision space
+g      : X x U -> D                                       policy mapping
+f      : X x D -> X                                       state transition
+h_theta: X -> X  where  h = f ∘ g                         composed transition
+A_deps = {(name, {(e,v)}) : ac in A}                      admissibility dependencies
+R_deps = {(mech, {(e,v)}) : sig in Sig}                   mechanism read dependencies
 ```
 
 **Definition 1.5 (Role Partition).** Blocks partition into disjoint roles:
@@ -306,7 +314,8 @@ bijectivity:
 2. **Blank nodes**: Space fields and update map entries use RDF blank nodes.
    These have no stable identity across serializations. Structural equality
    compares by content (field name + type), not by node identity.
-3. **Lossy fields**: TypeDef.constraint is always None after import.
+3. **Lossy fields**: TypeDef.constraint and
+   AdmissibleInputConstraint.constraint are always None after import.
    TypeDef.python_type falls back to `str` for types not in the built-in
    map. These are documented R3 losses, not bijectivity failures.
 
@@ -418,25 +427,31 @@ Specifically:
 
 ## 4. Layer 1 Representability: Specification Framework
 
-**Property 4.1 (GDSSpec Structure is R1).** The 6-tuple
-S = (T, Sp, E, B, W, Theta) round-trips through OWL losslessly for all
-structural fields.
+**Property 4.1 (GDSSpec Structure is R1).** The 8-tuple
+S = (T, Sp, E, B, W, Theta, A, Sig) round-trips through OWL losslessly
+for all structural fields.
 
 *Argument.* Each component maps to an OWL class with named properties:
 
 ```
-TypeDef     |-> gds-core:TypeDef       + name, pythonType, units, hasConstraint
-Space       |-> gds-core:Space         + name, description, hasField -> SpaceField
-Entity      |-> gds-core:Entity        + name, description, hasVariable -> StateVariable
-Block       |-> gds-core:{role class}  + name, kind, hasInterface, usesParameter, ...
-SpecWiring  |-> gds-core:SpecWiring    + name, wiringBlock, hasWire -> Wire
-ParameterDef|-> gds-core:ParameterDef  + name, paramType, lowerBound, upperBound
+TypeDef                    |-> gds-core:TypeDef       + name, pythonType, units, hasConstraint
+Space                      |-> gds-core:Space         + name, description, hasField -> SpaceField
+Entity                     |-> gds-core:Entity        + name, description, hasVariable -> StateVariable
+Block                      |-> gds-core:{role class}  + name, kind, hasInterface, usesParameter, ...
+SpecWiring                 |-> gds-core:SpecWiring    + name, wiringBlock, hasWire -> Wire
+ParameterDef               |-> gds-core:ParameterDef  + name, paramType, lowerBound, upperBound
+AdmissibleInputConstraint  |-> gds-core:AdmissibleInputConstraint + name, constrainsBoundary,
+                                                        hasDependency -> AdmissibilityDep
+TransitionSignature        |-> gds-core:TransitionSignature + signatureForMechanism,
+                                                        hasReadEntry -> TransitionReadEntry
 ```
 
 The `test_roundtrip.py::TestSpecRoundTrip` suite verifies: types, spaces,
-entities, blocks (with role, params, updates), parameters, and wirings all
-survive the round-trip. The documented exception is TypeDef.constraint
-(Property 4.2).
+entities, blocks (with role, params, updates), parameters, wirings,
+admissibility constraints, and transition signatures all survive the
+round-trip. Documented exceptions: TypeDef.constraint (Property 4.2) and
+AdmissibleInputConstraint.constraint (Property 4.5) — both lossy for the
+same reason (arbitrary Callable).
 
 **Property 4.2 (Constraint Predicates).** The constraints used in practice
 across all GDS DSLs (numeric bounds, non-negativity, probability ranges)
@@ -470,13 +485,18 @@ imagine a framework that attaches executable policy functions to blocks.
 GDS deliberately does not, keeping the specification layer structural.
 
 **Property 4.4 (State Transition f Decomposes).** The state transition f
-decomposes as a tuple f = ⟨f_struct, f_behav⟩ where:
+decomposes as a tuple f = ⟨f_struct, f_read, f_behav⟩ where:
 
 ```
 f_struct : B_mechanism -> P(E x V)
-    The explicit topological mapping from mechanisms to state variables.
+    The explicit write mapping from mechanisms to state variables.
     "Mechanism M updates Entity E variable V."
-    This is a finite relation — R1.
+    This is a finite relation — R1. (Stored in Mechanism.updates.)
+
+f_read : B_mechanism -> P(E x V)
+    The explicit read mapping from mechanisms to state variables.
+    "Mechanism M reads Entity E variable V to compute its update."
+    This is a finite relation — R1. (Stored in TransitionSignature.reads.)
 
 f_behav : X x D -> X
     The endomorphism on the state space parameterized by decisions.
@@ -484,15 +504,64 @@ f_behav : X x D -> X
     This is an arbitrary computable function — R3.
 ```
 
+Together, f_struct and f_read provide a complete structural data-flow
+picture of each mechanism: what it reads and what it writes. Only
+f_behav — the function that transforms reads into writes — remains R3.
+
 The composed system h = f ∘ g inherits: the structural decomposition
 (which blocks compose into h, via what wirings) is R1. The execution
 semantics (what h actually computes given inputs) is R3.
+
+**Property 4.5 (Admissible Input Constraints follow the f_struct/f_behav
+pattern).** An AdmissibleInputConstraint (Paper Def 2.5: U_x) decomposes
+as:
+
+```
+U_x_struct : A -> P(E x V)
+    The dependency relation: "BoundaryAction B's admissible outputs
+    depend on Entity E variable V."
+    This is a finite relation — R1.
+
+U_x_behav : (state, input) -> bool
+    The actual admissibility predicate: "is this input admissible
+    given this state?"
+    This is an arbitrary Callable — R3.
+```
+
+The structural part (name, boundary_block, depends_on) round-trips
+through OWL. The constraint callable is exported as a boolean
+`admissibilityHasConstraint` flag (present/absent) and imported as
+None — the same pattern as TypeDef.constraint. SC-008 validates that
+the structural references are well-formed (boundary block exists and
+is a BoundaryAction, depends_on references valid entity.variable pairs).
+
+**Property 4.6 (Transition Signatures follow the same pattern).**
+A TransitionSignature (Paper Def 2.7: f|_x) provides:
+
+```
+f_read : Sig -> P(E x V)
+    The read dependency relation: "Mechanism M reads Entity E variable V."
+    This is a finite relation — R1.
+
+f_block_deps : Sig -> P(B)
+    Which upstream blocks feed this mechanism.
+    This is a finite relation — R1.
+```
+
+Combined with the existing update_map (f_struct: which variables a
+mechanism *writes*), TransitionSignature completes the structural
+picture: now both reads and writes of every mechanism are declared.
+SC-009 validates that the structural references are well-formed.
+
+The actual transition function (what M computes from its reads to
+produce new values for its writes) remains R3 — it is an arbitrary
+computable function, never stored in GDSSpec.
 
 ---
 
 ## 5. Verification Check Classification
 
-Each of the 13 GDS verification checks is classified by whether
+Each of the 15 GDS verification checks is classified by whether
 SHACL/SPARQL can express it on the exported RDF graph, with practical
 impact noted.
 
@@ -518,14 +587,16 @@ impact noted.
 | **SC-005** | Parameter references | **R1** | SHACL sh:class on usesParameter targets. Already implemented in gds-owl shacl.py. | Covered by SHACL |
 | **SC-006** | f non-empty | **R1** | Equivalent to SHACL `sh:qualifiedMinCount 1` with `sh:qualifiedValueShape [sh:class gds-core:Mechanism]` on the spec node. (SPARQL illustration: `ASK { ?m a gds-core:Mechanism }`) | Covered by SHACL-core |
 | **SC-007** | X non-empty | **R1** | Same pattern: SHACL `sh:qualifiedMinCount 1` for StateVariable. (SPARQL illustration: `ASK { ?sv a gds-core:StateVariable }`) | Covered by SHACL-core |
+| **SC-008** | Admissibility references | **R1** | SHACL: `constrainsBoundary` must target a `BoundaryAction` (sh:class). Dependency entries (AdmissibilityDep) validated structurally. | Covered by SHACL |
+| **SC-009** | Transition read consistency | **R1** | SHACL: `signatureForMechanism` must target a `Mechanism` (sh:class). Read entries (TransitionReadEntry) validated structurally. | Covered by SHACL |
 
 ### 5.3 Summary
 
 ```
-R1 (SHACL-core):     G-002, SC-005, SC-006, SC-007              = 4
-R2 (SPARQL):          G-004, G-006, SC-001, SC-002, SC-003, SC-004 = 6
-R3 (Python-only):     G-001, G-005                                = 2
-Mixed (R1 + R3):      G-003 (flag check R1, port matching R3)     = 1
+R1 (SHACL-core):     G-002, SC-005, SC-006, SC-007, SC-008, SC-009  = 6
+R2 (SPARQL):          G-004, G-006, SC-001, SC-002, SC-003, SC-004   = 6
+R3 (Python-only):     G-001, G-005                                    = 2
+Mixed (R1 + R3):      G-003 (flag check R1, port matching R3)         = 1
 ```
 
 The R1/R2 boundary is mechanically determined: R1 = expressible in
@@ -545,9 +616,12 @@ connections themselves are always R1 as explicit wiring edges.
 ```
 G_struct = { composition tree, block interfaces, role partition,
              wiring topology, update targets, parameter schema,
-             space/entity structure, canonical form metadata }
+             space/entity structure, canonical form metadata,
+             admissibility dependency graph (U_x_struct),
+             transition read dependencies (f_read) }
 
 G_behav  = { transition functions (f_behav), constraint predicates,
+             admissibility predicates (U_x_behav),
              auto-wiring process, construction-time validation,
              scheduling/execution semantics }
 ```
@@ -567,6 +641,8 @@ G_struct concepts and their tiers:
 - Update targets: R1 (Property 4.4, f_struct)
 - Parameter schema: R1 (Property 4.1)
 - Space/entity structure: R1 (Property 4.1)
+- Admissibility dependency graph (U_x_struct): R1 (Property 4.5)
+- Transition read dependencies (f_read): R1 (Property 4.6)
 - Acyclicity: R2 (Section 5.1, G-006)
 - Completeness/determinism: R2 (Section 5.2, SC-001, SC-002)
 - Reference validation (dangling wirings): R2 (Section 5.1, G-004)
@@ -574,6 +650,7 @@ G_struct concepts and their tiers:
 G_behav concepts and their tiers:
 - Transition functions: R3 (Property 4.4, f_behav)
 - Constraint predicates: R3 (Property 4.2, general case)
+- Admissibility predicates (U_x_behav): R3 (Property 4.5)
 - Auto-wiring process: R3 (Property 3.2)
 - Construction validation: R3 (Proposition 3.4)
 - Scheduling semantics: R3 (not stored in GDSSpec — external)
@@ -640,6 +717,8 @@ tier based on what it requires:
 | How blocks compose | Static structure | HierarchyNodeIR tree | Composition tree is R1 |
 | Which blocks are which roles | Static classification | project_canonical() partition | Role partition is R1 |
 | Which params affect which blocks | Static dependency | SpecQuery.param_to_blocks() | usesParameter relation is R1 |
+| Which state variables constrain which inputs | Static dependency | SpecQuery.admissibility_dependency_map() | U_x_struct is R1 |
+| Which state variables does a mechanism read | Static dependency | SpecQuery.mechanism_read_map() | f_read is R1 |
 | Game classification | Static strategic | PatternIR game_type field | Metadata on blocks, R1 |
 
 ### 7.2 R2: SPARQL-Expressible (Graph Queries + Aggregation)
@@ -685,14 +764,15 @@ individuals connected by named object properties.
 ### Correspondence 2: Structural Invariants <-> SHACL Shapes + SPARQL Queries
 
 ```
-{G-002, G-004, G-006, SC-001..SC-007} <-> SHACL + SPARQL
+{G-002, G-004, G-006, SC-001..SC-009} <-> SHACL + SPARQL
 ```
 
 R1 or R2 depending on the check. SHACL-core captures cardinality and
-class-membership constraints (4 checks). SPARQL captures graph-pattern
-queries requiring negation, transitivity, aggregation, or cross-node
-string matching (6 checks). The 2 remaining checks (G-001, G-005) require
-tokenization. G-003 splits: flag check R1, port matching R3.
+class-membership constraints (6 checks: G-002, SC-005..SC-009). SPARQL
+captures graph-pattern queries requiring negation, transitivity,
+aggregation, or cross-node string matching (6 checks). The 2 remaining
+checks (G-001, G-005) require tokenization. G-003 splits: flag check R1,
+port matching R3.
 
 ### Correspondence 3: Dynamic Behavior <-> Python Runtime Only
 

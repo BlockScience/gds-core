@@ -15,7 +15,11 @@ from __future__ import annotations
 from pydantic import BaseModel, ConfigDict, Field
 
 from gds.blocks.base import Block
-from gds.blocks.roles import HasParams, Mechanism
+from gds.blocks.roles import BoundaryAction, HasParams, Mechanism
+from gds.constraints import (  # noqa: TC001
+    AdmissibleInputConstraint,
+    TransitionSignature,
+)
 from gds.parameters import ParameterDef, ParameterSchema
 from gds.spaces import Space
 from gds.state import Entity
@@ -62,6 +66,12 @@ class GDSSpec(Tagged):
     blocks: dict[str, Block] = Field(default_factory=dict)
     wirings: dict[str, SpecWiring] = Field(default_factory=dict)
     parameter_schema: ParameterSchema = Field(default_factory=ParameterSchema)
+    admissibility_constraints: dict[str, AdmissibleInputConstraint] = Field(
+        default_factory=dict
+    )
+    transition_signatures: dict[str, TransitionSignature] = Field(
+        default_factory=dict
+    )
 
     # ── Registration ────────────────────────────────────────
 
@@ -118,6 +128,31 @@ class GDSSpec(Tagged):
         self.parameter_schema = self.parameter_schema.add(param)
         return self
 
+    def register_admissibility(
+        self, ac: AdmissibleInputConstraint
+    ) -> GDSSpec:
+        """Register an admissible input constraint.
+
+        Raises if name already registered.
+        """
+        if ac.name in self.admissibility_constraints:
+            raise ValueError(
+                f"Admissibility constraint '{ac.name}' already registered"
+            )
+        self.admissibility_constraints[ac.name] = ac
+        return self
+
+    def register_transition_signature(
+        self, ts: TransitionSignature
+    ) -> GDSSpec:
+        """Register a transition signature. Raises if mechanism already has one."""
+        if ts.mechanism in self.transition_signatures:
+            raise ValueError(
+                f"Transition signature for '{ts.mechanism}' already registered"
+            )
+        self.transition_signatures[ts.mechanism] = ts
+        return self
+
     @property
     def parameters(self) -> dict[str, TypeDef]:
         """Legacy access: parameter name → TypeDef mapping."""
@@ -131,9 +166,10 @@ class GDSSpec(Tagged):
         """Register multiple objects by type-dispatching each.
 
         Accepts any mix of TypeDef, Space, Entity, Block, and
-        ParameterDef instances. Does not handle SpecWiring or
+        ParameterDef instances. Does not handle SpecWiring,
+        AdmissibleInputConstraint, TransitionSignature, or
         (name, typedef) parameter shorthand --- those stay explicit
-        via ``register_wiring()`` and ``register_parameter()``.
+        via their respective ``register_*()`` methods.
 
         Raises TypeError for unrecognized types.
         """
@@ -164,6 +200,8 @@ class GDSSpec(Tagged):
         errors += self._validate_wiring_blocks()
         errors += self._validate_mechanism_updates()
         errors += self._validate_param_references()
+        errors += self._validate_admissibility_constraints()
+        errors += self._validate_transition_signatures()
         return errors
 
     def _validate_space_types(self) -> list[str]:
@@ -236,4 +274,64 @@ class GDSSpec(Tagged):
                             f"Block '{block.name}' references "
                             f"unregistered parameter '{param}'"
                         )
+        return errors
+
+    def _validate_admissibility_constraints(self) -> list[str]:
+        """Admissibility constraints reference existing blocks and variables."""
+        errors: list[str] = []
+        for ac in self.admissibility_constraints.values():
+            if ac.boundary_block not in self.blocks:
+                errors.append(
+                    f"Admissibility constraint '{ac.name}' references "
+                    f"unregistered block '{ac.boundary_block}'"
+                )
+            elif not isinstance(self.blocks[ac.boundary_block], BoundaryAction):
+                errors.append(
+                    f"Admissibility constraint '{ac.name}': "
+                    f"block '{ac.boundary_block}' is not a BoundaryAction"
+                )
+            for entity_name, var_name in ac.depends_on:
+                if entity_name not in self.entities:
+                    errors.append(
+                        f"Admissibility constraint '{ac.name}' depends on "
+                        f"unknown entity '{entity_name}'"
+                    )
+                elif var_name not in self.entities[entity_name].variables:
+                    errors.append(
+                        f"Admissibility constraint '{ac.name}' depends on "
+                        f"unknown variable '{entity_name}.{var_name}'"
+                    )
+        return errors
+
+    def _validate_transition_signatures(self) -> list[str]:
+        """Transition signatures reference existing Mechanisms and variables."""
+        errors: list[str] = []
+        for ts in self.transition_signatures.values():
+            if ts.mechanism not in self.blocks:
+                errors.append(
+                    f"Transition signature references "
+                    f"unregistered block '{ts.mechanism}'"
+                )
+            elif not isinstance(self.blocks[ts.mechanism], Mechanism):
+                errors.append(
+                    f"Transition signature for '{ts.mechanism}': "
+                    f"block is not a Mechanism"
+                )
+            for entity_name, var_name in ts.reads:
+                if entity_name not in self.entities:
+                    errors.append(
+                        f"Transition signature for '{ts.mechanism}' reads "
+                        f"unknown entity '{entity_name}'"
+                    )
+                elif var_name not in self.entities[entity_name].variables:
+                    errors.append(
+                        f"Transition signature for '{ts.mechanism}' reads "
+                        f"unknown variable '{entity_name}.{var_name}'"
+                    )
+            for bname in ts.depends_on_blocks:
+                if bname not in self.blocks:
+                    errors.append(
+                        f"Transition signature for '{ts.mechanism}' "
+                        f"depends on unregistered block '{bname}'"
+                    )
         return errors

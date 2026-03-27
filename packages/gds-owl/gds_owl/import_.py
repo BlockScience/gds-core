@@ -102,6 +102,7 @@ def graph_to_spec(
         Wire,
     )
     from gds.blocks.roles import BoundaryAction, Mechanism, Policy
+    from gds.constraints import AdmissibleInputConstraint, TransitionSignature
     from gds.spaces import Space
     from gds.state import Entity, StateVariable
     from gds.types.interface import Interface, port
@@ -320,6 +321,59 @@ def graph_to_spec(
                 block_names=block_names,
                 wires=wires,
                 description=w_desc,
+            )
+        )
+
+    # Import admissibility constraints
+    ac_uris = list(
+        g.objects(spec_uri, GDS_CORE["hasAdmissibilityConstraint"])
+    )
+    for ac_uri in ac_uris:
+        if not isinstance(ac_uri, URIRef):
+            continue
+        ac_name = _str(g, ac_uri, GDS_CORE["name"])
+        ac_boundary = _str(
+            g, ac_uri, GDS_CORE["constraintBoundaryBlock"]
+        )
+        ac_desc = _str(g, ac_uri, GDS_CORE["description"])
+        depends_on: list[tuple[str, str]] = []
+        for dep in g.objects(ac_uri, GDS_CORE["hasDependency"]):
+            ent = _str(g, dep, GDS_CORE["depEntity"])
+            var = _str(g, dep, GDS_CORE["depVariable"])
+            depends_on.append((ent, var))
+        spec.register_admissibility(
+            AdmissibleInputConstraint(
+                name=ac_name,
+                boundary_block=ac_boundary,
+                depends_on=depends_on,
+                constraint=None,
+                description=ac_desc,
+            )
+        )
+
+    # Import transition signatures
+    ts_uris = list(
+        g.objects(spec_uri, GDS_CORE["hasTransitionSignature"])
+    )
+    for ts_uri in ts_uris:
+        if not isinstance(ts_uri, URIRef):
+            continue
+        ts_mech = _str(g, ts_uri, GDS_CORE["signatureMechanism"])
+        reads: list[tuple[str, str]] = []
+        for entry in g.objects(ts_uri, GDS_CORE["hasReadEntry"]):
+            ent = _str(g, entry, GDS_CORE["readEntity"])
+            var = _str(g, entry, GDS_CORE["readVariable"])
+            reads.append((ent, var))
+        depends_on_blocks = _strs(
+            g, ts_uri, GDS_CORE["dependsOnBlock"]
+        )
+        invariant = _str(g, ts_uri, GDS_CORE["preservesInvariant"])
+        spec.register_transition_signature(
+            TransitionSignature(
+                mechanism=ts_mech,
+                reads=reads,
+                depends_on_blocks=depends_on_blocks,
+                preserves_invariant=invariant,
             )
         )
 

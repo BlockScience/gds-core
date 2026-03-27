@@ -90,6 +90,48 @@ class TestSpecRoundTrip:
         for td in spec2.types.values():
             assert td.constraint is None
 
+    def test_admissibility_constraints_survive(
+        self, thermostat_spec: GDSSpec
+    ) -> None:
+        from gds.constraints import AdmissibleInputConstraint
+
+        thermostat_spec.register_admissibility(
+            AdmissibleInputConstraint(
+                name="sensor_dep",
+                boundary_block="Sensor",
+                depends_on=[("Room", "temperature")],
+                constraint=lambda s, u: True,
+                description="Sensor reads room temp",
+            )
+        )
+        spec2 = self._round_trip(thermostat_spec)
+        assert "sensor_dep" in spec2.admissibility_constraints
+        ac = spec2.admissibility_constraints["sensor_dep"]
+        assert ac.boundary_block == "Sensor"
+        assert set(ac.depends_on) == {("Room", "temperature")}
+        assert ac.description == "Sensor reads room temp"
+        assert ac.constraint is None  # lossy
+
+    def test_transition_signatures_survive(
+        self, thermostat_spec: GDSSpec
+    ) -> None:
+        from gds.constraints import TransitionSignature
+
+        thermostat_spec.register_transition_signature(
+            TransitionSignature(
+                mechanism="Heater",
+                reads=[("Room", "temperature")],
+                depends_on_blocks=["Controller"],
+                preserves_invariant="temp >= 0",
+            )
+        )
+        spec2 = self._round_trip(thermostat_spec)
+        assert "Heater" in spec2.transition_signatures
+        ts = spec2.transition_signatures["Heater"]
+        assert set(ts.reads) == {("Room", "temperature")}
+        assert set(ts.depends_on_blocks) == {"Controller"}
+        assert ts.preserves_invariant == "temp >= 0"
+
 
 class TestSystemIRRoundTrip:
     def _round_trip(self, ir: SystemIR) -> SystemIR:

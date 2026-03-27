@@ -82,6 +82,25 @@ def spec_to_dict(spec: GDSSpec) -> dict[str, Any]:
             }
             for name, p in spec.parameter_schema.parameters.items()
         },
+        "admissibility_constraints": {
+            name: {
+                "name": ac.name,
+                "boundary_block": ac.boundary_block,
+                "depends_on": [list(pair) for pair in ac.depends_on],
+                "has_constraint": ac.constraint is not None,
+                "description": ac.description,
+            }
+            for name, ac in spec.admissibility_constraints.items()
+        },
+        "transition_signatures": {
+            name: {
+                "mechanism": ts.mechanism,
+                "reads": [list(pair) for pair in ts.reads],
+                "depends_on_blocks": list(ts.depends_on_blocks),
+                "preserves_invariant": ts.preserves_invariant,
+            }
+            for name, ts in spec.transition_signatures.items()
+        },
     }
 
 
