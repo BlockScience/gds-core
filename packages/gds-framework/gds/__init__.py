@@ -41,6 +41,9 @@ from gds.compiler.compile import (
     flatten_blocks,
 )
 
+# ── Structural annotations ────────────────────────────────
+from gds.constraints import AdmissibleInputConstraint, TransitionSignature
+
 # ── Convenience helpers ────────────────────────────────────
 from gds.helpers import (
     all_checks,
@@ -98,17 +101,20 @@ from gds.types.typedef import (
 from gds.verification.engine import verify
 from gds.verification.findings import Finding, Severity, VerificationReport
 from gds.verification.spec_checks import (
+    check_admissibility_references,
     check_canonical_wellformedness,
     check_completeness,
     check_determinism,
     check_parameter_references,
     check_reachability,
+    check_transition_reads,
     check_type_safety,
 )
 
 __all__ = [
     "EMPTY",
     "TERMINAL",
+    "AdmissibleInputConstraint",
     "AgentID",
     "AtomicBlock",
     "Block",
@@ -154,6 +160,7 @@ __all__ = [
     "TemporalLoop",
     "Timestamp",
     "TokenAmount",
+    "TransitionSignature",
     "TypeDef",
     "VerificationReport",
     "Wire",
@@ -161,11 +168,13 @@ __all__ = [
     "WiringIR",
     "WiringOrigin",
     "all_checks",
+    "check_admissibility_references",
     "check_canonical_wellformedness",
     "check_completeness",
     "check_determinism",
     "check_parameter_references",
     "check_reachability",
+    "check_transition_reads",
     "check_type_safety",
     "compile_system",
     "entity",

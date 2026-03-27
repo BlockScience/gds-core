@@ -252,6 +252,32 @@ def _build_spec_framework(g: Graph) -> None:
         comment="Reified (mechanism, entity, variable) update relationship",
     )
 
+    # Structural annotations (Paper Defs 2.5, 2.7)
+    _add_class(
+        g,
+        "AdmissibleInputConstraint",
+        label="Admissible Input Constraint",
+        comment="State-dependent constraint on BoundaryAction outputs (U_x)",
+    )
+    _add_class(
+        g,
+        "AdmissibilityDep",
+        label="Admissibility Dependency",
+        comment="Reified (entity, variable) dependency for admissibility",
+    )
+    _add_class(
+        g,
+        "TransitionSignature",
+        label="Transition Signature",
+        comment="Structural read signature of a mechanism transition (f|_x)",
+    )
+    _add_class(
+        g,
+        "TransitionReadEntry",
+        label="Transition Read Entry",
+        comment="Reified (entity, variable) read dependency",
+    )
+
     # GDSSpec -> children
     _add_object_property(g, "hasBlock", domain="GDSSpec", range_="Block")
     _add_object_property(g, "hasType", domain="GDSSpec", range_="TypeDef")
@@ -260,6 +286,18 @@ def _build_spec_framework(g: Graph) -> None:
     _add_object_property(g, "hasWiring", domain="GDSSpec", range_="SpecWiring")
     _add_object_property(g, "hasParameter", domain="GDSSpec", range_="ParameterDef")
     _add_object_property(g, "hasCanonical", domain="GDSSpec", range_="CanonicalGDS")
+    _add_object_property(
+        g,
+        "hasAdmissibilityConstraint",
+        domain="GDSSpec",
+        range_="AdmissibleInputConstraint",
+    )
+    _add_object_property(
+        g,
+        "hasTransitionSignature",
+        domain="GDSSpec",
+        range_="TransitionSignature",
+    )
 
     # Entity -> StateVariable
     _add_object_property(g, "hasVariable", domain="Entity", range_="StateVariable")
@@ -311,6 +349,56 @@ def _build_spec_framework(g: Graph) -> None:
     _add_object_property(g, "policyBlock", domain="CanonicalGDS", range_="Block")
     _add_object_property(g, "mechanismBlock", domain="CanonicalGDS", range_="Block")
     _add_datatype_property(g, "formula", domain="CanonicalGDS")
+
+    # AdmissibleInputConstraint properties
+    _add_object_property(
+        g,
+        "constrainsBoundary",
+        domain="AdmissibleInputConstraint",
+        range_="BoundaryAction",
+    )
+    _add_datatype_property(
+        g, "constraintBoundaryBlock", domain="AdmissibleInputConstraint"
+    )
+    _add_datatype_property(
+        g,
+        "admissibilityHasConstraint",
+        domain="AdmissibleInputConstraint",
+        range_="boolean",
+    )
+    _add_object_property(
+        g,
+        "hasDependency",
+        domain="AdmissibleInputConstraint",
+        range_="AdmissibilityDep",
+    )
+    _add_datatype_property(g, "depEntity", domain="AdmissibilityDep")
+    _add_datatype_property(g, "depVariable", domain="AdmissibilityDep")
+
+    # TransitionSignature properties
+    _add_object_property(
+        g,
+        "signatureForMechanism",
+        domain="TransitionSignature",
+        range_="Mechanism",
+    )
+    _add_datatype_property(
+        g, "signatureMechanism", domain="TransitionSignature"
+    )
+    _add_datatype_property(
+        g, "dependsOnBlock", domain="TransitionSignature"
+    )
+    _add_datatype_property(
+        g, "preservesInvariant", domain="TransitionSignature"
+    )
+    _add_object_property(
+        g,
+        "hasReadEntry",
+        domain="TransitionSignature",
+        range_="TransitionReadEntry",
+    )
+    _add_datatype_property(g, "readEntity", domain="TransitionReadEntry")
+    _add_datatype_property(g, "readVariable", domain="TransitionReadEntry")
 
     # Shared datatype properties
     _add_datatype_property(g, "name")

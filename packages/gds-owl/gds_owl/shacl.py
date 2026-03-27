@@ -183,6 +183,52 @@ def build_structural_shapes() -> Graph:
         message="Space must have a name",
     )
 
+    # AdmissibleInputConstraint: must have name and boundaryBlock
+    aic_shape = GDS_SHAPE["AdmissibleInputConstraintShape"]
+    g.add((aic_shape, RDF.type, SH.NodeShape))
+    g.add((aic_shape, SH.targetClass, GDS_CORE["AdmissibleInputConstraint"]))
+    _add_property_shape(
+        g,
+        aic_shape,
+        GDS_CORE["name"],
+        min_count=1,
+        max_count=1,
+        datatype=XSD.string,
+        message="AdmissibleInputConstraint must have a name",
+    )
+    _add_property_shape(
+        g,
+        aic_shape,
+        GDS_CORE["constraintBoundaryBlock"],
+        min_count=1,
+        max_count=1,
+        datatype=XSD.string,
+        message="AdmissibleInputConstraint must have a boundaryBlock",
+    )
+
+    # TransitionSignature: must have name and mechanismName
+    ts_shape = GDS_SHAPE["TransitionSignatureShape"]
+    g.add((ts_shape, RDF.type, SH.NodeShape))
+    g.add((ts_shape, SH.targetClass, GDS_CORE["TransitionSignature"]))
+    _add_property_shape(
+        g,
+        ts_shape,
+        GDS_CORE["name"],
+        min_count=1,
+        max_count=1,
+        datatype=XSD.string,
+        message="TransitionSignature must have a name",
+    )
+    _add_property_shape(
+        g,
+        ts_shape,
+        GDS_CORE["signatureMechanism"],
+        min_count=1,
+        max_count=1,
+        datatype=XSD.string,
+        message="TransitionSignature must have a mechanismName",
+    )
+
     # BlockIR: must have name
     bir_shape = GDS_SHAPE["BlockIRShape"]
     g.add((bir_shape, RDF.type, SH.NodeShape))
@@ -321,6 +367,35 @@ def build_semantic_shapes() -> Graph:
         message=(
             "SC-005: Block references a parameter that is not a registered ParameterDef"
         ),
+    )
+
+    # SC-008: Admissibility constraint must reference a BoundaryAction
+    sc008_shape = GDS_SHAPE["SC008AdmissibilityShape"]
+    g.add((sc008_shape, RDF.type, SH.NodeShape))
+    g.add(
+        (sc008_shape, SH.targetClass, GDS_CORE["AdmissibleInputConstraint"])
+    )
+    _add_property_shape(
+        g,
+        sc008_shape,
+        GDS_CORE["constrainsBoundary"],
+        class_=GDS_CORE["BoundaryAction"],
+        message=(
+            "SC-008: Admissibility constraint must reference "
+            "a BoundaryAction"
+        ),
+    )
+
+    # SC-009: Transition signature must reference a Mechanism
+    sc009_shape = GDS_SHAPE["SC009TransitionSigShape"]
+    g.add((sc009_shape, RDF.type, SH.NodeShape))
+    g.add((sc009_shape, SH.targetClass, GDS_CORE["TransitionSignature"]))
+    _add_property_shape(
+        g,
+        sc009_shape,
+        GDS_CORE["signatureForMechanism"],
+        class_=GDS_CORE["Mechanism"],
+        message="SC-009: Transition signature must reference a Mechanism",
     )
 
     return g
