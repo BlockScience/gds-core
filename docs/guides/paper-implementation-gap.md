@@ -26,13 +26,18 @@
 | State Transition Map (Def 2.9) | h = f\|_x . g | `project_canonical()` computes formula | Declared composition, not executable |
 | GDS (Def 2.10) | {h, X} | `CanonicalGDS` dataclass | Faithful for structural identity |
 
-### 1.2 Not Implemented
+### 1.2 Structurally Implemented (Steps 1-2 of Bridge Proposal)
+
+| Paper (Section 2) | Notation | Software | Notes |
+|---|---|---|---|
+| Admissible Input Space (Def 2.5) | U_x subset U | `AdmissibleInputConstraint` — dependency graph (which state variables constrain which inputs) | Structural skeleton (R1). The actual constraint predicate is R3/lossy, same as TypeDef.constraint. SC-008 validates references. |
+| Restricted State Update Map (Def 2.7) | f\|_x : U_x -> X | `TransitionSignature` — read dependencies (which state variables a mechanism reads) | Structural skeleton (R1). Complements Mechanism.updates (writes). SC-009 validates references. |
+
+### 1.3 Not Implemented
 
 | Paper (Section 2-4) | Notation | What It Does | Why It Matters |
 |---|---|---|---|
-| Admissible Input Space (Def 2.5) | U_x subset U | State-dependent subset of legal inputs | Enables feasibility constraints: "you can only vote if you hold tokens" |
-| Admissible Input Map (Def 2.5) | U : X -> P(U) | Returns legal input set for current state | Foundation for the restricted state update map |
-| Restricted State Update Map (Def 2.7) | f\|_x : U_x -> X | f fixed at a state x | Required for differential invariants and design verification |
+| Admissible Input Map (Def 2.5) | U : X -> P(U) | The actual function computing the admissible input set | R3 — requires runtime evaluation. The structural dependency graph is captured (see 1.2), but the computation is not. |
 | Metric on State Space (Asm 3.2) | d_X : X x X -> R | Distance between states | Required for contingent derivative, reachability rate |
 | Attainability Correspondence (Def 3.1) | F : X x R+ x R+ => X | Set of states reachable at time t from (x_0, t_0) | Foundation for reachability and controllability |
 | Contingent Derivative (Def 3.3) | D'F(x_0, t_0, t) | Generalized rate of change (set-valued) | Connects trajectories to input maps; enables existence proofs |
@@ -43,7 +48,7 @@
 | Local Controllability (Thm 4.4) | 0-controllable from eta_0 | Conditions for steering to equilibrium | Engineering design guarantee |
 | Observability / Design Invariants (Sec 4.4) | P(x_i) = TRUE | Properties that should hold along trajectories | Design verification (invariant checking) |
 
-### 1.3 Software Extensions Beyond the Paper
+### 1.4 Software Extensions Beyond the Paper
 
 | Software Concept | Purpose | Paper Status |
 |---|---|---|
@@ -53,7 +58,7 @@
 | Token-based type system | Structural auto-wiring via port name matching | No counterpart |
 | Parameters Theta (ParameterDef, ParameterSchema) | Explicit configuration space | Paper alludes to "factors that change h" but never formalizes |
 | Decision space D | Intermediate space between g and f | Paper's g maps X -> U_x directly |
-| Verification checks (G-001..G-006, SC-001..SC-007) | Structural validation | Paper assumes well-formed h |
+| Verification checks (G-001..G-006, SC-001..SC-009) | Structural validation | Paper assumes well-formed h |
 | Compiler pipeline (flatten -> wire -> hierarchy) | Build IR from composition tree | No counterpart |
 | SystemIR intermediate representation | Flat, inspectable system graph | No counterpart |
 | Domain DSLs (stockflow, control, games, software, business) | Domain-specific compilation to GDS | No counterpart |
@@ -165,11 +170,14 @@ wirings"). This is topological, not dynamical. The paper's reachability
 asks: "given concrete state x, which states x' can the system reach under
 some input sequence?" -- a fundamentally different question.
 
-### 3.3 The Gap in One Sentence
+### 3.3 The Remaining Gap
 
-The software answers "what is the system?" (structure). The paper's
-Sections 3-4 answer "what can the system do?" (behavior). The bridge
-between them is the admissible input map U_x and a metric on X.
+The structural skeletons of U_x and f|_x are now captured
+(AdmissibleInputConstraint and TransitionSignature). What remains is the
+analytical machinery that *uses* these structures: the metric on X, the
+reachable set R(x), the configuration space X_C, and the contingent
+derivative. These require runtime evaluation of f and g — they are
+behavioral (R3), not structural.
 
 ---
 
@@ -179,88 +187,77 @@ The gap between paper and implementation can be bridged incrementally.
 Each step adds analytical capability while preserving the existing
 structural core. Steps are ordered by dependency and increasing difficulty.
 
-### Step 1: Admissible Input Map U_x
+### Step 1: Admissible Input Map U_x -- IMPLEMENTED
 
-**What:** Add state-dependent input constraints to the specification.
+**What:** State-dependent input constraints on the specification.
 
-**Paper reference:** Definition 2.5 -- U : X -> P(U), returning the set of
-admissible inputs given current state x.
+**Paper reference:** Definition 2.5 -- U : X -> P(U).
 
-**Concrete design:**
-
-```python
-@dataclass(frozen=True)
-class AdmissibleInputConstraint:
-    """Declares that a BoundaryAction's output is constrained by state."""
-    boundary_block: str           # name of BoundaryAction
-    depends_on: list[str]         # entity.variable names read
-    constraint: Callable[[dict, Any], bool]  # (state, input) -> admissible?
-    description: str = ""         # human-readable description
-```
-
-Register on GDSSpec alongside blocks:
+**Implementation:** `gds.AdmissibleInputConstraint` (frozen Pydantic model
+in `gds/constraints.py`):
 
 ```python
+from gds import AdmissibleInputConstraint
+
 spec.register_admissibility(
     AdmissibleInputConstraint(
+        name="balance_limit",
         boundary_block="market_order",
-        depends_on=["agent.balance"],
-        constraint=lambda state, u: u["quantity"] <= state["agent.balance"],
+        depends_on=[("agent", "balance")],
+        constraint=lambda state, u: u["quantity"] <= state["agent"]["balance"],
         description="Cannot sell more than owned balance"
     )
 )
 ```
 
-**Impact:**
-- Enables SC-008: "every BoundaryAction with registered admissibility
-  constraints references existing entities/variables"
-- Enables R2 structural validation: "are all admissibility dependencies
-  declared?"
-- The constraint callable itself is R3, but the dependency graph
-  (which state variables constrain which inputs) is R1
+**What was delivered:**
+- SC-008 (`check_admissibility_references`): validates boundary block exists,
+  is a BoundaryAction, depends_on references valid (entity, variable) pairs
+- `CanonicalGDS.admissibility_map`: populated by `project_canonical()`
+- `SpecQuery.admissibility_dependency_map()`: boundary -> state variable deps
+- OWL export/import with BNode-based tuple reification for depends_on
+- SHACL shapes for structural validation
+- Round-trip test (constraint callable is lossy, structural fields preserved)
+- Keyed by `name` (not `boundary_block`) to allow multiple constraints per
+  BoundaryAction
 
 **Structural vs. behavioral split:**
 - U_x_struct: the dependency relation (boundary -> state variables) -- R1
 - U_x_behav: the actual constraint function -- R3 (same as TypeDef.constraint)
 
-This mirrors the existing f_struct / f_behav pattern and extends it to
-the input side.
+### Step 2: Restricted State Update Map f|_x -- IMPLEMENTED
 
-**Prerequisite:** None. Can be added to GDSSpec today.
+**What:** Mechanism read dependencies (which state variables a mechanism reads).
 
-### Step 2: Restricted State Update Map f|_x
+**Paper reference:** Definition 2.7 -- f|_x : U_x -> X.
 
-**What:** Formalize that f is parameterized by state, producing a
-state-dependent update.
-
-**Paper reference:** Definition 2.7 -- f|_x : U_x -> X, where
-Image(f|_x) = Image(f(x, .)).
-
-**Concrete design:**
-
-This is primarily a conceptual bridge, not a new data structure. The
-existing Mechanism blocks already encode f_struct (which entity/variable
-is updated). What's missing is the ability to declare:
+**Implementation:** `gds.TransitionSignature` (frozen Pydantic model in
+`gds/constraints.py`):
 
 ```python
-@dataclass(frozen=True)
-class TransitionSignature:
-    """Declares the structural signature of a mechanism's transition."""
-    mechanism: str                    # mechanism block name
-    reads: list[str]                  # state variables read
-    writes: list[str]                 # state variables written
-    input_depends: list[str]          # decision ports consumed
-    preserves_invariant: str = ""     # optional: invariant annotation
+from gds import TransitionSignature
+
+spec.register_transition_signature(
+    TransitionSignature(
+        mechanism="Heater",
+        reads=[("Room", "temperature"), ("Environment", "outdoor_temp")],
+        depends_on_blocks=["Controller"],
+        preserves_invariant="energy conservation"
+    )
+)
 ```
 
-**Impact:**
-- Enables SC-008 (extended): "are all state variable reads declared?"
-- Enables structural dependency analysis: which mechanisms read which
-  variables? (currently only writes are tracked)
-- Enables structural invariant annotation (paper Section 4.4):
-  "this mechanism preserves property P"
-
-**Prerequisite:** None. Can be added alongside Step 1.
+**What was delivered:**
+- SC-009 (`check_transition_reads`): validates mechanism exists, is a
+  Mechanism, reads references valid (entity, variable) pairs,
+  depends_on_blocks references registered blocks
+- `CanonicalGDS.read_map`: populated by `project_canonical()`
+- `SpecQuery.mechanism_read_map()`, `SpecQuery.variable_readers()`
+- OWL export/import with BNode-based tuple reification for reads
+- SHACL shapes for structural validation
+- Round-trip test (structural fields preserved)
+- `writes` deliberately omitted -- `Mechanism.updates` already tracks those
+- One signature per mechanism (intentional simplification)
 
 ### Step 3: Metric on State Space
 
@@ -425,8 +422,8 @@ This connects directly to RQ1 (MIMO semantics) in research-boundaries.md.
 ## 5. Dependency Graph
 
 ```
-Step 1: AdmissibleInputConstraint (U_x declaration)   -- structural, today
-Step 2: TransitionSignature (f|_x declaration)         -- structural, today
+Step 1: AdmissibleInputConstraint (U_x declaration)   -- DONE (gds-framework v0.2.3)
+Step 2: TransitionSignature (f|_x declaration)         -- DONE (gds-framework v0.2.3)
     |
     v
 Step 3: StateMetric (d_X on X)                        -- requires runtime
@@ -442,19 +439,19 @@ Step 6: Contingent Derivative D'F                     -- research frontier
 Step 7: Local Controllability                          -- research frontier
 ```
 
-Steps 1-2 are purely structural and can be added to gds-framework now.
-Steps 3-5 require runtime evaluation and belong in gds-sim or a new
-gds-analysis package. Steps 6-7 are research-level and may warrant a
-dedicated analytical package or external tooling integration.
+Steps 1-2 are implemented in gds-framework with full OWL/SHACL support
+in gds-owl. Steps 3-5 require runtime evaluation and belong in gds-sim
+or a new gds-analysis package. Steps 6-7 are research-level and may
+warrant a dedicated analytical package or external tooling integration.
 
 ---
 
 ## 6. Package Placement
 
-| Step | Where | Rationale |
+| Step | Where | Status |
 |---|---|---|
-| 1 (U_x) | gds-framework (spec.py) | Structural declaration, no runtime needed |
-| 2 (f\|_x signature) | gds-framework (spec.py or canonical.py) | Structural declaration |
+| 1 (U_x) | gds-framework (constraints.py, spec.py) | **Done** — SC-008, OWL, SHACL |
+| 2 (f\|_x signature) | gds-framework (constraints.py, spec.py, canonical.py) | **Done** — SC-009, OWL, SHACL |
 | 3 (metric) | gds-sim or gds-analysis | Requires concrete state values |
 | 4 (R(x)) | gds-analysis (new) | Dynamical computation |
 | 5 (X_C) | gds-analysis | Dynamical computation |
