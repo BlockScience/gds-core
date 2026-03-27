@@ -7,6 +7,117 @@ h = f ∘ g.
 
 ---
 
+## Overview
+
+### The representation boundary is h = f ∘ g
+
+The GDS canonical decomposition h = f ∘ g is not just mathematical
+notation — it is the exact line where formal representation changes
+character:
+
+- **g** (policy mapping): which blocks connect to what, in what roles,
+  through what wires. Fully representable — by design, GDSSpec stores no
+  behavioral content here.
+- **f_struct** (update map): "Mechanism M updates Entity E variable V."
+  Fully representable — a finite relation.
+- **f_behav** (transition function): "Given state x and decisions d,
+  compute new state x'." Not representable — arbitrary computation.
+
+Everything to the left of f_behav is topology. Everything at f_behav and
+beyond is computation. OWL/SHACL/SPARQL live on the topology side. Python
+lives on both sides.
+
+### Composition: structure preserved, process lost
+
+The five composition operators (>>, |, feedback, loop) and their resulting
+trees survive OWL round-trip perfectly. You can reconstruct exactly how a
+system was assembled.
+
+The *process* of composition — auto-wiring via token overlap, port
+matching, construction-time validation — requires Python string computation
+that SPARQL cannot replicate. But this gap is **moot in practice**: gds-owl
+materializes both the tokens (as `typeToken` literals) and the wired
+connections (as explicit `WiringIR` edges) during export. The RDF consumer
+never needs to recompute what Python already computed.
+
+This reveals a general design principle: **materialize computation results
+as data before export, and the representation gap closes for practical
+purposes.**
+
+### Temporality: structure preserved, semantics lost
+
+A `TemporalLoop` (physical state at t feeds sensors at t+1) and a
+`CorecursiveLoop` (decisions at round t feed observations at round t+1)
+have identical RDF representation: covariant wiring from inner.forward_out
+to inner.forward_in with an exit_condition string. OWL captures "there is
+a loop" but not "what kind of time this loop means." The interpretation
+requires knowing which DSL compiled the system — that is metadata
+(preserved via `gds-ir:sourceLabel`), not topology.
+
+State evolution itself — computing x_{t+1} = f(x_t, g(x_t, u_t)) — is
+fundamentally not representable. You need a runtime, period.
+
+### The data/computation duality
+
+The same pattern recurs at every level of GDS:
+
+| Data (representable) | Computation (not representable) |
+|---|---|
+| Token sets on ports | The `tokenize()` function that produces them |
+| Wired connections | The auto-wiring process that discovers them |
+| Constraint bounds (0 <= x <= 1) | Arbitrary `Callable[[Any], bool]` constraints |
+| Update map (M updates E.V) | Transition function (how V changes) |
+| Equilibrium structure (which games compose how) | Equilibrium computation (finding Nash equilibria) |
+| Wiring graph topology (can A reach B?) | Signal propagation (does A's output actually affect B?) |
+
+If you materialize computation results as data before crossing the
+boundary, the gap shrinks to what genuinely requires a runtime: simulation,
+constraint evaluation, and equilibrium solving.
+
+### The validation stack
+
+The three semantic web formalisms serve architecturally distinct roles —
+a validation stack, not a containment chain:
+
+| Layer | Formalism | Role | Example |
+|---|---|---|---|
+| Vocabulary | OWL | Defines what things *are* | "A Mechanism is a kind of AtomicBlock" |
+| Local constraints | SHACL-core | Validates individual nodes | "Every Mechanism must update >= 1 state variable" |
+| Graph patterns | SPARQL | Validates cross-node relationships | "No two mechanisms update the same (entity, variable) pair" |
+| Computation | Python | Evaluates functions, evolves state | "Given x=0.5, f(x) = 0.7" |
+
+Each step adds expressiveness and loses decidability guarantees. The
+R1/R2/R3 tier system in this document maps directly onto this stack.
+
+### Architectural consequences
+
+1. **RDF is a viable structural interchange format.** Of 13 verification
+   checks, 4 are SHACL-expressible, 6 more with SPARQL, only 2 genuinely
+   need Python. The structural skeleton carries the vast majority of system
+   information.
+
+2. **Games are naturally ontological.** When h = g (no state, no f), the
+   GDSSpec projection is lossless. Games are morphisms between spaces, not
+   state machines. Game composition maps cleanly to OWL because it is all
+   structure.
+
+3. **Dynamical systems degrade gracefully.** Each mechanism contributes one
+   representable fact (what it updates) and one non-representable fact (how
+   it computes). The structural skeleton is always complete; what degrades
+   is the fraction of total content it represents.
+
+4. **The canonical form is architecturally load-bearing.** By separating
+   "what connects to what" (g) from "what the connections compute"
+   (f_behav), GDS provides a clean cut point for partial representation,
+   cross-tool interop, and formal reasoning.
+
+The representability boundary is Rice's theorem applied to system
+specifications: you can represent everything about a system except what
+its programs actually do. The canonical decomposition h = f ∘ g makes this
+boundary explicit and exploitable.
+
+---
+
 ## 1. Preliminaries
 
 ### 1.1 GDS Formal Objects
