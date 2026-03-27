@@ -1,0 +1,84 @@
+[project]
+name = "gds-owl"
+dynamic = ["version"]
+description = "OWL/Turtle, SHACL, and SPARQL for gds-framework specifications"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.12"
+authors = [
+    { name = "Rohan Mehta", email = "rohan@block.science" },
+]
+keywords = [
+    "generalized-dynamical-systems",
+    "owl",
+    "rdf",
+    "turtle",
+    "shacl",
+    "sparql",
+    "ontology",
+    "gds-framework",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+dependencies = [
+    "gds-framework>=0.2.3",
+    "rdflib>=7.0",
+]
+
+[project.optional-dependencies]
+shacl = [
+    "pyshacl>=0.27",
+]
+
+[project.urls]
+Homepage = "https://github.com/BlockScience/gds-core"
+Repository = "https://github.com/BlockScience/gds-core"
+Documentation = "https://blockscience.github.io/gds-core"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "gds_owl/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["gds_owl"]
+
+[tool.uv.sources]
+gds-framework = { workspace = true }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--import-mode=importlib --cov=gds_owl --cov-report=term-missing --no-header -q"
+
+[tool.coverage.run]
+source = ["gds_owl"]
+omit = ["gds_owl/__init__.py"]
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true
+exclude_lines = [
+    "if TYPE_CHECKING:",
+    "pragma: no cover",
+]
+
+[dependency-groups]
+dev = [
+    "mypy>=1.19.1",
+    "pyright>=1.1.408",
+    "pytest>=8.0",
+    "pytest-cov>=6.0",
+    "ruff>=0.8",
+]
