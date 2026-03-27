@@ -10,7 +10,7 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import TYPE_CHECKING
 
-from gds.blocks.roles import HasParams, Mechanism
+from gds.blocks.roles import BoundaryAction, HasParams, Mechanism
 from gds.canonical import project_canonical
 from gds.verification.findings import Finding, Severity
 
@@ -275,6 +275,151 @@ def check_canonical_wellformedness(spec: GDSSpec) -> list[Finding]:
                 severity=Severity.INFO,
                 message=(
                     f"State space X has {len(canonical.state_variables)} variable(s)"
+                ),
+                passed=True,
+            )
+        )
+
+    return findings
+
+
+def check_admissibility_references(spec: GDSSpec) -> list[Finding]:
+    """Admissibility constraints reference valid BoundaryActions and variables.
+
+    SC-008: Every registered AdmissibleInputConstraint references an
+    existing BoundaryAction and valid (entity, variable) pairs.
+    """
+    findings: list[Finding] = []
+
+    if not spec.admissibility_constraints:
+        findings.append(
+            Finding(
+                check_id="SC-008",
+                severity=Severity.INFO,
+                message="No admissibility constraints registered",
+                passed=True,
+            )
+        )
+        return findings
+
+    issues: list[str] = []
+    bad_names: list[str] = []
+    for ac in spec.admissibility_constraints.values():
+        before = len(issues)
+        block = spec.blocks.get(ac.boundary_block)
+        if block is None:
+            issues.append(f"'{ac.name}': block '{ac.boundary_block}' not registered")
+        elif not isinstance(block, BoundaryAction):
+            issues.append(
+                f"'{ac.name}': '{ac.boundary_block}' is not a BoundaryAction "
+                f"(is {type(block).__name__})"
+            )
+
+        for entity_name, var_name in ac.depends_on:
+            if entity_name not in spec.entities:
+                issues.append(f"'{ac.name}': unknown entity '{entity_name}'")
+            elif var_name not in spec.entities[entity_name].variables:
+                issues.append(
+                    f"'{ac.name}': unknown variable '{entity_name}.{var_name}'"
+                )
+        if len(issues) > before:
+            bad_names.append(ac.name)
+
+    if issues:
+        findings.append(
+            Finding(
+                check_id="SC-008",
+                severity=Severity.ERROR,
+                message=f"Admissibility constraint issues: {issues}",
+                source_elements=bad_names,
+                passed=False,
+            )
+        )
+    else:
+        findings.append(
+            Finding(
+                check_id="SC-008",
+                severity=Severity.INFO,
+                message=(
+                    f"All {len(spec.admissibility_constraints)} admissibility "
+                    f"constraint(s) are well-formed"
+                ),
+                passed=True,
+            )
+        )
+
+    return findings
+
+
+def check_transition_reads(spec: GDSSpec) -> list[Finding]:
+    """Transition signatures reference valid Mechanisms and variables.
+
+    SC-009: Every TransitionSignature references an existing Mechanism,
+    reads valid (entity, variable) pairs, and depends_on_blocks are
+    registered blocks.
+    """
+    findings: list[Finding] = []
+
+    if not spec.transition_signatures:
+        findings.append(
+            Finding(
+                check_id="SC-009",
+                severity=Severity.INFO,
+                message="No transition signatures registered",
+                passed=True,
+            )
+        )
+        return findings
+
+    issues: list[str] = []
+    bad_names: list[str] = []
+    for ts in spec.transition_signatures.values():
+        before = len(issues)
+        block = spec.blocks.get(ts.mechanism)
+        if block is None:
+            issues.append(f"'{ts.mechanism}': block not registered")
+        elif not isinstance(block, Mechanism):
+            issues.append(
+                f"'{ts.mechanism}': not a Mechanism (is {type(block).__name__})"
+            )
+
+        for entity_name, var_name in ts.reads:
+            if entity_name not in spec.entities:
+                issues.append(
+                    f"'{ts.mechanism}': reads unknown entity '{entity_name}'"
+                )
+            elif var_name not in spec.entities[entity_name].variables:
+                issues.append(
+                    f"'{ts.mechanism}': reads unknown variable "
+                    f"'{entity_name}.{var_name}'"
+                )
+
+        for bname in ts.depends_on_blocks:
+            if bname not in spec.blocks:
+                issues.append(
+                    f"'{ts.mechanism}': depends on unregistered block '{bname}'"
+                )
+        if len(issues) > before:
+            bad_names.append(ts.mechanism)
+
+    if issues:
+        findings.append(
+            Finding(
+                check_id="SC-009",
+                severity=Severity.ERROR,
+                message=f"Transition signature issues: {issues}",
+                source_elements=bad_names,
+                passed=False,
+            )
+        )
+    else:
+        findings.append(
+            Finding(
+                check_id="SC-009",
+                severity=Severity.INFO,
+                message=(
+                    f"All {len(spec.transition_signatures)} transition "
+                    f"signature(s) are consistent"
                 ),
                 passed=True,
             )
