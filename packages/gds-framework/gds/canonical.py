@@ -59,6 +59,12 @@ class CanonicalGDS(BaseModel):
     # Mechanism update targets: (entity, variable) per mechanism
     update_map: tuple[tuple[str, tuple[tuple[str, str], ...]], ...] = ()
 
+    # Admissibility deps: (constraint_name, ((entity, var), ...))
+    admissibility_map: tuple[tuple[str, tuple[tuple[str, str], ...]], ...] = ()
+
+    # Mechanism read deps: (mechanism_name, ((entity, var), ...))
+    read_map: tuple[tuple[str, tuple[tuple[str, str], ...]], ...] = ()
+
     @property
     def has_parameters(self) -> bool:
         """True if the system has any parameters."""
@@ -136,6 +142,18 @@ def project_canonical(spec: GDSSpec) -> CanonicalGDS:
             updates = tuple(tuple(pair) for pair in block.updates)
             update_map.append((bname, updates))  # type: ignore[arg-type]
 
+    # 7. Admissibility dependencies
+    admissibility_map: list[tuple[str, tuple[tuple[str, str], ...]]] = []
+    for ac_name, ac in spec.admissibility_constraints.items():
+        deps = tuple(tuple(pair) for pair in ac.depends_on)
+        admissibility_map.append((ac_name, deps))  # type: ignore[arg-type]
+
+    # 8. Transition read map
+    read_map: list[tuple[str, tuple[tuple[str, str], ...]]] = []
+    for mname, ts in spec.transition_signatures.items():
+        reads = tuple(tuple(pair) for pair in ts.reads)
+        read_map.append((mname, reads))  # type: ignore[arg-type]
+
     return CanonicalGDS(
         state_variables=tuple(state_variables),
         parameter_schema=parameter_schema,
@@ -146,4 +164,6 @@ def project_canonical(spec: GDSSpec) -> CanonicalGDS:
         policy_blocks=tuple(policy_blocks),
         mechanism_blocks=tuple(mechanism_blocks),
         update_map=tuple(update_map),
+        admissibility_map=tuple(admissibility_map),
+        read_map=tuple(read_map),
     )
