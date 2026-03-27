@@ -11,14 +11,15 @@ h = f ∘ g.
 
 ### 1.1 GDS Formal Objects
 
-**Definition 1.1 (Composition Algebra).** The GDS composition algebra has
-the algebraic structure of a symmetric monoidal category with feedback
-(sequential composition, parallel tensor, feedback morphisms). The full
-categorical axioms (associativity, interchange law, coherence conditions)
-are enforced by construction in the Python implementation but have not
-been formally verified.
+**Definition 1.1 (Composition Algebra).** The GDS composition algebra is
+a tuple (Block, >>, |, fb, loop) with operations inspired by symmetric
+monoidal categories with feedback. The operations satisfy the expected
+algebraic properties (associativity of >> and |, commutativity of |) by
+construction, but the full categorical axioms (interchange law, coherence
+conditions, traced monoidal structure for feedback) have not been formally
+verified.
 
-The algebra is a tuple (Block, >>, |, fb, loop) where:
+The components are:
 
 - **Objects** are Interfaces: I = (F_in, F_out, B_in, B_out), each a tuple
   of Ports
@@ -141,16 +142,23 @@ different problems under different assumptions:
 - SPARQL: graph pattern queries with aggregation and negation
 
 They do not form a simple containment chain. However, for the specific
-purpose of **enforcing constraints on GDS-exported RDF graphs**, their
-capabilities order as follows:
+purpose of **enforcing constraints on GDS-exported RDF graphs**, we
+distinguish three tiers of validation expressiveness:
 
 ```
-OWL class/property structure  <  SHACL cardinality/class shapes  <  SPARQL graph patterns  <  Turing-complete
+SHACL-core (node/property shapes)  <  SPARQL graph patterns  <  Turing-complete
 ```
 
-Each step adds expressiveness for validation: OWL defines the vocabulary,
-SHACL constrains individual nodes, SPARQL can express cross-node patterns
-(negation, transitivity, aggregation). None can express arbitrary computation.
+OWL defines the vocabulary (classes, properties, subsumption). SHACL-core
+— node shapes, property shapes with cardinality/datatype/class constraints,
+but *without* sh:sparql — validates individual nodes against local
+constraints. SPARQL graph patterns (standalone or embedded in SHACL via
+sh:sparql) can express cross-node patterns: negation-as-failure, transitive
+closure, aggregation. None can express arbitrary computation.
+
+This three-level ordering directly motivates the R1/R2/R3 tiers in
+Definition 2.2: R1 maps to OWL + SHACL-core, R2 maps to SPARQL, R3
+exceeds all three formalisms.
 
 ---
 
@@ -191,8 +199,10 @@ bijectivity:
    TypeDef.python_type falls back to `str` for types not in the built-in
    map. These are documented R3 losses, not bijectivity failures.
 
-The 155-test round-trip suite (test_roundtrip.py) verifies structural
-equality under these conventions for all four rho/rho^{-1} pairs.
+The round-trip suite (test_roundtrip.py: TestSpecRoundTrip,
+TestSystemIRRoundTrip, TestCanonicalRoundTrip, TestReportRoundTrip)
+verifies structural equality under these conventions for all four
+rho/rho^{-1} pairs.
 
 **Definition 2.2 (Representability Tiers).** A GDS concept c belongs to:
 
@@ -259,9 +269,11 @@ never needs to run tokenize(). The tokens are data, not computation. The
 R3 classification applies specifically to **auto-wiring as a process**:
 discovering which ports should connect by computing token overlap from port
 name strings. This requires the tokenize() function (string splitting +
-lowercasing), which SPARQL cannot replicate — SPARQL operates on existing
-graph topology and cannot dynamically project string data into new graph
-structure.
+lowercasing). While SPARQL CONSTRUCT can generate new triples from pattern
+matches, it cannot generate an unbounded number of new nodes from a single
+string value — the split points must be known at query-write time. Since
+GDS port names use variable numbers of delimiters, a fixed SPARQL query
+cannot handle all cases.
 
 In practice this is a moot point: the *wired connections* are exported as
 explicit WiringIR edges (R1). Only the *process of discovering them* is not
@@ -380,7 +392,7 @@ impact noted.
 | **G-001** | Domain/codomain matching | **R3** | Requires tokenize() — string splitting computation | Low: wired connections already exported as explicit edges |
 | **G-002** | Signature completeness | **R1** | Cardinality check on signature fields. SHACL sh:minCount. | Covered by SHACL |
 | **G-003** | Direction consistency | **R1** (flags) / **R3** (ports) | Flag contradiction is boolean — SHACL expressible. Port matching uses tokens (R3). | Flags covered; port check deferred to Python |
-| **G-004** | Dangling wirings | **R1** | SHACL sh:class on source/target references, same pattern as SC-005 (reference validation against registered names) | Covered by SHACL |
+| **G-004** | Dangling wirings | **R2** | WiringIR source/target are string literals (datatype properties), not object property references. Checking that a string name appears in the set of BlockIR names requires SPARQL negation-as-failure on string matching. Unlike SC-005 where `usesParameter` is an object property. | Expressible via SPARQL |
 | **G-005** | Sequential type compatibility | **R3** | Same tokenize() requirement as G-001 | Low: same mitigation as G-001 |
 | **G-006** | Covariant acyclicity (DAG) | **R2** | Cycle detection = self-reachability under transitive closure on materialized covariant edges. SPARQL: `ASK { ?v gds-ir:covariantSuccessor+ ?v }`. Requires materializing the filtered edge relation (direction="covariant" and is_temporal=false) first. | Expressible with preprocessing |
 
@@ -391,19 +403,22 @@ impact noted.
 | **SC-001** | Completeness | **R2** | SPARQL: LEFT JOIN Entity.variables with Mechanism.updatesEntry, FILTER NOT EXISTS for orphans. | Expressible |
 | **SC-002** | Determinism | **R2** | SPARQL: GROUP BY (entity, variable) within wiring, HAVING COUNT(mechanism) > 1. | Expressible |
 | **SC-003** | Reachability | **R2** | SPARQL property paths on the wiring graph. Note: follows directed wiring edges (wireSource -> wireTarget), respecting flow direction. | Expressible |
-| **SC-004** | Type safety | **R2** | SPARQL set membership or SHACL sh:class constraint. | Expressible |
+| **SC-004** | Type safety | **R2** | Wire.space is a string literal; checking membership in the set of registered Space names requires SPARQL, not SHACL sh:class (which works on object properties, as in SC-005). | Expressible via SPARQL |
 | **SC-005** | Parameter references | **R1** | SHACL sh:class on usesParameter targets. Already implemented in gds-owl shacl.py. | Covered by SHACL |
-| **SC-006** | f non-empty | **R1** | SPARQL: `ASK { ?m a gds-core:Mechanism }` | Trivially expressible |
-| **SC-007** | X non-empty | **R1** | SPARQL: `ASK { ?sv a gds-core:StateVariable }` | Trivially expressible |
+| **SC-006** | f non-empty | **R1** | Equivalent to SHACL `sh:qualifiedMinCount 1` with `sh:qualifiedValueShape [sh:class gds-core:Mechanism]` on the spec node. (SPARQL illustration: `ASK { ?m a gds-core:Mechanism }`) | Covered by SHACL-core |
+| **SC-007** | X non-empty | **R1** | Same pattern: SHACL `sh:qualifiedMinCount 1` for StateVariable. (SPARQL illustration: `ASK { ?sv a gds-core:StateVariable }`) | Covered by SHACL-core |
 
 ### 5.3 Summary
 
 ```
-R1 (OWL/SHACL):      G-002, G-004, SC-005, SC-006, SC-007    = 5
-R2 (SPARQL):          G-006, SC-001, SC-002, SC-003, SC-004   = 5
-R3 (Python-only):     G-001, G-005                             = 2
-Mixed (R1 + R3):      G-003 (flag check R1, port matching R3)  = 1
+R1 (SHACL-core):     G-002, SC-005, SC-006, SC-007              = 4
+R2 (SPARQL):          G-004, G-006, SC-001, SC-002, SC-003, SC-004 = 6
+R3 (Python-only):     G-001, G-005                                = 2
+Mixed (R1 + R3):      G-003 (flag check R1, port matching R3)     = 1
 ```
+
+The R1/R2 boundary is mechanically determined: R1 = expressible in
+SHACL-core (no sh:sparql), R2 = requires SPARQL graph patterns.
 
 The R3 checks share a single root cause: **token-based port name matching
 requires string computation that exceeds SPARQL's value space operations**.
@@ -443,7 +458,7 @@ G_struct concepts and their tiers:
 - Space/entity structure: R1 (Property 4.1)
 - Acyclicity: R2 (Section 5.1, G-006)
 - Completeness/determinism: R2 (Section 5.2, SC-001, SC-002)
-- Dangling references: R1 (Section 5.1, G-004)
+- Reference validation (dangling wirings): R2 (Section 5.1, G-004)
 
 G_behav concepts and their tiers:
 - Transition functions: R3 (Property 4.4, f_behav)
@@ -484,7 +499,7 @@ is always complete in OWL. Each mechanism adds one update target to
 f_struct (R1) and one transition function to f_behav (R3). The "what" is
 never lost — only the "how."
 
-**Corollary 6.5 (TemporalLoop vs CorecursiveLoop).** OWL cannot
+**Remark 6.5 (TemporalLoop vs CorecursiveLoop in OWL).** OWL cannot
 distinguish a temporal loop (physical state persistence, e.g., control
 systems) from a corecursive loop (strategic message threading, e.g.,
 repeated games). CorecursiveLoop (defined in gds-games as
@@ -493,8 +508,11 @@ repeated game semantics) shares identical structural representation: both
 use covariant wiring from inner.forward_out to inner.forward_in with an
 exit_condition string. The semantic difference — "state at t feeds sensors
 at t+1" vs "decisions at round t feed observations at round t+1" — is an
-interpretation of the temporal wiring, not a structural property. Domain
-context (which DSL compiled the system) is metadata, not topology.
+interpretation, not topology.
+
+In practice this is benign: gds-owl preserves the DSL source label
+(gds-ir:sourceLabel on SystemIR), so consumers can recover which DSL
+compiled the system and interpret temporal wirings accordingly.
 
 ---
 
@@ -559,12 +577,11 @@ individuals connected by named object properties.
 {G-002, G-004, G-006, SC-001..SC-007} <-> SHACL + SPARQL
 ```
 
-R1 or R2 depending on the check. SHACL captures cardinality and
-class-membership constraints (5 checks). SPARQL captures graph-pattern
-queries requiring negation, transitivity, or aggregation (5 checks).
-The 2 remaining checks (G-001, G-005) require tokenization — a string
-computation beyond SPARQL's expressiveness. G-003 splits: flag check R1,
-port matching R3.
+R1 or R2 depending on the check. SHACL-core captures cardinality and
+class-membership constraints (4 checks). SPARQL captures graph-pattern
+queries requiring negation, transitivity, aggregation, or cross-node
+string matching (6 checks). The 2 remaining checks (G-001, G-005) require
+tokenization. G-003 splits: flag check R1, port matching R3.
 
 ### Correspondence 3: Dynamic Behavior <-> Python Runtime Only
 
