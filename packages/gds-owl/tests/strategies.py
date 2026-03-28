@@ -18,7 +18,6 @@ from gds import (
     Wire,
     interface,
 )
-from gds.types.typedef import TypeDef
 
 # ---------------------------------------------------------------------------
 # Atomic strategies
@@ -45,64 +44,72 @@ _python_types = st.sampled_from([int, float, str, bool])
 
 
 # ---------------------------------------------------------------------------
-# TypeDef
-# ---------------------------------------------------------------------------
-
-@st.composite
-def typedefs(draw) -> TypeDef:
-    """Generate a random TypeDef. Constraint is always None (R3 lossy)."""
-    name = draw(_ident)
-    python_type = draw(_python_types)
-    units = draw(st.one_of(st.none(), _ident))
-    return gds.typedef(name, python_type, units=units)
-
-
-# ---------------------------------------------------------------------------
 # GDSSpec
 # ---------------------------------------------------------------------------
 
+
 @st.composite
-def gds_specs(draw, min_blocks=2, max_blocks=5) -> GDSSpec:
+def gds_specs(draw, min_blocks=3, max_blocks=5) -> GDSSpec:
     """Generate a random, structurally valid GDSSpec.
 
     Produces a spec with:
     - 1-3 TypeDefs
     - 1-2 Spaces referencing drawn types
     - 1 Entity referencing a drawn space
-    - min_blocks..max_blocks blocks (1 BoundaryAction, 1+ Policy, 1 Mechanism)
+    - min_blocks..max_blocks blocks (1 BoundaryAction, 1+ Policy,
+      1 Mechanism)
     - 1 SpecWiring connecting blocks sequentially
 
-    All R3 fields (constraints) are None by design.
+    All R3 fields (constraints) are None by design — lossiness of
+    real constraints is covered by fixture tests in test_roundtrip.py.
     """
     # --- Types ---
     n_types = draw(st.integers(min_value=1, max_value=3))
     type_names = draw(
-        st.lists(_ident, min_size=n_types, max_size=n_types, unique=True)
+        st.lists(
+            _ident, min_size=n_types, max_size=n_types, unique=True
+        )
     )
     types = [
-        gds.typedef(name, draw(_python_types), units=draw(st.one_of(st.none(), _ident)))
-        for name in type_names
+        gds.typedef(
+            tname,
+            draw(_python_types),
+            units=draw(st.one_of(st.none(), _ident)),
+        )
+        for tname in type_names
     ]
 
     # --- Spaces ---
     n_spaces = draw(st.integers(min_value=1, max_value=2))
     space_names = draw(
-        st.lists(_ident, min_size=n_spaces, max_size=n_spaces, unique=True)
+        st.lists(
+            _ident, min_size=n_spaces, max_size=n_spaces, unique=True
+        )
     )
     spaces = []
     for sname in space_names:
         n_fields = draw(st.integers(min_value=1, max_value=2))
         field_names = draw(
-            st.lists(_ident, min_size=n_fields, max_size=n_fields, unique=True)
+            st.lists(
+                _ident,
+                min_size=n_fields,
+                max_size=n_fields,
+                unique=True,
+            )
         )
-        fields = {fname: draw(st.sampled_from(types)) for fname in field_names}
+        fields = {
+            fname: draw(st.sampled_from(types))
+            for fname in field_names
+        }
         spaces.append(gds.space(sname, **fields))
 
     # --- Entity ---
     entity_name = draw(_ident)
     n_vars = draw(st.integers(min_value=1, max_value=2))
     var_names = draw(
-        st.lists(_ident, min_size=n_vars, max_size=n_vars, unique=True)
+        st.lists(
+            _ident, min_size=n_vars, max_size=n_vars, unique=True
+        )
     )
     variables = {
         vname: gds.state_var(draw(st.sampled_from(types)))
@@ -111,13 +118,21 @@ def gds_specs(draw, min_blocks=2, max_blocks=5) -> GDSSpec:
     entity = gds.entity(entity_name, **variables)
 
     # --- Blocks ---
-    # Generate unique port names for the block chain
-    n_blocks = draw(st.integers(min_value=min_blocks, max_value=max_blocks))
+    n_blocks = draw(
+        st.integers(min_value=min_blocks, max_value=max_blocks)
+    )
     port_names = draw(
-        st.lists(_port_name, min_size=n_blocks, max_size=n_blocks, unique=True)
+        st.lists(
+            _port_name,
+            min_size=n_blocks,
+            max_size=n_blocks,
+            unique=True,
+        )
     )
     block_names = draw(
-        st.lists(_ident, min_size=n_blocks, max_size=n_blocks, unique=True)
+        st.lists(
+            _ident, min_size=n_blocks, max_size=n_blocks, unique=True
+        )
     )
 
     blocks = []
@@ -130,7 +145,7 @@ def gds_specs(draw, min_blocks=2, max_blocks=5) -> GDSSpec:
         )
     )
 
-    # Middle blocks: Policy (forward_in from previous, forward_out to next)
+    # Middle blocks: Policy (forward_in from prev, forward_out to next)
     for i in range(1, n_blocks - 1):
         blocks.append(
             Policy(
@@ -142,14 +157,13 @@ def gds_specs(draw, min_blocks=2, max_blocks=5) -> GDSSpec:
             )
         )
 
-    # Last block: Mechanism (forward_in from previous, no forward_out)
+    # Last block: Mechanism (forward_in from previous)
     update_var = draw(st.sampled_from(list(variables.keys())))
+    last_in = port_names[-2] if n_blocks > 2 else port_names[0]
     blocks.append(
         Mechanism(
             name=block_names[-1],
-            interface=interface(
-                forward_in=[port_names[-2] if n_blocks > 1 else port_names[0]]
-            ),
+            interface=interface(forward_in=[last_in]),
             updates=[(entity_name, update_var)],
         )
     )

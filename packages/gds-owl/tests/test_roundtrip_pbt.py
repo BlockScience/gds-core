@@ -8,14 +8,29 @@ See: docs/research/verification-plan.md (Phase 3)
      docs/research/formal-representability.md (Remark 2.1)
 """
 
+import os
+
 from hypothesis import given, settings
 from rdflib import Graph
 
 from gds import GDSSpec
+from gds.blocks.roles import Mechanism
 from gds_owl.export import spec_to_graph
 from gds_owl.import_ import graph_to_spec
 from gds_owl.serialize import to_turtle
 from tests.strategies import gds_specs
+
+# ---------------------------------------------------------------------------
+# Reproducibility: derandomize in CI so failures are repeatable.
+# Set HYPOTHESIS_PROFILE=ci in env, or run with --hypothesis-seed=<N>.
+# ---------------------------------------------------------------------------
+settings.register_profile(
+    "ci", database=None, derandomize=True, max_examples=100
+)
+settings.register_profile(
+    "dev", max_examples=100
+)
+settings.load_profile(os.getenv("HYPOTHESIS_PROFILE", "dev"))
 
 
 def _round_trip(spec: GDSSpec) -> GDSSpec:
@@ -58,14 +73,6 @@ class TestSpecRoundTripPBT:
 
     @given(spec=gds_specs())
     @settings(max_examples=100)
-    def test_constraints_are_lossy(self, spec: GDSSpec) -> None:
-        """R3 fields: TypeDef.constraint is always None after round-trip."""
-        spec2 = _round_trip(spec)
-        for td in spec2.types.values():
-            assert td.constraint is None
-
-    @given(spec=gds_specs())
-    @settings(max_examples=100)
     def test_space_names_survive(self, spec: GDSSpec) -> None:
         spec2 = _round_trip(spec)
         assert set(spec2.spaces.keys()) == set(spec.spaces.keys())
@@ -89,7 +96,7 @@ class TestSpecRoundTripPBT:
     @given(spec=gds_specs())
     @settings(max_examples=100)
     def test_entity_variables_survive(self, spec: GDSSpec) -> None:
-        """Entity variable names survive (set-based, order independent)."""
+        """Entity variable names survive (set-based)."""
         spec2 = _round_trip(spec)
         for name in spec.entities:
             assert set(spec2.entities[name].variables.keys()) == set(
@@ -108,16 +115,14 @@ class TestSpecRoundTripPBT:
         """Each block retains its role (kind) after round-trip."""
         spec2 = _round_trip(spec)
         for name in spec.blocks:
-            orig_kind = getattr(spec.blocks[name], "kind", "generic")
-            new_kind = getattr(spec2.blocks[name], "kind", "generic")
-            assert new_kind == orig_kind, f"Block {name}: {orig_kind} -> {new_kind}"
+            orig = getattr(spec.blocks[name], "kind", "generic")
+            new = getattr(spec2.blocks[name], "kind", "generic")
+            assert new == orig, f"Block {name}: {orig} -> {new}"
 
     @given(spec=gds_specs())
     @settings(max_examples=100)
     def test_mechanism_updates_survive(self, spec: GDSSpec) -> None:
         """Mechanism.updates survive as sets (order independent)."""
-        from gds.blocks.roles import Mechanism
-
         spec2 = _round_trip(spec)
         for name, block in spec.blocks.items():
             if isinstance(block, Mechanism):
@@ -133,7 +138,16 @@ class TestSpecRoundTripPBT:
 
     @given(spec=gds_specs())
     @settings(max_examples=100)
-    def test_wiring_wire_count_survives(self, spec: GDSSpec) -> None:
+    def test_wire_content_survives(self, spec: GDSSpec) -> None:
+        """Wire source, target, and space all survive round-trip."""
         spec2 = _round_trip(spec)
         for name in spec.wirings:
-            assert len(spec2.wirings[name].wires) == len(spec.wirings[name].wires)
+            orig = {
+                (w.source, w.target, w.space)
+                for w in spec.wirings[name].wires
+            }
+            new = {
+                (w.source, w.target, w.space)
+                for w in spec2.wirings[name].wires
+            }
+            assert orig == new

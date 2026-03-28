@@ -32,6 +32,8 @@ jobs:
       - uses: astral-sh/setup-uv@v7
       - run: uv sync --package ${{ matrix.package }}
       - name: Run tests
+        env:
+          HYPOTHESIS_PROFILE: ci
         run: |
           if [ "${{ matrix.package }}" = "gds-examples" ]; then
             uv run --package ${{ matrix.package }} pytest packages/gds-examples -v

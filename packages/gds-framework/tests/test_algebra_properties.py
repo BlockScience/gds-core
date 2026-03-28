@@ -12,11 +12,25 @@ See: docs/research/verification-plan.md (Phase 1a)
      docs/research/formal-representability.md (Def 1.1)
 """
 
+import os
+
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
 from gds.blocks.base import AtomicBlock
 from gds.types.interface import Interface, Port, port
+
+# ---------------------------------------------------------------------------
+# Reproducibility: fixed seed database ensures CI determinism.
+# Run with --hypothesis-seed=<N> to reproduce a specific failure.
+# ---------------------------------------------------------------------------
+settings.register_profile(
+    "ci", database=None, derandomize=True, max_examples=200
+)
+settings.register_profile(
+    "dev", max_examples=200
+)
+settings.load_profile(os.getenv("HYPOTHESIS_PROFILE", "dev"))
 
 # ---------------------------------------------------------------------------
 # Strategies
@@ -38,11 +52,22 @@ block_names = st.text(
 
 
 @st.composite
-def port_tuples(draw, min_size=0, max_size=3):
-    """Generate a tuple of Ports with distinct names."""
+def port_tuples(draw, min_size=0, max_size=3, exclude=frozenset()):
+    """Generate a tuple of Ports with distinct names.
+
+    Parameters
+    ----------
+    exclude : frozenset[str]
+        Port names to exclude (e.g. a shared token already in use).
+    """
     n = draw(st.integers(min_value=min_size, max_value=max_size))
     names = draw(
-        st.lists(port_names, min_size=n, max_size=n, unique=True)
+        st.lists(
+            port_names.filter(lambda name: name not in exclude),
+            min_size=n,
+            max_size=n,
+            unique=True,
+        )
     )
     return tuple(port(name) for name in names)
 
@@ -69,14 +94,18 @@ def named_block(draw, name=None, iface=None):
 
 @st.composite
 def stackable_pair(draw):
-    """Generate two blocks where first.forward_out overlaps second.forward_in.
+    """Generate two blocks where first.forward_out overlaps
+    second.forward_in.
 
-    Uses a shared token to guarantee >> succeeds without explicit wiring.
+    Uses a shared token to guarantee >> succeeds without explicit
+    wiring. Extra ports exclude the shared token to prevent
+    duplicate port names.
     """
     shared = draw(port_names)
+    exclude = frozenset({shared})
 
-    extra_out = draw(port_tuples(max_size=2))
-    extra_in = draw(port_tuples(max_size=2))
+    extra_out = draw(port_tuples(max_size=2, exclude=exclude))
+    extra_in = draw(port_tuples(max_size=2, exclude=exclude))
 
     first = AtomicBlock(
         name=draw(block_names.filter(lambda n: n != "B")),
@@ -101,17 +130,17 @@ def stackable_pair(draw):
 
 @st.composite
 def interchange_quadruple(draw):
-    """Generate four blocks (f, g, h, j) for the interchange law test.
+    """Generate four blocks (f, g, h, j) for the interchange law.
 
     Interchange law: (g >> f) | (j >> h) = (g | j) >> (f | h)
 
     Requires:
     - g >> f is valid (g.forward_out overlaps f.forward_in)
     - j >> h is valid (j.forward_out overlaps h.forward_in)
-    - (g | j) >> (f | h) is valid (union of g,j forward_out overlaps
-      union of f,h forward_in)
+    - (g | j) >> (f | h) is valid (union of g,j forward_out
+      overlaps union of f,h forward_in)
 
-    Strategy: use two distinct shared tokens, one per sequential chain.
+    Strategy: two distinct shared tokens, one per sequential chain.
     """
     token1 = draw(port_names)
     token2 = draw(port_names.filter(lambda t: t != token1))
@@ -151,8 +180,10 @@ def interchange_quadruple(draw):
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def interface_eq(a: Interface, b: Interface) -> bool:
     """Compare interfaces by port name sets (order-independent)."""
+
     def port_set(ports: tuple[Port, ...]) -> frozenset[str]:
         return frozenset(p.name for p in ports)
 
@@ -165,13 +196,14 @@ def interface_eq(a: Interface, b: Interface) -> bool:
 
 
 def flat_names(block) -> list[str]:
-    """Get ordered list of atomic block names from a composition tree."""
+    """Get ordered list of atomic block names from a composition."""
     return [b.name for b in block.flatten()]
 
 
 # ---------------------------------------------------------------------------
 # Interchange Law
 # ---------------------------------------------------------------------------
+
 
 class TestInterchangeLaw:
     """The interchange law: (g >> f) | (j >> h) = (g | j) >> (f | h)
@@ -184,13 +216,10 @@ class TestInterchangeLaw:
     @given(interchange_quadruple())
     @settings(max_examples=200)
     def test_interface_equality(self, quad):
-        """Both sides of the interchange law produce the same interface."""
+        """Both sides of interchange produce the same interface."""
         f, g, h, j = quad
 
-        # Left side: (g >> f) | (j >> h)
         left = (g >> f) | (j >> h)
-
-        # Right side: (g | j) >> (f | h)
         right = (g | j) >> (f | h)
 
         assert interface_eq(left.interface, right.interface), (
@@ -215,6 +244,7 @@ class TestInterchangeLaw:
 # Associativity
 # ---------------------------------------------------------------------------
 
+
 class TestAssociativity:
     """>> and | must be associative: (a op b) op c = a op (b op c)"""
 
@@ -223,7 +253,9 @@ class TestAssociativity:
     def test_sequential_associativity(self, data):
         """(a >> b) >> c has the same interface as a >> (b >> c)."""
         token1 = data.draw(port_names)
-        token2 = data.draw(port_names.filter(lambda t: t != token1))
+        token2 = data.draw(
+            port_names.filter(lambda t: t != token1)
+        )
 
         a = AtomicBlock(
             name="a",
@@ -280,6 +312,7 @@ class TestAssociativity:
 # Commutativity of Parallel
 # ---------------------------------------------------------------------------
 
+
 class TestParallelCommutativity:
     """Parallel composition is commutative up to port ordering:
     a | b has the same port name sets as b | a.
@@ -306,25 +339,42 @@ class TestParallelCommutativity:
 # Identity / Unit
 # ---------------------------------------------------------------------------
 
+
 class TestIdentity:
-    """An empty-interface block acts as identity for both >> and |."""
+    """An empty-interface block acts as a right-identity for >> and
+    as a two-sided identity for |.
+    """
 
     @given(a=named_block(name="a"))
     @settings(max_examples=100)
-    def test_parallel_with_empty_is_identity(self, a):
+    def test_parallel_right_identity(self, a):
         """a | empty has the same interface as a."""
         empty = AtomicBlock(name="empty", interface=Interface())
-
         comp = a | empty
         assert interface_eq(comp.interface, a.interface)
 
     @given(a=named_block(name="a"))
     @settings(max_examples=100)
-    def test_sequential_with_empty_is_identity(self, a):
-        """a >> empty has the same interface as a (empty forward_in is vacuously ok)."""
+    def test_parallel_left_identity(self, a):
+        """empty | a has the same interface as a."""
         empty = AtomicBlock(name="empty", interface=Interface())
+        comp = empty | a
+        assert interface_eq(comp.interface, a.interface)
 
+    @given(a=named_block(name="a"))
+    @settings(max_examples=100)
+    def test_sequential_right_identity(self, a):
+        """a >> empty has the same interface as a."""
+        empty = AtomicBlock(name="empty", interface=Interface())
         comp = a >> empty
+        assert interface_eq(comp.interface, a.interface)
+
+    @given(a=named_block(name="a"))
+    @settings(max_examples=100)
+    def test_sequential_left_identity(self, a):
+        """empty >> a has the same interface as a."""
+        empty = AtomicBlock(name="empty", interface=Interface())
+        comp = empty >> a
         assert interface_eq(comp.interface, a.interface)
 
 
@@ -332,13 +382,14 @@ class TestIdentity:
 # Structural Properties
 # ---------------------------------------------------------------------------
 
+
 class TestStructuralProperties:
     """Additional algebraic properties of the composition operators."""
 
     @given(stackable_pair())
     @settings(max_examples=200)
     def test_sequential_flatten_order(self, pair):
-        """>> preserves left-to-right evaluation order in flatten()."""
+        """>> preserves left-to-right order in flatten()."""
         first, second = pair
         comp = first >> second
         names = flat_names(comp)
@@ -362,7 +413,7 @@ class TestStructuralProperties:
     )
     @settings(max_examples=100)
     def test_parallel_interface_is_concatenation(self, a, b):
-        """| interface is the tuple concatenation of both blocks'."""
+        """| interface is tuple concatenation of both blocks'."""
         comp = a | b
         ai, bi = a.interface, b.interface
         ci = comp.interface
@@ -374,10 +425,12 @@ class TestStructuralProperties:
     @given(stackable_pair())
     @settings(max_examples=100)
     def test_sequential_interface_is_concatenation(self, pair):
-        """>> interface is the tuple concatenation of both blocks'."""
+        """>> interface is tuple concatenation of both blocks'."""
         first, second = pair
         comp = first >> second
         fi, si = first.interface, second.interface
         ci = comp.interface
         assert ci.forward_in == fi.forward_in + si.forward_in
         assert ci.forward_out == fi.forward_out + si.forward_out
+        assert ci.backward_in == fi.backward_in + si.backward_in
+        assert ci.backward_out == fi.backward_out + si.backward_out
