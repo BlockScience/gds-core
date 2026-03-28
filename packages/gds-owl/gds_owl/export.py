@@ -371,18 +371,14 @@ def spec_to_graph(
             g.add((dep, GDS_CORE["depEntity"], Literal(entity_name)))
             g.add((dep, GDS_CORE["depVariable"], Literal(var_name)))
             g.add((ac_uri, GDS_CORE["hasDependency"], dep))
-        g.add(
-            (spec_uri, GDS_CORE["hasAdmissibilityConstraint"], ac_uri)
-        )
+        g.add((spec_uri, GDS_CORE["hasAdmissibilityConstraint"], ac_uri))
 
     # Transition signatures
     for mname, ts in spec.transition_signatures.items():
         ts_uri = _uri(ns, "transition_sig", mname)
         g.add((ts_uri, RDF.type, GDS_CORE["TransitionSignature"]))
         g.add((ts_uri, GDS_CORE["name"], Literal(mname)))
-        g.add(
-            (ts_uri, GDS_CORE["signatureMechanism"], Literal(ts.mechanism))
-        )
+        g.add((ts_uri, GDS_CORE["signatureMechanism"], Literal(ts.mechanism)))
         if ts.mechanism in block_uris:
             g.add(
                 (

@@ -86,9 +86,7 @@ class TestAdmissibleInputConstraintModel:
             ac.name = "changed"  # type: ignore[misc]
 
     def test_defaults(self):
-        ac = AdmissibleInputConstraint(
-            name="test", boundary_block="b"
-        )
+        ac = AdmissibleInputConstraint(name="test", boundary_block="b")
         assert ac.depends_on == []
         assert ac.constraint is None
         assert ac.description == ""
@@ -152,12 +150,8 @@ class TestRegistration:
             thermostat_spec.register_admissibility(ac)
 
     def test_multiple_constraints_per_boundary(self, thermostat_spec):
-        ac1 = AdmissibleInputConstraint(
-            name="limit_a", boundary_block="Sensor"
-        )
-        ac2 = AdmissibleInputConstraint(
-            name="limit_b", boundary_block="Sensor"
-        )
+        ac1 = AdmissibleInputConstraint(name="limit_a", boundary_block="Sensor")
+        ac2 = AdmissibleInputConstraint(name="limit_b", boundary_block="Sensor")
         thermostat_spec.register_admissibility(ac1)
         thermostat_spec.register_admissibility(ac2)
         assert len(thermostat_spec.admissibility_constraints) == 2
@@ -195,9 +189,7 @@ class TestValidation:
 
     def test_admissibility_unknown_block(self, thermostat_spec):
         thermostat_spec.register_admissibility(
-            AdmissibleInputConstraint(
-                name="bad", boundary_block="NonExistent"
-            )
+            AdmissibleInputConstraint(name="bad", boundary_block="NonExistent")
         )
         errors = thermostat_spec.validate_spec()
         assert any("unregistered block" in e for e in errors)
@@ -205,7 +197,8 @@ class TestValidation:
     def test_admissibility_wrong_role(self, thermostat_spec):
         thermostat_spec.register_admissibility(
             AdmissibleInputConstraint(
-                name="bad", boundary_block="Controller"  # Policy, not BoundaryAction
+                name="bad",
+                boundary_block="Controller",  # Policy, not BoundaryAction
             )
         )
         errors = thermostat_spec.validate_spec()
@@ -312,9 +305,7 @@ class TestSC008:
 
     def test_invalid_block_fails(self, thermostat_spec):
         thermostat_spec.register_admissibility(
-            AdmissibleInputConstraint(
-                name="bad", boundary_block="NonExistent"
-            )
+            AdmissibleInputConstraint(name="bad", boundary_block="NonExistent")
         )
         findings = check_admissibility_references(thermostat_spec)
         failed = [f for f in findings if not f.passed]
@@ -323,9 +314,7 @@ class TestSC008:
 
     def test_wrong_role_fails(self, thermostat_spec):
         thermostat_spec.register_admissibility(
-            AdmissibleInputConstraint(
-                name="bad", boundary_block="Heater"
-            )
+            AdmissibleInputConstraint(name="bad", boundary_block="Heater")
         )
         findings = check_admissibility_references(thermostat_spec)
         failed = [f for f in findings if not f.passed]

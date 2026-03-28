@@ -382,15 +382,9 @@ def _build_spec_framework(g: Graph) -> None:
         domain="TransitionSignature",
         range_="Mechanism",
     )
-    _add_datatype_property(
-        g, "signatureMechanism", domain="TransitionSignature"
-    )
-    _add_datatype_property(
-        g, "dependsOnBlock", domain="TransitionSignature"
-    )
-    _add_datatype_property(
-        g, "preservesInvariant", domain="TransitionSignature"
-    )
+    _add_datatype_property(g, "signatureMechanism", domain="TransitionSignature")
+    _add_datatype_property(g, "dependsOnBlock", domain="TransitionSignature")
+    _add_datatype_property(g, "preservesInvariant", domain="TransitionSignature")
     _add_object_property(
         g,
         "hasReadEntry",

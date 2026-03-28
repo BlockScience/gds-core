@@ -372,18 +372,13 @@ def build_semantic_shapes() -> Graph:
     # SC-008: Admissibility constraint must reference a BoundaryAction
     sc008_shape = GDS_SHAPE["SC008AdmissibilityShape"]
     g.add((sc008_shape, RDF.type, SH.NodeShape))
-    g.add(
-        (sc008_shape, SH.targetClass, GDS_CORE["AdmissibleInputConstraint"])
-    )
+    g.add((sc008_shape, SH.targetClass, GDS_CORE["AdmissibleInputConstraint"]))
     _add_property_shape(
         g,
         sc008_shape,
         GDS_CORE["constrainsBoundary"],
         class_=GDS_CORE["BoundaryAction"],
-        message=(
-            "SC-008: Admissibility constraint must reference "
-            "a BoundaryAction"
-        ),
+        message=("SC-008: Admissibility constraint must reference a BoundaryAction"),
     )
 
     # SC-009: Transition signature must reference a Mechanism

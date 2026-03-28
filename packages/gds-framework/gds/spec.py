@@ -69,9 +69,7 @@ class GDSSpec(Tagged):
     admissibility_constraints: dict[str, AdmissibleInputConstraint] = Field(
         default_factory=dict
     )
-    transition_signatures: dict[str, TransitionSignature] = Field(
-        default_factory=dict
-    )
+    transition_signatures: dict[str, TransitionSignature] = Field(default_factory=dict)
 
     # ── Registration ────────────────────────────────────────
 
@@ -128,23 +126,17 @@ class GDSSpec(Tagged):
         self.parameter_schema = self.parameter_schema.add(param)
         return self
 
-    def register_admissibility(
-        self, ac: AdmissibleInputConstraint
-    ) -> GDSSpec:
+    def register_admissibility(self, ac: AdmissibleInputConstraint) -> GDSSpec:
         """Register an admissible input constraint.
 
         Raises if name already registered.
         """
         if ac.name in self.admissibility_constraints:
-            raise ValueError(
-                f"Admissibility constraint '{ac.name}' already registered"
-            )
+            raise ValueError(f"Admissibility constraint '{ac.name}' already registered")
         self.admissibility_constraints[ac.name] = ac
         return self
 
-    def register_transition_signature(
-        self, ts: TransitionSignature
-    ) -> GDSSpec:
+    def register_transition_signature(self, ts: TransitionSignature) -> GDSSpec:
         """Register a transition signature. Raises if mechanism already has one."""
         if ts.mechanism in self.transition_signatures:
             raise ValueError(

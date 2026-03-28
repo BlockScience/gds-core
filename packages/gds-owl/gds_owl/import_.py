@@ -325,16 +325,12 @@ def graph_to_spec(
         )
 
     # Import admissibility constraints
-    ac_uris = list(
-        g.objects(spec_uri, GDS_CORE["hasAdmissibilityConstraint"])
-    )
+    ac_uris = list(g.objects(spec_uri, GDS_CORE["hasAdmissibilityConstraint"]))
     for ac_uri in ac_uris:
         if not isinstance(ac_uri, URIRef):
             continue
         ac_name = _str(g, ac_uri, GDS_CORE["name"])
-        ac_boundary = _str(
-            g, ac_uri, GDS_CORE["constraintBoundaryBlock"]
-        )
+        ac_boundary = _str(g, ac_uri, GDS_CORE["constraintBoundaryBlock"])
         ac_desc = _str(g, ac_uri, GDS_CORE["description"])
         depends_on: list[tuple[str, str]] = []
         for dep in g.objects(ac_uri, GDS_CORE["hasDependency"]):
@@ -352,9 +348,7 @@ def graph_to_spec(
         )
 
     # Import transition signatures
-    ts_uris = list(
-        g.objects(spec_uri, GDS_CORE["hasTransitionSignature"])
-    )
+    ts_uris = list(g.objects(spec_uri, GDS_CORE["hasTransitionSignature"]))
     for ts_uri in ts_uris:
         if not isinstance(ts_uri, URIRef):
             continue
@@ -364,9 +358,7 @@ def graph_to_spec(
             ent = _str(g, entry, GDS_CORE["readEntity"])
             var = _str(g, entry, GDS_CORE["readVariable"])
             reads.append((ent, var))
-        depends_on_blocks = _strs(
-            g, ts_uri, GDS_CORE["dependsOnBlock"]
-        )
+        depends_on_blocks = _strs(g, ts_uri, GDS_CORE["dependsOnBlock"])
         invariant = _str(g, ts_uri, GDS_CORE["preservesInvariant"])
         spec.register_transition_signature(
             TransitionSignature(
