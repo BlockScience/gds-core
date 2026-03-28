@@ -64,6 +64,7 @@ plugins:
         Games (gds-games / ogs):
           - {games/index.md: "Typed DSL for compositional game theory (Open Games)"}
           - {games/getting-started.md: "Model a Prisoner's Dilemma game"}
+          - {games/equilibrium.md: "Nash equilibrium computation via Nashpy"}
           - games/guide/*.md
           - games/design/*.md
           - games/api/*.md
@@ -119,6 +120,15 @@ plugins:
           - {psuu/getting-started.md: "Installation + first parameter sweep"}
           - psuu/guide/*.md
           - psuu/api/*.md
+        Continuous-Time (gds-continuous):
+          - {continuous/index.md: "Continuous-time ODE integration engine — 6 SciPy solvers"}
+          - {continuous/getting-started.md: "Define and simulate an ODE system"}
+        Symbolic Math (gds-symbolic):
+          - {symbolic/index.md: "SymPy bridge for gds-control — symbolic equations and linearization"}
+          - {symbolic/getting-started.md: "Compile symbolic equations to ODE functions"}
+        Analysis (gds-analysis):
+          - {analysis/index.md: "Bridge GDSSpec structural annotations to gds-sim runtime"}
+          - {analysis/getting-started.md: "Convert a GDSSpec to a runnable simulation model"}
         Case Studies:
           - {case-studies/index.md: "Real-world projects built on the GDS ecosystem"}
           - {case-studies/axelrod.md: "Axelrod tournament — one model, many views with gds-games, gds-sim, gds-psuu, gds-viz"}
@@ -224,6 +234,7 @@ nav:
               - Reports: games/guide/reports.md
               - Visualization: games/guide/visualization.md
               - CLI: games/guide/cli.md
+              - Equilibrium Analysis: games/equilibrium.md
           - Design:
               - Architecture Overview: games/design/architecture-overview.md
           - API Reference:
@@ -354,6 +365,15 @@ nav:
               - gds_psuu.optimizers: psuu/api/optimizers.md
               - gds_psuu.sweep: psuu/api/sweep.md
               - gds_psuu.results: psuu/api/results.md
+      - Continuous-Time:
+          - Overview: continuous/index.md
+          - Getting Started: continuous/getting-started.md
+      - Symbolic Math:
+          - Overview: symbolic/index.md
+          - Getting Started: symbolic/getting-started.md
+      - Analysis:
+          - Overview: analysis/index.md
+          - Getting Started: analysis/getting-started.md
   - Case Studies:
       - case-studies/index.md
       - Axelrod Tournament: case-studies/axelrod.md
