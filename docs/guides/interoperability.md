@@ -179,7 +179,7 @@ Three layers of simulation logic, each consuming only `get_payoff()`:
 Each layer is independently testable. The simulation code knows nothing about OGS composition trees, PatternIR, or GDS blocks — it only knows payoff values.
 
 !!! note "Thin runner, not a general simulator"
-    This is **not** a GDS execution engine. It is a domain-specific simulation that uses the GDS specification as its source of truth for game rules. The strategies, match logic, and evolutionary dynamics are all hand-written Python specific to the iterated PD. A general `gds-sim` would require solving the much harder problem of executing arbitrary GDS specifications — see [Research Boundaries](research-boundaries.md#research-question-2-what-does-a-timestep-mean-across-dsls).
+    This is **not** a GDS execution engine. It is a domain-specific simulation that uses the GDS specification as its source of truth for game rules. The strategies, match logic, and evolutionary dynamics are all hand-written Python specific to the iterated PD. A general `gds-sim` would require solving the much harder problem of executing arbitrary GDS specifications — see [Research Boundaries](../research/research-boundaries.md#research-question-2-what-does-a-timestep-mean-across-dsls).
 
 ---
 
@@ -290,7 +290,7 @@ All paths relative to `packages/gds-examples/`.
 
 ## Connection to Research Boundaries
 
-This work provides concrete evidence for two open questions in [Research Boundaries](research-boundaries.md):
+This work provides concrete evidence for two open questions in [Research Boundaries](../research/research-boundaries.md):
 
 **RQ2 (Timestep semantics):** The tournament simulator implements a specific execution model — synchronous iterated play with optional noise — on top of a structural specification that encodes no execution semantics. This is exactly the pattern anticipated in RQ2: "Each DSL defines its own execution contract if/when it adds simulation."
 

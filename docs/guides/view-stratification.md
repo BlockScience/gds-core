@@ -127,8 +127,8 @@ canonical, they must augment it with execution semantics from the domain
 layer. Canonical alone is insufficient for execution. This boundary must
 remain explicit to avoid the illusion that `h = f ∘ g` is a runnable program.
 
-See [RQ2 (timestep semantics)](research-boundaries.md#research-question-2-what-does-a-timestep-mean-across-dsls)
-and [RQ4 (cross-lens analysis)](research-boundaries.md#research-question-4-cross-lens-analysis-when-equilibrium-and-reachability-disagree).
+See [RQ2 (timestep semantics)](../research/research-boundaries.md#research-question-2-what-does-a-timestep-mean-across-dsls)
+and [RQ4 (cross-lens analysis)](../research/research-boundaries.md#research-question-4-cross-lens-analysis-when-equilibrium-and-reachability-disagree).
 
 ### Semantic enrichment must remain opt-in
 

@@ -261,7 +261,7 @@ Control and stock-flow systems lose the `f` semantics:
 
 ### What This Means for the Research Questions
 
-The GDS research boundaries document (docs/guides/research-boundaries.md) identified
+The GDS research boundaries document (research-boundaries.md) identified
 three key open questions. Each maps directly to the OWL representation gap:
 
 **RQ1 (MIMO semantics)**: Should vector-valued spaces become first-class?
