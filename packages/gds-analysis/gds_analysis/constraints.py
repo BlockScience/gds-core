@@ -2,14 +2,19 @@
 
 Wraps policy functions with AdmissibleInputConstraint guards that
 validate outputs against the current state before passing them downstream.
+
+The ``depends_on`` field from AdmissibleInputConstraint is used to project
+state to only the declared dependencies before calling the constraint.
+This enforces the R1 structural skeleton at runtime.
 """
 
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from gds.constraints import AdmissibleInputConstraint  # noqa: TC002
+if TYPE_CHECKING:
+    from gds.constraints import AdmissibleInputConstraint
 
 logger = logging.getLogger(__name__)
 
@@ -49,8 +54,17 @@ def guarded_policy(
         for ac in constraints:
             if ac.constraint is None:
                 continue
+            # Project state to declared dependencies (R1 skeleton).
+            # If depends_on is empty, pass full state (fallback).
+            if ac.depends_on:
+                projected = {
+                    f"{ent}.{var}": state.get(f"{ent}.{var}")
+                    for ent, var in ac.depends_on
+                }
+            else:
+                projected = state
             try:
-                if not ac.constraint(state, signal):
+                if not ac.constraint(projected, signal):
                     msg = (
                         f"Constraint '{ac.name}' violated for "
                         f"block '{ac.boundary_block}'"
