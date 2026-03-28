@@ -42,7 +42,7 @@ from gds.compiler.compile import (
 )
 
 # ── Structural annotations ────────────────────────────────
-from gds.constraints import AdmissibleInputConstraint, TransitionSignature
+from gds.constraints import AdmissibleInputConstraint, StateMetric, TransitionSignature
 
 # ── Convenience helpers ────────────────────────────────────
 from gds.helpers import (
@@ -153,6 +153,7 @@ __all__ = [
     "SpecQuery",
     "SpecWiring",
     "StackComposition",
+    "StateMetric",
     "StateVariable",
     "StructuralWiring",
     "SystemIR",

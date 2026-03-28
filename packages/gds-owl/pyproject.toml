@@ -76,6 +76,7 @@ exclude_lines = [
 
 [dependency-groups]
 dev = [
+    "hypothesis>=6.151.9",
     "mypy>=1.19.1",
     "pyright>=1.1.408",
     "pytest>=8.0",

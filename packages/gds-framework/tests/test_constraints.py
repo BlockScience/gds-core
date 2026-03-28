@@ -1,10 +1,12 @@
-"""Tests for AdmissibleInputConstraint, TransitionSignature, and SC-008/SC-009."""
+"""Tests for structural annotations: AdmissibleInputConstraint,
+TransitionSignature, StateMetric, and SC-008/SC-009.
+"""
 
 import pytest
 from pydantic import ValidationError
 
 from gds.blocks.roles import BoundaryAction, Mechanism, Policy
-from gds.constraints import AdmissibleInputConstraint, TransitionSignature
+from gds.constraints import AdmissibleInputConstraint, StateMetric, TransitionSignature
 from gds.spec import GDSSpec
 from gds.state import Entity, StateVariable
 from gds.types.interface import Interface, port
@@ -526,3 +528,95 @@ class TestQueryEngine:
         q = SpecQuery(thermostat_spec)
         readers = q.variable_readers("Room", "temperature")
         assert readers == []
+
+
+# ── StateMetric ────────────────────────────────────────────────
+
+
+class TestStateMetricModel:
+    def test_creates_frozen(self):
+        sm = StateMetric(
+            name="spatial_distance",
+            variables=[("Room", "temperature")],
+            metric_type="euclidean",
+            description="Temperature distance",
+        )
+        assert sm.name == "spatial_distance"
+        assert sm.variables == [("Room", "temperature")]
+        assert sm.metric_type == "euclidean"
+        assert sm.distance is None
+
+        with pytest.raises(ValidationError):
+            sm.name = "changed"  # type: ignore[misc]
+
+    def test_with_callable(self):
+        sm = StateMetric(
+            name="custom",
+            variables=[("Room", "temperature")],
+            distance=lambda a, b: abs(a - b),
+        )
+        assert sm.distance is not None
+        assert sm.distance(3.0, 1.0) == 2.0
+
+    def test_defaults(self):
+        sm = StateMetric(name="empty")
+        assert sm.variables == []
+        assert sm.metric_type == ""
+        assert sm.distance is None
+        assert sm.description == ""
+
+
+class TestStateMetricRegistration:
+    def test_register_chainable(self, thermostat_spec):
+        sm = StateMetric(
+            name="temp_dist",
+            variables=[("Room", "temperature")],
+            metric_type="euclidean",
+        )
+        result = thermostat_spec.register_state_metric(sm)
+        assert result is thermostat_spec
+        assert "temp_dist" in thermostat_spec.state_metrics
+
+    def test_duplicate_raises(self, thermostat_spec):
+        sm = StateMetric(name="dup", variables=[("Room", "temperature")])
+        thermostat_spec.register_state_metric(sm)
+        with pytest.raises(ValueError, match="already registered"):
+            thermostat_spec.register_state_metric(sm)
+
+
+class TestStateMetricValidation:
+    def test_valid_metric_no_errors(self, thermostat_spec):
+        thermostat_spec.register_state_metric(
+            StateMetric(
+                name="temp_dist",
+                variables=[("Room", "temperature")],
+                metric_type="euclidean",
+            )
+        )
+        errors = thermostat_spec.validate_spec()
+        assert not errors
+
+    def test_unknown_entity(self, thermostat_spec):
+        thermostat_spec.register_state_metric(
+            StateMetric(
+                name="bad",
+                variables=[("NonExistent", "x")],
+            )
+        )
+        errors = thermostat_spec.validate_spec()
+        assert any("unknown entity" in e for e in errors)
+
+    def test_unknown_variable(self, thermostat_spec):
+        thermostat_spec.register_state_metric(
+            StateMetric(
+                name="bad",
+                variables=[("Room", "nonexistent_var")],
+            )
+        )
+        errors = thermostat_spec.validate_spec()
+        assert any("unknown variable" in e for e in errors)
+
+    def test_empty_variables(self, thermostat_spec):
+        thermostat_spec.register_state_metric(StateMetric(name="empty_metric"))
+        errors = thermostat_spec.validate_spec()
+        assert any("no variables" in e for e in errors)

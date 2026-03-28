@@ -2,7 +2,7 @@
 
 The formal representability analysis classifies which GDS concepts can and cannot be represented in OWL/SHACL/SPARQL.
 
-See the full analysis: [formal-representability.md](https://github.com/BlockScience/gds-core/blob/dev/packages/gds-owl/docs/formal-representability.md)
+See the full analysis: [formal-representability.md](../../research/formal-representability.md)
 
 ## Key Results
 
