@@ -1,0 +1,4 @@
+# file: /home/rohan/Documents/Github/blockscience/gds-core/packages/gds-owl/gds_owl/shacl.py
+# hypothesis_version: 6.151.9
+
+['AtomicBlock', 'BlockIR', 'BlockIRShape', 'BoundaryAction', 'BoundaryActionShape', 'Entity', 'EntityShape', 'Finding', 'FindingShape', 'GDSSpec', 'GDSSpecShape', 'Mechanism', 'MechanismShape', 'ParameterDef', 'Policy', 'PolicyShape', 'SC005ParamRefShape', 'Space', 'SpaceShape', 'SystemIR', 'SystemIRShape', 'TransitionSignature', 'TypeDef', 'TypeDefShape', 'WiringIR', 'WiringIRShape', 'checkId', 'class', 'constrainsBoundary', 'gds-shape', 'hasInterface', 'name', 'passed', 'pythonType', 'severity', 'sh', 'signatureMechanism', 'source', 'target', 'updatesEntry', 'usesParameter', 'xsd']

@@ -232,31 +232,31 @@ class TestCrosswalkEndToEnd:
 
         Even with bad luck (l=0), crossing at the crosswalk is safe.
         """
-        spec, model = self._build_model(enforce=False)
+        _, model = self._build_model(enforce=False)
         state = {"Street.traffic_state": 1}
         # Cross at crosswalk with bad luck: still safe
         samples = [{"cross": 1, "safe_crossing": 1}]
         reached = reachable_set(
-            spec,
             model,
             state,
             input_samples=samples,
             state_key="Street.traffic_state",
-        )
+            exhaustive=True,
+        ).states
         assert all(r["Street.traffic_state"] == 0 for r in reached)
 
     def test_accident_reachable_via_jaywalking(self) -> None:
         """Jaywalking with bad luck → Accident (-1)."""
-        spec, model = self._build_model(enforce=False)
+        _, model = self._build_model(enforce=False)
         state = {"Street.traffic_state": 1}
         samples = [{"cross": 1, "safe_crossing": 0}]
         reached = reachable_set(
-            spec,
             model,
             state,
             input_samples=samples,
             state_key="Street.traffic_state",
-        )
+            exhaustive=True,
+        ).states
         assert any(r["Street.traffic_state"] == -1 for r in reached)
 
     def test_flowing_unreachable_from_accident(self) -> None:
@@ -265,7 +265,7 @@ class TestCrosswalkEndToEnd:
         Accident can only recover to Stopped (0), never directly to
         Flowing (+1).
         """
-        spec, model = self._build_model(enforce=False)
+        _, model = self._build_model(enforce=False)
         state = {"Street.traffic_state": -1}
         # Try all possible inputs from Accident
         samples = [
@@ -274,12 +274,12 @@ class TestCrosswalkEndToEnd:
             {"cross": 1, "safe_crossing": 0},
         ]
         reached = reachable_set(
-            spec,
             model,
             state,
             input_samples=samples,
             state_key="Street.traffic_state",
-        )
+            exhaustive=True,
+        ).states
         reached_states = {r["Street.traffic_state"] for r in reached}
         assert 1 not in reached_states, (
             "Flowing (+1) should be unreachable from Accident (-1)"
@@ -287,21 +287,21 @@ class TestCrosswalkEndToEnd:
 
     def test_not_crossing_preserves_flowing(self) -> None:
         """Not crossing (s=0) keeps traffic Flowing (+1)."""
-        spec, model = self._build_model(enforce=False)
+        _, model = self._build_model(enforce=False)
         state = {"Street.traffic_state": 1}
         samples = [{"cross": 0, "safe_crossing": 1}]
         reached = reachable_set(
-            spec,
             model,
             state,
             input_samples=samples,
             state_key="Street.traffic_state",
-        )
+            exhaustive=True,
+        ).states
         assert all(r["Street.traffic_state"] == 1 for r in reached)
 
     def test_all_three_states_reachable_from_flowing(self) -> None:
         """From Flowing, all three states are reachable."""
-        spec, model = self._build_model(enforce=False)
+        _, model = self._build_model(enforce=False)
         state = {"Street.traffic_state": 1}
         samples = [
             {"cross": 0, "safe_crossing": 1},  # → Flowing
@@ -309,18 +309,18 @@ class TestCrosswalkEndToEnd:
             {"cross": 1, "safe_crossing": 0},  # → Accident
         ]
         reached = reachable_set(
-            spec,
             model,
             state,
             input_samples=samples,
             state_key="Street.traffic_state",
-        )
+            exhaustive=True,
+        ).states
         reached_states = {r["Street.traffic_state"] for r in reached}
         assert reached_states == {-1, 0, 1}
 
     def test_configuration_space_from_all_states(self) -> None:
         """SCCs from a 2-depth BFS starting from all three states."""
-        spec, model = self._build_model(enforce=False)
+        _, model = self._build_model(enforce=False)
         samples = [
             {"cross": 0, "safe_crossing": 1},
             {"cross": 1, "safe_crossing": 1},
@@ -328,7 +328,6 @@ class TestCrosswalkEndToEnd:
         ]
         initials = [{"Street.traffic_state": s} for s in [1, 0, -1]]
         graph = reachable_graph(
-            spec,
             model,
             initials,
             input_samples=samples,

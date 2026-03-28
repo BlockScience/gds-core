@@ -196,12 +196,11 @@ def main():
         for d in [0.0, 0.3, 1.0, 5.0, 10.0]
     ]
     reached = reachable_set(
-        spec,
         model,
         initial,
         input_samples=samples,
         state_key="Infected.count",
-    )
+    ).states
     print(f"  {len(reached)} distinct next states found:")
     for r in sorted(reached, key=lambda x: x.get("Infected.count", 0)):
         s = r.get("Susceptible.count", 0)

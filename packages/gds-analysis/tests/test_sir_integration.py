@@ -255,7 +255,7 @@ class TestSIREndToEnd:
 
     def test_reachable_set(self) -> None:
         """R(x) from initial state with varied contact rates."""
-        spec, model = self._build_sir_model(enforce_constraints=False)
+        _, model = self._build_sir_model(enforce_constraints=False)
         state = {
             "Susceptible.count": 999.0,
             "Infected.count": 1.0,
@@ -266,17 +266,16 @@ class TestSIREndToEnd:
             for c in [1.0, 5.0, 10.0, 20.0]
         ]
         reached = reachable_set(
-            spec,
             model,
             state,
             input_samples=samples,
             state_key="Infected.count",
-        )
+        ).states
         assert len(reached) >= 1
 
     def test_reachability_graph(self) -> None:
         """Build a small reachability graph from initial state."""
-        spec, model = self._build_sir_model(enforce_constraints=False)
+        _, model = self._build_sir_model(enforce_constraints=False)
         initial = {
             "Susceptible.count": 999.0,
             "Infected.count": 1.0,
@@ -287,7 +286,6 @@ class TestSIREndToEnd:
             {"delta_s": 0, "delta_i": -1, "delta_r": 1},
         ]
         graph = reachable_graph(
-            spec,
             model,
             [initial],
             input_samples=samples,
@@ -298,7 +296,7 @@ class TestSIREndToEnd:
 
     def test_configuration_space(self) -> None:
         """SCCs should exist in the reachability graph."""
-        spec, model = self._build_sir_model(enforce_constraints=False)
+        _, model = self._build_sir_model(enforce_constraints=False)
         initial = {
             "Susceptible.count": 999.0,
             "Infected.count": 1.0,
@@ -309,7 +307,6 @@ class TestSIREndToEnd:
             {"delta_s": 0, "delta_i": -1, "delta_r": 1},
         ]
         graph = reachable_graph(
-            spec,
             model,
             [initial],
             input_samples=samples,

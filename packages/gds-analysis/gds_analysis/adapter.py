@@ -6,6 +6,19 @@ annotations from a GDSSpec and produces a gds_sim.Model that can be run.
 Users must supply the behavioral functions (policies, SUFs) that
 gds-framework deliberately leaves as R3. The adapter wires them together
 using the structural skeleton.
+
+State Key Convention
+--------------------
+State dict keys use the format ``"EntityName.VariableName"`` throughout
+gds-analysis. This convention is used by:
+
+- ``_default_initial_state()`` when building initial state from entities
+- ``guarded_policy()`` when projecting state to ``depends_on`` fields
+- ``_extract_metric_state()`` when extracting metric variables
+- ``_state_fingerprint()`` when deduplicating reached states
+
+SUF callables must return ``("EntityName.VariableName", value)`` tuples
+matching this convention.
 """
 
 from __future__ import annotations
@@ -146,7 +159,21 @@ def _build_state_update_blocks(
                     f"Missing state update function for block '{name}' (Mechanism)"
                 )
             # Key by target state variable, not block name.
-            # gds-sim validates that SUF dict keys exist in initial_state.
+            # gds-sim validates that SUF dict keys exist in
+            # initial_state.
+            #
+            # WARNING: if a Mechanism updates multiple variables,
+            # the same SUF is registered for each. The SUF must
+            # return the correct (key, value) for each state_key.
+            # gds-sim calls each SUF independently.
+            if len(block.updates) > 1:
+                warnings.warn(
+                    f"Mechanism '{name}' updates "
+                    f"{len(block.updates)} variables. The same "
+                    f"SUF will be called once per variable — "
+                    f"ensure it returns the correct key each time.",
+                    stacklevel=3,
+                )
             for entity_name, var_name in block.updates:
                 state_key = f"{entity_name}.{var_name}"
                 block_sufs[state_key] = sufs[name]
