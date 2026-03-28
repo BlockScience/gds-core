@@ -38,6 +38,9 @@ dependencies = [
     "jinja2>=3.1",
 ]
 
+[project.optional-dependencies]
+nash = ["nashpy>=0.0.41", "numpy>=1.26"]
+
 [tool.uv.sources]
 gds-framework = { workspace = true }
 
