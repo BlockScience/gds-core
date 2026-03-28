@@ -131,6 +131,23 @@ graph, R1) and `U_behav` (constraint predicate, R3) for ontological
 engineering. Same for `StateMetric` and `TransitionSignature`. The
 canonical decomposition `h = f . g` IS faithful to the paper.
 
+## Open Question: Promoting Common Constraints to R2
+
+Zargham's feedback: *"We can probably classify them as two different
+kinds of predicates -- those associated with the model structure
+(owl/shacl/sparql) and those associated with the runtime."*
+
+Currently all `TypeDef.constraint` callables are treated as R3 (lossy).
+But many common constraints ARE expressible in SHACL:
+
+- `lambda x: x >= 0` --> `sh:minInclusive 0`
+- `lambda x: 0 <= x <= 1` --> `sh:minInclusive 0` + `sh:maxInclusive 1`
+- `lambda x: x in {-1, 0, 1}` --> `sh:in (-1 0 1)`
+
+A constraint classifier could promote these from R3 to R2, making them
+round-trippable through Turtle. The general case (arbitrary callable)
+remains R3. See #152 for the design proposal.
+
 ## Files
 
 - `packages/gds-owl/` -- the full export/import/SHACL/SPARQL implementation
