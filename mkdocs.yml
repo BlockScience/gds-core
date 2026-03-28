@@ -381,5 +381,11 @@ nav:
       - Layer 0 Milestone: guides/architecture-milestone-layer0.md
       - DSL Roadmap: guides/dsl-roadmap.md
       - Research Boundaries: research/research-boundaries.md
+      - Paper Implementation Gap: research/paper-implementation-gap.md
       - View Stratification: guides/view-stratification.md
       - Ecosystem: framework/ecosystem.md
+      - Formal Verification:
+          - Verification Plan: research/verification-plan.md
+          - R3 Non-Representability: research/verification/r3-undecidability.md
+          - R1/R2 Decidability: research/verification/representability-proof.md
+          - Research Journal: research/journal.md
