@@ -1,8 +1,7 @@
 """Tests for the GDS Ecosystem self-model."""
 
-from software.gds_ecosystem.model import build_model, build_spec, build_system
-
 from gds import project_canonical, verify
+from software.gds_ecosystem.model import build_model, build_spec, build_system
 
 
 class TestEcosystemModel:
