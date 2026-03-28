@@ -70,6 +70,8 @@ from gds import (
     check_type_safety,                       # (spec) -> list[Finding]  SC-004
     check_parameter_references,              # (spec) -> list[Finding]  SC-005
     check_canonical_wellformedness,          # (spec) -> list[Finding]  SC-006/SC-007
+    check_admissibility_references,          # (spec) -> list[Finding]  SC-008
+    check_transition_reads,                  # (spec) -> list[Finding]  SC-009
 
     # Custom checks
     gds_check, get_custom_checks, all_checks,  # decorator + registries
@@ -213,7 +215,7 @@ canonical = gds.project_canonical(spec)  # derives h = f . g
 Domain-neutral engine. Blocks with bidirectional typed interfaces, composed via `>>`, `|`, `.feedback()`, `.loop()`. A 3-stage compiler flattens composition trees into flat IR. Six generic checks (G-001..G-006) validate structural properties.
 
 **Layer 1 — Specification Framework** (`spec.py`, `canonical.py`, `state.py`, `spaces.py`, `types/`):
-GDS theory layer. `GDSSpec` registry for types, spaces, entities, blocks, wirings, parameters. `project_canonical()` derives formal `h = f . g` decomposition. Seven semantic checks (SC-001..SC-007) validate domain properties.
+GDS theory layer. `GDSSpec` registry for types, spaces, entities, blocks, wirings, parameters, admissibility constraints, and transition signatures. `project_canonical()` derives formal `h = f . g` decomposition. Nine semantic checks (SC-001..SC-009) validate domain properties.
 
 Layers are loosely coupled: use the composition algebra without `GDSSpec`, or use `GDSSpec` without the compiler.
 
