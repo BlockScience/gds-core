@@ -343,9 +343,7 @@ class GDSSpec(Tagged):
         errors: list[str] = []
         for sm in self.state_metrics.values():
             if not sm.variables:
-                errors.append(
-                    f"State metric '{sm.name}' has no variables"
-                )
+                errors.append(f"State metric '{sm.name}' has no variables")
             for entity_name, var_name in sm.variables:
                 if entity_name not in self.entities:
                     errors.append(

@@ -411,9 +411,7 @@ def spec_to_graph(
         g.add((sm_uri, RDF.type, GDS_CORE["StateMetric"]))
         g.add((sm_uri, GDS_CORE["name"], Literal(sm_name)))
         if sm.metric_type:
-            g.add(
-                (sm_uri, GDS_CORE["metricType"], Literal(sm.metric_type))
-            )
+            g.add((sm_uri, GDS_CORE["metricType"], Literal(sm.metric_type)))
         g.add(
             (
                 sm_uri,
@@ -426,9 +424,7 @@ def spec_to_graph(
             entry = BNode()
             g.add((entry, RDF.type, GDS_CORE["MetricVariableEntry"]))
             g.add((entry, GDS_CORE["metricEntity"], Literal(entity_name)))
-            g.add(
-                (entry, GDS_CORE["metricVariable"], Literal(var_name))
-            )
+            g.add((entry, GDS_CORE["metricVariable"], Literal(var_name)))
             g.add((sm_uri, GDS_CORE["hasMetricVariable"], entry))
         g.add((spec_uri, GDS_CORE["hasStateMetric"], sm_uri))
 

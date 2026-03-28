@@ -617,8 +617,6 @@ class TestStateMetricValidation:
         assert any("unknown variable" in e for e in errors)
 
     def test_empty_variables(self, thermostat_spec):
-        thermostat_spec.register_state_metric(
-            StateMetric(name="empty_metric")
-        )
+        thermostat_spec.register_state_metric(StateMetric(name="empty_metric"))
         errors = thermostat_spec.validate_spec()
         assert any("no variables" in e for e in errors)

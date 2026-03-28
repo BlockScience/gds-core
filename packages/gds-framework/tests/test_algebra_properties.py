@@ -24,12 +24,8 @@ from gds.types.interface import Interface, Port, port
 # Reproducibility: fixed seed database ensures CI determinism.
 # Run with --hypothesis-seed=<N> to reproduce a specific failure.
 # ---------------------------------------------------------------------------
-settings.register_profile(
-    "ci", database=None, derandomize=True, max_examples=200
-)
-settings.register_profile(
-    "dev", max_examples=200
-)
+settings.register_profile("ci", database=None, derandomize=True, max_examples=200)
+settings.register_profile("dev", max_examples=200)
 settings.load_profile(os.getenv("HYPOTHESIS_PROFILE", "dev"))
 
 # ---------------------------------------------------------------------------
@@ -253,9 +249,7 @@ class TestAssociativity:
     def test_sequential_associativity(self, data):
         """(a >> b) >> c has the same interface as a >> (b >> c)."""
         token1 = data.draw(port_names)
-        token2 = data.draw(
-            port_names.filter(lambda t: t != token1)
-        )
+        token2 = data.draw(port_names.filter(lambda t: t != token1))
 
         a = AtomicBlock(
             name="a",
