@@ -27,6 +27,7 @@ Composition: claim >> risk >> premium >> payout >> reserve_update
 
 from gds.blocks.roles import BoundaryAction, ControlAction, Mechanism, Policy
 from gds.compiler.compile import compile_system
+from gds.constraints import AdmissibleInputConstraint
 from gds.ir.models import SystemIR
 from gds.spaces import Space
 from gds.spec import GDSSpec, SpecWiring, Wire
@@ -276,6 +277,19 @@ def build_spec() -> GDSSpec:
                     space="PayoutResultSpace",
                 ),
             ],
+        )
+    )
+
+    # Admissibility constraint: claim amount bounded by insurer reserve.
+    # Paper Def 2.5 — U_x: the set of admissible inputs depends on state.
+    spec.register_admissibility(
+        AdmissibleInputConstraint(
+            name="solvency_constraint",
+            boundary_block="Claim Arrival",
+            depends_on=[("Insurer", "reserve")],
+            constraint=lambda state, u: u.get("amount", 0)
+            <= state["Insurer"]["reserve"],
+            description="Claim amount cannot exceed insurer reserve (solvency)",
         )
     )
 

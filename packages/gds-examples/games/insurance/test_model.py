@@ -144,6 +144,20 @@ class TestSpec:
             "coverage_limit",
         }
 
+    def test_admissibility_constraint_registered(self):
+        spec = build_spec()
+        assert len(spec.admissibility_constraints) == 1
+        ac = spec.admissibility_constraints["solvency_constraint"]
+        assert ac.boundary_block == "Claim Arrival"
+        assert ("Insurer", "reserve") in ac.depends_on
+
+    def test_admissibility_sc008_passes(self):
+        from gds.verification.spec_checks import check_admissibility_references
+
+        spec = build_spec()
+        findings = check_admissibility_references(spec)
+        assert all(f.passed for f in findings)
+
 
 class TestVerification:
     def test_ir_compilation(self):

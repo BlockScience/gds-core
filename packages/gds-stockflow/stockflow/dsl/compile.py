@@ -391,6 +391,23 @@ def compile_model(model: StockFlowModel) -> GDSSpec:
             )
         )
 
+    # 7. Register transition signatures (mechanism read dependencies)
+    from gds.constraints import TransitionSignature
+
+    for stock in model.stocks:
+        connected_flows = [
+            flow.name
+            for flow in model.flows
+            if flow.target == stock.name or flow.source == stock.name
+        ]
+        spec.register_transition_signature(
+            TransitionSignature(
+                mechanism=_accumulation_block_name(stock.name),
+                reads=[(stock.name, "level")],
+                depends_on_blocks=connected_flows,
+            )
+        )
+
     return spec
 
 

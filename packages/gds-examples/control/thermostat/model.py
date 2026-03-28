@@ -29,6 +29,7 @@ Composition: (sensor >> controller >> plant >> update).feedback(
 from gds.blocks.composition import Wiring
 from gds.blocks.roles import BoundaryAction, ControlAction, Mechanism, Policy
 from gds.compiler.compile import compile_system
+from gds.constraints import AdmissibleInputConstraint
 from gds.ir.models import FlowDirection, SystemIR
 from gds.spaces import Space
 from gds.spec import GDSSpec, SpecWiring, Wire
@@ -252,6 +253,17 @@ def build_spec() -> GDSSpec:
                     space="EnergyCostSpace",
                 ),
             ],
+        )
+    )
+
+    # Admissibility constraint: sensor reading depends on room temperature.
+    # Paper Def 2.5 — U_x: the observation is state-dependent.
+    spec.register_admissibility(
+        AdmissibleInputConstraint(
+            name="sensor_state_dependency",
+            boundary_block="Temperature Sensor",
+            depends_on=[("Room", "temperature")],
+            description="Sensor reading depends on actual room temperature",
         )
     )
 
