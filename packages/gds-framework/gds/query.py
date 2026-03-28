@@ -103,6 +103,29 @@ class SpecQuery:
 
         return sorted(all_affecting)
 
+    def admissibility_dependency_map(self) -> dict[str, list[tuple[str, str]]]:
+        """Map boundary block -> state variables constraining its inputs."""
+        result: dict[str, list[tuple[str, str]]] = {}
+        for ac in self.spec.admissibility_constraints.values():
+            result.setdefault(ac.boundary_block, []).extend(ac.depends_on)
+        return result
+
+    def mechanism_read_map(self) -> dict[str, list[tuple[str, str]]]:
+        """Map mechanism -> state variables it reads."""
+        return {
+            mname: list(ts.reads)
+            for mname, ts in self.spec.transition_signatures.items()
+        }
+
+    def variable_readers(self, entity: str, variable: str) -> list[str]:
+        """Which mechanisms declare reading this state variable?"""
+        ref = (entity, variable)
+        return [
+            mname
+            for mname, ts in self.spec.transition_signatures.items()
+            if ref in ts.reads
+        ]
+
     @staticmethod
     def _can_reach(adj: dict[str, set[str]], source: str, target: str) -> bool:
         """BFS reachability check."""
