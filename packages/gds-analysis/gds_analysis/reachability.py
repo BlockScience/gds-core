@@ -18,11 +18,36 @@ merge SCCs. For discrete systems, provide exhaustive input samples.
 
 from __future__ import annotations
 
+from dataclasses import dataclass, field
 from typing import Any
 
 from gds_sim import Model, Simulation
 
 _META_KEYS = frozenset({"timestep", "substep", "run", "subset"})
+
+
+@dataclass
+class ReachabilityResult:
+    """Result of a reachable set computation with coverage metadata.
+
+    Attributes
+    ----------
+    states
+        Distinct reached states.
+    n_samples
+        Number of input samples tried.
+    n_distinct
+        Number of distinct states found.
+    is_exhaustive
+        Whether the caller declared the input samples as exhaustive.
+        When True, ``states`` is the exact R(x). When False, it is
+        a lower bound (unsampled inputs may reach additional states).
+    """
+
+    states: list[dict[str, Any]] = field(default_factory=list)
+    n_samples: int = 0
+    n_distinct: int = 0
+    is_exhaustive: bool = False
 
 
 def reachable_set(
@@ -31,7 +56,9 @@ def reachable_set(
     *,
     input_samples: list[dict[str, Any]],
     state_key: str | None = None,
-) -> list[dict[str, Any]]:
+    exhaustive: bool = False,
+    float_tolerance: float | None = None,
+) -> ReachabilityResult:
     """Compute the reachable set R(x) by running one timestep per input.
 
     Parameters
@@ -43,28 +70,43 @@ def reachable_set(
     input_samples
         List of input dicts to try. Each dict overrides the policy
         outputs for one simulation step. For discrete state spaces,
-        pass exhaustive inputs for exact R(x). For continuous spaces,
-        results are approximate (no coverage guarantee).
+        pass exhaustive inputs and set ``exhaustive=True`` for exact
+        R(x). For continuous spaces, results are approximate (no
+        coverage guarantee).
     state_key
         If provided, extract only this key from each reached state
         for comparison. Otherwise return full state dicts.
+    exhaustive
+        If True, declares that ``input_samples`` covers the full
+        input space. The result's ``is_exhaustive`` flag is set
+        accordingly. This is a caller assertion, not verified.
+    float_tolerance
+        If provided, round float values to this number of decimal
+        places before fingerprinting. This prevents distinct
+        fingerprints from float rounding noise. For example,
+        ``float_tolerance=6`` rounds to 6 decimal places.
 
     Returns
     -------
-    List of distinct reached states (one per input sample that
-    produced a unique next state).
+    ReachabilityResult
+        Contains the distinct reached states plus coverage metadata.
     """
     reached: list[dict[str, Any]] = []
     seen: set[tuple[Any, ...]] = set()
 
     for sample in input_samples:
         next_state = _step_once(model, state, sample)
-        fingerprint = _state_fingerprint(next_state, state_key)
+        fingerprint = _state_fingerprint(next_state, state_key, float_tolerance)
         if fingerprint not in seen:
             seen.add(fingerprint)
             reached.append(next_state)
 
-    return reached
+    return ReachabilityResult(
+        states=reached,
+        n_samples=len(input_samples),
+        n_distinct=len(reached),
+        is_exhaustive=exhaustive,
+    )
 
 
 def reachable_graph(
@@ -74,6 +116,8 @@ def reachable_graph(
     input_samples: list[dict[str, Any]],
     max_depth: int = 1,
     state_key: str | None = None,
+    exhaustive: bool = False,
+    float_tolerance: float | None = None,
 ) -> dict[tuple[Any, ...], list[tuple[Any, ...]]]:
     """Build a reachability graph by BFS from initial states.
 
@@ -91,6 +135,10 @@ def reachable_graph(
         Maximum BFS depth (number of steps from initial states).
     state_key
         Key to extract for state fingerprinting.
+    exhaustive
+        Passed through to ``reachable_set`` at each node.
+    float_tolerance
+        Passed through to ``reachable_set`` at each node.
 
     Returns
     -------
@@ -104,20 +152,24 @@ def reachable_graph(
     for _ in range(max_depth):
         next_frontier: list[dict[str, Any]] = []
         for state in frontier:
-            fp = _state_fingerprint(state, state_key)
+            fp = _state_fingerprint(state, state_key, float_tolerance)
             if fp in visited:
                 continue
             visited.add(fp)
 
-            neighbors = reachable_set(
+            result = reachable_set(
                 model,
                 state,
                 input_samples=input_samples,
                 state_key=state_key,
+                exhaustive=exhaustive,
+                float_tolerance=float_tolerance,
             )
-            neighbor_fps = [_state_fingerprint(n, state_key) for n in neighbors]
+            neighbor_fps = [
+                _state_fingerprint(n, state_key, float_tolerance) for n in result.states
+            ]
             graph[fp] = neighbor_fps
-            next_frontier.extend(neighbors)
+            next_frontier.extend(result.states)
 
         frontier = next_frontier
         if not frontier:
@@ -239,8 +291,31 @@ def _step_once(
 def _state_fingerprint(
     state: dict[str, Any],
     state_key: str | None,
+    float_tolerance: float | None = None,
 ) -> tuple[Any, ...]:
-    """Create a hashable fingerprint of a state for deduplication."""
+    """Create a hashable fingerprint of a state for deduplication.
+
+    Parameters
+    ----------
+    state
+        State dict to fingerprint.
+    state_key
+        If provided, fingerprint only this key.
+    float_tolerance
+        If provided (as number of decimal places), round float values
+        before fingerprinting to absorb rounding noise.
+    """
     if state_key is not None:
-        return (state_key, state.get(state_key))
-    return tuple(sorted((k, v) for k, v in state.items() if k not in _META_KEYS))
+        val = state.get(state_key)
+        if float_tolerance is not None and isinstance(val, float):
+            val = round(val, int(float_tolerance))
+        return (state_key, val)
+
+    items = []
+    for k, v in sorted(state.items()):
+        if k in _META_KEYS:
+            continue
+        if float_tolerance is not None and isinstance(v, float):
+            v = round(v, int(float_tolerance))
+        items.append((k, v))
+    return tuple(items)
