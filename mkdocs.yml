@@ -109,6 +109,11 @@ plugins:
           - guides/dsl-roadmap.md
           - guides/research-boundaries.md
           - guides/view-stratification.md
+        OWL (gds-owl):
+          - {owl/index.md: "OWL/SHACL/SPARQL for GDS specifications — semantic web interoperability"}
+          - {owl/getting-started.md: "Export a spec to Turtle, import back, validate with SHACL"}
+          - owl/guide/*.md
+          - owl/api/*.md
         PSUU (gds-psuu):
           - {psuu/index.md: "Parameter space search under uncertainty for gds-sim"}
           - {psuu/getting-started.md: "Installation + first parameter sweep"}
@@ -319,6 +324,20 @@ nav:
               - gds_software.dependency.compile: software/api/dep-compile.md
               - gds_software.dependency.checks: software/api/dep-checks.md
               - gds_software.verification: software/api/verification.md
+      - OWL:
+          - Overview: owl/index.md
+          - Getting Started: owl/getting-started.md
+          - User Guide:
+              - Representability: owl/guide/representability.md
+              - Formal Analysis: owl/guide/formal-representability.md
+          - API Reference:
+              - gds_owl: owl/api/init.md
+              - gds_owl.ontology: owl/api/ontology.md
+              - gds_owl.export: owl/api/export.md
+              - gds_owl.import_: owl/api/import.md
+              - gds_owl.shacl: owl/api/shacl.md
+              - gds_owl.sparql: owl/api/sparql.md
+              - gds_owl.serialize: owl/api/serialize.md
       - PSUU:
           - Overview: psuu/index.md
           - Getting Started: psuu/getting-started.md

@@ -146,6 +146,20 @@ class TestSpec:
         spec = build_spec()
         assert set(spec.parameters.keys()) == {"setpoint", "Kp", "Ki", "Kd"}
 
+    def test_admissibility_constraint_registered(self):
+        spec = build_spec()
+        assert len(spec.admissibility_constraints) == 1
+        ac = spec.admissibility_constraints["sensor_state_dependency"]
+        assert ac.boundary_block == "Temperature Sensor"
+        assert ("Room", "temperature") in ac.depends_on
+
+    def test_admissibility_sc008_passes(self):
+        from gds.verification.spec_checks import check_admissibility_references
+
+        spec = build_spec()
+        findings = check_admissibility_references(spec)
+        assert all(f.passed for f in findings)
+
 
 class TestVerification:
     def test_generic_checks_pass(self):

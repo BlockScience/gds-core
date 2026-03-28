@@ -80,7 +80,7 @@ gds-sim        ←  simulation engine (standalone — no gds-framework dep, only
 Domain-neutral engine. Blocks with bidirectional typed interfaces, composed via four operators (`>>`, `|`, `.feedback()`, `.loop()`). A 3-stage compiler flattens composition trees into flat IR (blocks + wirings + hierarchy). Six generic verification checks (G-001..G-006) validate structural properties on the IR.
 
 **Layer 1 — Specification Framework** (`spec.py`, `canonical.py`, `state.py`, `spaces.py`, `types/`):
-Where GDS theory lives. `GDSSpec` is the central registry for types, spaces, entities, blocks, wirings, and parameters. `project_canonical()` derives the formal `h = f ∘ g` decomposition. Seven semantic checks (SC-001..SC-007) validate domain properties on the spec.
+Where GDS theory lives. `GDSSpec` is the central registry for types, spaces, entities, blocks, wirings, and parameters. `project_canonical()` derives the formal `h = f ∘ g` decomposition. Nine semantic checks (SC-001..SC-009) validate domain properties on the spec.
 
 These layers are loosely coupled — you can use the composition algebra without `GDSSpec`, and `GDSSpec` does not depend on the compiler.
 
@@ -140,7 +140,7 @@ Block roles (`BoundaryAction`, `Policy`, `Mechanism`, `ControlAction`) subclass 
 Both use the pluggable pattern: `Callable[[T], list[Finding]]`.
 
 - **Generic checks (G-001..G-006)** operate on `SystemIR` — structural topology only
-- **Semantic checks (SC-001..SC-007)** operate on `GDSSpec` — domain properties (completeness, determinism, reachability, type safety, parameter references, canonical wellformedness)
+- **Semantic checks (SC-001..SC-009)** operate on `GDSSpec` — domain properties (completeness, determinism, reachability, type safety, parameter references, canonical wellformedness, admissibility references, transition read consistency)
 - **Domain checks** operate on domain models (e.g., `StockFlowModel`, `ControlModel`) — pre-compilation structural validation
 
 ### Branching Workflow

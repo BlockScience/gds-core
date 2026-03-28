@@ -378,6 +378,21 @@ def compile_model(model: ControlModel) -> GDSSpec:
             )
         )
 
+    # 7. Register transition signatures (mechanism read dependencies)
+    from gds.constraints import TransitionSignature
+
+    for state in model.states:
+        driving_controllers = [
+            ctrl.name for ctrl in model.controllers if state.name in ctrl.drives
+        ]
+        spec.register_transition_signature(
+            TransitionSignature(
+                mechanism=_dynamics_block_name(state.name),
+                reads=[(state.name, "value")],
+                depends_on_blocks=driving_controllers,
+            )
+        )
+
     return spec
 
 

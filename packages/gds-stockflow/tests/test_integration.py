@@ -81,6 +81,14 @@ class TestPopulationEndToEnd:
         errors = spec.validate_spec()
         assert len(errors) == 0, f"Spec validation errors: {errors}"
 
+    def test_transition_signatures_emitted(self, model):
+        spec = compile_model(model)
+        assert len(spec.transition_signatures) == 1
+        ts = spec.transition_signatures["Population Accumulation"]
+        assert ("Population", "level") in ts.reads
+        assert "Births" in ts.depends_on_blocks
+        assert "Deaths" in ts.depends_on_blocks
+
 
 class TestPredatorPreyEndToEnd:
     """Two-stock predator-prey model."""
