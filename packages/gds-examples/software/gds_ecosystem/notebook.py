@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.20.4"
+__generated_with = "0.20.2"
 app = marimo.App(width="medium", app_title="GDS Ecosystem Self-Model")
 
 
@@ -43,9 +43,9 @@ def imports():
         Component,
         ComponentModel,
         Connector,
+        DFDModel,
         DataFlow,
         DataStore,
-        DFDModel,
         ERDEntity,
         ERDModel,
         ERDRelationship,
@@ -67,21 +67,22 @@ def imports():
 
 @app.cell
 def intro(mo):
-    mo.md("""# GDS Ecosystem Self-Model
+    mo.md("""
+    # GDS Ecosystem Self-Model
 
-The GDS framework models **itself** using three of its own
-software architecture diagram types. This is dog-fooding:
-the framework's DSLs, compilers, and verification checks
-are applied to the framework's own package structure.
+    The GDS framework models **itself** using three of its own
+    software architecture diagram types. This is dog-fooding:
+    the framework's DSLs, compilers, and verification checks
+    are applied to the framework's own package structure.
 
-Each diagram type reveals a different canonical form:
+    Each diagram type reveals a different canonical form:
 
-| Diagram | Canonical | What it reveals |
-|---------|-----------|-----------------|
-| Component | h = g | Package API dependencies (stateless) |
-| DFD | h = f . g | User data pipeline (full dynamics) |
-| ERD | h = f | Pydantic model graph (pure state) |
-""")
+    | Diagram | Canonical | What it reveals |
+    |---------|-----------|-----------------|
+    | Component | h = g | Package API dependencies (stateless) |
+    | DFD | h = f . g | User data pipeline (full dynamics) |
+    | ERD | h = f | Pydantic model graph (pure state) |
+    """)
     return
 
 
@@ -255,7 +256,12 @@ def component_results(
     )
 
     _mermaid = system_to_mermaid(_ir)
-    mo.mermaid(_mermaid)
+    mo.vstack(
+        [
+            mo.md("### Package Dependency Graph"),
+            mo.mermaid(_mermaid),
+        ]
+    )
     return
 
 
@@ -382,7 +388,12 @@ def dfd_model(
         """
     )
 
-    mo.mermaid(system_to_mermaid(_ir))
+    mo.vstack(
+        [
+            mo.md("### User Data Pipeline"),
+            mo.mermaid(system_to_mermaid(_ir)),
+        ]
+    )
     return
 
 
@@ -542,26 +553,32 @@ def erd_model(
         """
     )
 
-    mo.mermaid(system_to_mermaid(_ir))
+    mo.vstack(
+        [
+            mo.md("### Pydantic Model Graph (Entity-Relationships)"),
+            mo.mermaid(system_to_mermaid(_ir)),
+        ]
+    )
     return
 
 
 @app.cell
 def summary(mo):
-    mo.md("""## Canonical Spectrum
+    mo.md("""
+    ## Canonical Spectrum
 
-| Diagram | dim(X) | dim(f) | dim(g) | Form | Character |
-|---------|--------|--------|--------|------|-----------|
-| Component | 0 | 0 | 6 | h = g | Stateless API composition |
-| DFD | 4 | 4 | 7 | h = f . g | Full dynamical pipeline |
-| ERD | 20 | 9 | 0 | h = f | Pure state (closed system) |
+    | Diagram | dim(X) | dim(f) | dim(g) | Form | Character |
+    |---------|--------|--------|--------|------|-----------|
+    | Component | 0 | 0 | 6 | h = g | Stateless API composition |
+    | DFD | 4 | 4 | 7 | h = f . g | Full dynamical pipeline |
+    | ERD | 20 | 9 | 0 | h = f | Pure state (closed system) |
 
-The three canonical forms span the full spectrum of GDS
-dynamical character -- from stateless (games-like) through full
-dynamics (control-like) to pure state (data model). This
-validates that GDS's canonical decomposition h = f . g is
-genuinely universal across diagram types.
-""")
+    The three canonical forms span the full spectrum of GDS
+    dynamical character -- from stateless (games-like) through full
+    dynamics (control-like) to pure state (data model). This
+    validates that GDS's canonical decomposition h = f . g is
+    genuinely universal across diagram types.
+    """)
     return
 
 
