@@ -7,7 +7,7 @@ A hands-on walkthrough of the three verification layers in GDS, using deliberate
 | Layer | Checks | Operates on | Catches |
 |-------|--------|-------------|---------|
 | **Generic** | G-001..G-006 | `SystemIR` | Structural topology errors |
-| **Semantic** | SC-001..SC-007 | `GDSSpec` | Domain property violations |
+| **Semantic** | SC-001..SC-009 | `GDSSpec` | Domain property violations |
 | **Domain** | SF-001..SF-005 | DSL model | DSL-specific errors |
 
 Each layer operates on a different representation, and the layers are complementary: a model can pass all generic checks but fail semantic checks (and vice versa).
@@ -357,6 +357,8 @@ gds_findings = [f for f in report.findings if f.check_id.startswith("G-")]
 | SC-005 | Parameter refs | Unregistered params |
 | SC-006 | Canonical f | No mechanisms |
 | SC-007 | Canonical X | No state space |
+| SC-008 | Admissibility refs | Invalid boundary block or state deps |
+| SC-009 | Transition reads | Invalid mechanism reads or block deps |
 
 ### Domain Checks (StockFlowModel)
 
