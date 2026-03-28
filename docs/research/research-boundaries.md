@@ -6,7 +6,7 @@
 
 ## Status: What Has Been Validated
 
-Three independent DSLs now compile to the same algebraic core:
+Six independent DSLs now compile to the same algebraic core:
 
 | DSL | Domain | Decision layer (g) | Update layer (f) | Canonical |
 |---|---|---|---|---|
@@ -26,7 +26,7 @@ Key structural facts:
 - Canonical `h = f ∘ g` has survived three domains with no extensions required.
 - No DSL uses `ControlAction` — all non-state-updating blocks map to `Policy`.
 - Role partition (boundary, policy, mechanism) is complete and disjoint in every case.
-- Cross-built equivalence (DSL-compiled vs hand-built) has been verified at Spec, Canonical, and SystemIR levels for all three DSLs.
+- Cross-built equivalence (DSL-compiled vs hand-built) has been verified at Spec, Canonical, and SystemIR levels for all validated DSLs.
 - OGS canonical validation confirms `f = ∅`, `X = ∅` — compositional game theory is a **degenerate dynamical system** where `h = g` (pure policy, no state transition). See [RQ3](#research-question-3-ogs-as-degenerate-dynamical-system) below.
 
 A canonical composition pattern has emerged across DSLs:
@@ -358,7 +358,7 @@ These are view-layer concerns (Layer 4). Whether to consolidate `PatternIR` into
 
 ### Background
 
-With three DSLs compiling to GDSSpec, the framework now supports two independent analytical lenses on the same system:
+With six DSLs compiling to GDSSpec, the framework now supports two independent analytical lenses on the same system:
 
 1. **Game-theoretic lens** (via PatternIR) — equilibria, incentive compatibility, strategic structure, utility propagation
 2. **Dynamical lens** (via GDSSpec/CanonicalGDS) — reachability, controllability, stability, state-space structure
@@ -437,7 +437,7 @@ Do not attempt to resolve the tension architecturally. Keep the lenses parallel.
 
 These questions mark the boundary between:
 
-- **Structural compositional modeling** — validated by three DSLs, canonical proven stable
+- **Structural compositional modeling** — validated by six DSLs, canonical proven stable
 - **Dynamical execution and control-theoretic analysis** — the next frontier
 
 They are the first genuine architectural fork points after validating canonical centrality.
@@ -450,9 +450,9 @@ Neither question requires immediate resolution. Both are triggered by concrete f
 |---|---|
 | Building a structural controllability analyzer | RQ1 (MIMO semantics) |
 | Building a shared simulation harness | RQ2 (timestep semantics) |
-| Adding a continuous-time DSL | RQ1 + RQ2 |
+| Adding a continuous-time DSL | RQ1 + RQ2 | **Done** — `gds-continuous` |
 | Adding a hybrid systems DSL | RQ1 + RQ2 |
-| Extracting state-space matrices (A, B, C, D) | RQ1 |
+| Extracting state-space matrices (A, B, C, D) | RQ1 | **Done** — `gds-symbolic` linearize |
 | Consolidating OGS PatternIR into GDSSpec | RQ3 (refactoring decision) |
 | Adding a stateless DSL (signal processing, Bayesian networks) | RQ3 (validates X=∅ pattern) |
 
@@ -467,7 +467,7 @@ After three independent domains with three distinct canonical profiles (`h = g`,
 - The role system (Boundary, Policy, Mechanism) covers all three domains without `ControlAction`.
 - The type/space system handles semantic separation across all three domains.
 - The temporal loop pattern is structurally uniform and semantically adequate for structural modeling.
-- Cross-built equivalence holds at Spec, Canonical, and SystemIR levels for all three DSLs.
+- Cross-built equivalence holds at Spec, Canonical, and SystemIR levels for all validated DSLs.
 
 The canonical form `(x, u) ↦ x'` with varying dimensionality of X now functions as a **unified transition calculus** — not merely a decomposition of dynamical systems, but a typed algebra of transition structure that absorbs stateless (games), stateful (control), and state-dominant (stockflow) formalisms under one composition substrate.
 
