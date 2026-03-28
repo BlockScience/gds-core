@@ -137,7 +137,7 @@ class TestSpecToGraph:
     def test_custom_base_uri(self, thermostat_spec: GDSSpec) -> None:
         g = spec_to_graph(thermostat_spec, base_uri="https://example.com/")
         ttl = g.serialize(format="turtle")
-        assert "example.com" in ttl
+        assert "https://example.com/" in ttl
 
 
 class TestSystemIRToGraph:
