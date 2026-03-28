@@ -205,9 +205,7 @@ class TestVerifyConservation:
 
         times = results.times
         rows = results.to_list()
-        states = [
-            [row[n] for n in system.augmented_names] for row in rows
-        ]
+        states = [[row[n] for n in system.augmented_names] for row in rows]
 
         # Conservation won't be exact for non-optimal trajectories,
         # but we can check the function runs without error
