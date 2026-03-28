@@ -124,7 +124,6 @@ def main():
     for start_state in [1, 0, -1]:
         state = {"Street.traffic_state": start_state}
         reached = reachable_set(
-            spec,
             model,
             state,
             input_samples=input_samples,
@@ -142,7 +141,6 @@ def main():
 
     initials = [{"Street.traffic_state": s} for s in [1, 0, -1]]
     graph = reachable_graph(
-        spec,
         model,
         initials,
         input_samples=input_samples,
@@ -209,7 +207,6 @@ def main():
     print("=" * 60)
     # Check: Flowing unreachable from Accident?
     accident_reached = reachable_set(
-        spec,
         model,
         {"Street.traffic_state": -1},
         input_samples=input_samples,

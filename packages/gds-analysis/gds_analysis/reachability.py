@@ -4,27 +4,28 @@ Paper Definition 4.1: R(x) = union over u in U_x of {f(x, u)}
 
 Given a state x, the reachable set R(x) is the set of all states
 reachable in one step by applying any admissible input. For discrete
-input spaces, this can be computed exactly by enumeration. For
-continuous spaces, Monte Carlo sampling approximates R(x).
+input spaces with exhaustive enumeration, R(x) is exact. For
+continuous spaces, Monte Carlo sampling approximates R(x) without
+coverage guarantees.
 
 Paper Definition 4.2: X_C is the configuration space -- the largest
 set of mutually reachable states (largest SCC of the reachability graph).
+
+Note: configuration_space operates on the sampled graph, not the true
+transition structure. Missing edges (unsampled inputs) may split or
+merge SCCs. For discrete systems, provide exhaustive input samples.
 """
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from gds_sim import Model, Simulation
-
-if TYPE_CHECKING:
-    from gds import GDSSpec
 
 _META_KEYS = frozenset({"timestep", "substep", "run", "subset"})
 
 
 def reachable_set(
-    spec: GDSSpec,
     model: Model,
     state: dict[str, Any],
     *,
@@ -35,16 +36,15 @@ def reachable_set(
 
     Parameters
     ----------
-    spec
-        GDSSpec (used for structural metadata; not directly executed).
     model
         A gds_sim.Model with policies and SUFs already wired.
     state
         The current state x from which to compute reachability.
     input_samples
         List of input dicts to try. Each dict overrides the policy
-        outputs for one simulation step. For BoundaryAction blocks,
-        these represent exogenous inputs u.
+        outputs for one simulation step. For discrete state spaces,
+        pass exhaustive inputs for exact R(x). For continuous spaces,
+        results are approximate (no coverage guarantee).
     state_key
         If provided, extract only this key from each reached state
         for comparison. Otherwise return full state dicts.
@@ -68,7 +68,6 @@ def reachable_set(
 
 
 def reachable_graph(
-    spec: GDSSpec,
     model: Model,
     initial_states: list[dict[str, Any]],
     *,
@@ -80,14 +79,14 @@ def reachable_graph(
 
     Parameters
     ----------
-    spec
-        GDSSpec for structural metadata.
     model
         A gds_sim.Model with policies and SUFs wired.
     initial_states
         Starting states for the BFS.
     input_samples
         Inputs to try at each state (same set applied everywhere).
+        For discrete systems, use exhaustive enumeration for exact
+        graphs. For continuous systems, results are approximate.
     max_depth
         Maximum BFS depth (number of steps from initial states).
     state_key
@@ -111,7 +110,6 @@ def reachable_graph(
             visited.add(fp)
 
             neighbors = reachable_set(
-                spec,
                 model,
                 state,
                 input_samples=input_samples,
@@ -139,6 +137,10 @@ def configuration_space(
     the configuration space X_C.
 
     Uses iterative Tarjan's algorithm (no recursion limit).
+
+    Note: SCCs are only as complete as the input graph. For sampled
+    (non-exhaustive) graphs, missing edges may cause SCCs to be
+    smaller than the true configuration space.
     """
     index_counter = 0
     stack: list[tuple[Any, ...]] = []
@@ -179,7 +181,6 @@ def configuration_space(
             if found_unvisited:
                 continue
 
-            # All neighbors processed — check for SCC root.
             if lowlink[v] == index[v]:
                 scc: set[tuple[Any, ...]] = set()
                 while True:
@@ -191,7 +192,6 @@ def configuration_space(
                 sccs.append(scc)
 
             work.pop()
-            # Update parent's lowlink.
             if work:
                 parent = work[-1][0]
                 lowlink[parent] = min(lowlink[parent], lowlink[v])
@@ -210,7 +210,6 @@ def _step_once(
     runs for 1 timestep, and returns the resulting state with metadata
     keys stripped.
     """
-    # Strip any metadata keys from incoming state (from prior BFS steps).
     clean_state = {k: v for k, v in state.items() if k not in _META_KEYS}
 
     def _override_policy(st: dict, params: dict, **kw: Any) -> dict:
@@ -234,7 +233,6 @@ def _step_once(
     results = sim.run()
     rows = results.to_list()
     raw = rows[-1] if rows else dict(clean_state)
-    # Strip gds-sim metadata keys from the result.
     return {k: v for k, v in raw.items() if k not in _META_KEYS}
 
 
