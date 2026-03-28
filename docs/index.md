@@ -27,36 +27,65 @@ Key guides include embedded [marimo](https://marimo.io) notebooks — run code, 
 
 ## Packages
 
-| PyPI Package | Import Name | Description |
+Install just what you need: `uv add gds-core[control,continuous]`
+
+### Structural Specification
+
+| Package | Import | Description |
 |---|---|---|
-| `gds-framework` | `gds` | Core engine — blocks, composition algebra, compiler, verification |
-| `gds-viz` | `gds_viz` | Mermaid diagram renderers for GDS specifications |
-| `gds-stockflow` | `stockflow` | Declarative stock-flow DSL over GDS semantics |
-| `gds-control` | `gds_control` | State-space control DSL over GDS semantics |
-| `gds-games` | `ogs` | Typed DSL for compositional game theory (Open Games) |
-| `gds-software` | `gds_software` | Software architecture DSL (DFD, state machine, C4, ERD, etc.) |
-| `gds-business` | `gds_business` | Business dynamics DSL (CLD, supply chain, value stream map) |
-| `gds-sim` | `gds_sim` | Simulation engine — Model, Simulation, Results |
-| `gds-psuu` | `gds_psuu` | Parameter space search under uncertainty for gds-sim |
-| `gds-examples` | — | Tutorial models demonstrating framework features |
+| [`gds-framework`](framework/index.md) | `gds` | Core engine -- composition algebra, compiler, verification |
+| [`gds-viz`](viz/index.md) | `gds_viz` | Mermaid diagrams + [phase portraits](viz/index.md) `[phase]` |
+| [`gds-owl`](owl/index.md) | `gds_owl` | OWL/SHACL/SPARQL export for formal representability |
+
+### Domain DSLs
+
+| Package | Import | Description |
+|---|---|---|
+| [`gds-stockflow`](stockflow/index.md) | `stockflow` | Declarative stock-flow DSL |
+| [`gds-control`](control/index.md) | `gds_control` | State-space control DSL |
+| [`gds-games`](games/index.md) | `ogs` | Compositional game theory + [Nash equilibrium](games/equilibrium.md) `[nash]` |
+| [`gds-software`](software/index.md) | `gds_software` | Software architecture DSL (DFD, SM, C4, ERD) |
+| [`gds-business`](business/index.md) | `gds_business` | Business dynamics DSL (CLD, SCN, VSM) |
+| [`gds-symbolic`](symbolic/index.md) | `gds_symbolic` | SymPy bridge for control models `[sympy]` |
+
+### Simulation & Analysis
+
+| Package | Import | Description |
+|---|---|---|
+| [`gds-sim`](https://pypi.org/project/gds-sim/) | `gds_sim` | Discrete-time simulation engine (standalone) |
+| [`gds-continuous`](continuous/index.md) | `gds_continuous` | Continuous-time ODE engine `[scipy]` |
+| [`gds-analysis`](analysis/index.md) | `gds_analysis` | GDSSpec-to-gds-sim bridge, reachability |
+| [`gds-psuu`](psuu/index.md) | `gds_psuu` | Parameter sweep + Optuna optimization |
+
+### Tutorials
+
+| Package | Description |
+|---|---|
+| `gds-examples` | [Tutorial models](examples/learning-path.md) + [Homicidal Chauffeur](continuous/getting-started.md) notebook |
 
 ## Architecture
 
 ```
-gds-framework  ←  core engine (no GDS dependencies)
+gds-framework  ←  core engine (pydantic only)
     ↑
-gds-viz        ←  visualization (depends on gds-framework)
-gds-games      ←  game theory DSL (depends on gds-framework)
-gds-stockflow  ←  stock-flow DSL (depends on gds-framework)
-gds-control    ←  control systems DSL (depends on gds-framework)
-gds-software   ←  software architecture DSL (depends on gds-framework)
-gds-business   ←  business dynamics DSL (depends on gds-framework)
-    ↑
-gds-examples   ←  tutorials (depends on gds-framework + gds-viz)
+    ├── gds-viz        ←  Mermaid diagrams + phase portraits [matplotlib]
+    ├── gds-games      ←  game theory DSL + Nash equilibrium [nashpy]
+    ├── gds-stockflow  ←  stock-flow DSL
+    ├── gds-control    ←  control systems DSL
+    ├── gds-software   ←  software architecture DSL
+    ├── gds-business   ←  business dynamics DSL (CLD, SCN, VSM)
+    └── gds-owl        ←  OWL/SHACL/SPARQL export (rdflib, pyshacl)
+         ↑
+    gds-symbolic       ←  SymPy bridge (extends gds-control) [sympy]
+         ↑
+    gds-examples       ←  tutorials (depends on most DSLs + viz)
 
-gds-sim        ←  simulation engine (standalone — no gds-framework dep)
+gds-sim            ←  discrete-time simulation (standalone, pydantic only)
     ↑
-gds-psuu       ←  parameter search under uncertainty (depends on gds-sim)
+    ├── gds-analysis   ←  spec→sim bridge, reachability
+    └── gds-psuu       ←  parameter sweep + Optuna
+
+gds-continuous     ←  continuous-time ODE engine (standalone) [scipy]
 ```
 
 ## License

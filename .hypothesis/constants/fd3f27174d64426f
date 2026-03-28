@@ -1,4 +1,0 @@
-# file: /home/rohan/Documents/Github/blockscience/gds-core/packages/gds-owl/gds_owl/sparql.py
-# hypothesis_version: 6.151.9
-
-['blocks_by_role', 'dependency_path', 'entity_update_map', 'ir_block_list', 'ir_wiring_list', 'param_impact', 'verification_summary']
