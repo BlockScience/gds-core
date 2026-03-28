@@ -18,6 +18,7 @@ from gds.blocks.base import Block
 from gds.blocks.roles import BoundaryAction, HasParams, Mechanism
 from gds.constraints import (  # noqa: TC001
     AdmissibleInputConstraint,
+    StateMetric,
     TransitionSignature,
 )
 from gds.parameters import ParameterDef, ParameterSchema
@@ -70,6 +71,7 @@ class GDSSpec(Tagged):
         default_factory=dict
     )
     transition_signatures: dict[str, TransitionSignature] = Field(default_factory=dict)
+    state_metrics: dict[str, StateMetric] = Field(default_factory=dict)
 
     # ── Registration ────────────────────────────────────────
 
@@ -145,6 +147,13 @@ class GDSSpec(Tagged):
         self.transition_signatures[ts.mechanism] = ts
         return self
 
+    def register_state_metric(self, sm: StateMetric) -> GDSSpec:
+        """Register a state metric. Raises if name already registered."""
+        if sm.name in self.state_metrics:
+            raise ValueError(f"State metric '{sm.name}' already registered")
+        self.state_metrics[sm.name] = sm
+        return self
+
     @property
     def parameters(self) -> dict[str, TypeDef]:
         """Legacy access: parameter name → TypeDef mapping."""
@@ -194,6 +203,7 @@ class GDSSpec(Tagged):
         errors += self._validate_param_references()
         errors += self._validate_admissibility_constraints()
         errors += self._validate_transition_signatures()
+        errors += self._validate_state_metrics()
         return errors
 
     def _validate_space_types(self) -> list[str]:
@@ -325,5 +335,26 @@ class GDSSpec(Tagged):
                     errors.append(
                         f"Transition signature for '{ts.mechanism}' "
                         f"depends on unregistered block '{bname}'"
+                    )
+        return errors
+
+    def _validate_state_metrics(self) -> list[str]:
+        """State metrics reference existing entities and variables."""
+        errors: list[str] = []
+        for sm in self.state_metrics.values():
+            if not sm.variables:
+                errors.append(
+                    f"State metric '{sm.name}' has no variables"
+                )
+            for entity_name, var_name in sm.variables:
+                if entity_name not in self.entities:
+                    errors.append(
+                        f"State metric '{sm.name}' references "
+                        f"unknown entity '{entity_name}'"
+                    )
+                elif var_name not in self.entities[entity_name].variables:
+                    errors.append(
+                        f"State metric '{sm.name}' references "
+                        f"unknown variable '{entity_name}.{var_name}'"
                     )
         return errors
