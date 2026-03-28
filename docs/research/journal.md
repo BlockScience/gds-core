@@ -409,6 +409,141 @@ coverage is **39 tests generating ~4,660 random examples**.
 | Issue | Phase | Status |
 |---|---|---|
 | #135 | 1b-c: Coq mechanized proofs | Open (long-term, needs Coq expertise) |
-| #138 | 4: Dynamical invariants | Open (blocked on gds-analysis package) |
+| #138 | 4: Dynamical invariants | Closed (superseded by #140-#142) |
+
+---
+
+## Entry 006 — 2026-03-28
+
+**Subject:** StateMetric (bridge Step 3) + gds-analysis package (Steps 4-5)
+
+### Motivation
+
+The bridge proposal (paper-implementation-gap.md) maps paper definitions to
+code in 7 incremental steps. Steps 1-2 were done prior. Steps 3-5 were
+identified as the next actionable work — Step 3 is structural (same pattern
+as Steps 1-2), and Steps 4-5 require runtime but are now unblocked by
+gds-sim's existence.
+
+### Actions
+
+#### Step 3: StateMetric (Paper Assumption 3.2)
+
+Added `StateMetric` to gds-framework following the exact
+AdmissibleInputConstraint / TransitionSignature pattern:
+
+- `constraints.py`: frozen Pydantic model with `name`, `variables`
+  (entity-variable pairs), `metric_type` (annotation), `distance`
+  (R3 lossy callable), `description`
+- `spec.py`: `GDSSpec.register_state_metric()` + `_validate_state_metrics()`
+  (checks entity/variable references exist, rejects empty variables)
+- `__init__.py`: exported as public API
+- `export.py`: RDF export as `StateMetric` class + `MetricVariableEntry`
+  blank nodes
+- `import_.py`: round-trip import with `distance=None` (R3 lossy)
+- `shacl.py`: `StateMetricShape` (name required, xsd:string)
+- 9 new framework tests + 1 OWL round-trip test
+
+Commit: `f9168ee`
+
+#### gds-analysis Package (#140)
+
+New package bridging gds-framework structural annotations to gds-sim
+runtime. Dependency graph:
+
+```
+gds-framework  <--  gds-sim  <--  gds-analysis
+     ^                                  |
+     +----------------------------------+
+```
+
+Three modules:
+
+- **`adapter.py`**: `spec_to_model(spec, policies, sufs, ...)` maps
+  GDSSpec blocks to `gds_sim.Model`. BoundaryAction + Policy → policies,
+  Mechanism.updates → SUFs keyed by state variable. Auto-generates initial
+  state from entities. Optionally wraps BoundaryAction policies with
+  constraint guards.
+
+- **`constraints.py`**: `guarded_policy(fn, constraints)` wraps a policy
+  with AdmissibleInputConstraint enforcement. Three violation modes:
+  warn (log + continue), raise (ConstraintViolation), zero (empty signal).
+
+- **`metrics.py`**: `trajectory_distances(spec, trajectory)` computes
+  StateMetric distances between successive states. Extracts relevant
+  variables by `EntityName.VariableName` key, applies distance callable.
+
+21 tests, 93% coverage, including end-to-end thermostat integration
+(spec → model → simulate → measure distances).
+
+Commit: `447fc62`
+
+#### Reachable Set R(x) and Configuration Space X_C (#141)
+
+Added `reachability.py` to gds-analysis:
+
+- **`reachable_set(spec, model, state, input_samples)`**: Paper Def 4.1.
+  For each input sample, runs one timestep with overridden policy outputs,
+  collects distinct reached states. Deduplicates by state fingerprint.
+
+- **`reachable_graph(spec, model, initial_states, input_samples, max_depth)`**:
+  BFS expansion from initial states, applying `reachable_set()` at each
+  node. Returns adjacency dict of state fingerprints.
+
+- **`configuration_space(graph)`**: Paper Def 4.2. Tarjan's algorithm for
+  strongly connected components. Returns SCCs sorted by size — the largest
+  is X_C.
+
+11 new tests covering single/multiple/duplicate inputs, empty inputs,
+BFS depth expansion, SCC cases (self-loop, cycle, DAG, disconnected),
+and end-to-end thermostat integration.
+
+Commit: `081cb9c`
+
+### Bridge Status
+
+| Step | Paper | Annotation / Function | Status |
+|---|---|---|---|
+| 1 | Def 2.5 | AdmissibleInputConstraint | Done (prior) |
+| 2 | Def 2.7 | TransitionSignature | Done (prior) |
+| 3 | Assumption 3.2 | StateMetric | **Done** |
+| 4 | Def 4.1 | `reachable_set()` | **Done** |
+| 5 | Def 4.2 | `configuration_space()` | **Done** |
+| 6 | Def 3.3 | Contingent derivative D'F | Open (#142, research) |
+| 7 | Theorem 4.4 | Local controllability | Open (#142, research) |
+
+### Issue Tracker
+
+| Issue | Status |
+|---|---|
+| #134 Phase 1a | Closed |
+| #135 Phase 1b-c (Coq) | Open |
+| #136 Phase 2 | Closed |
+| #137 Phase 3 | Closed |
+| #138 Phase 4 (original) | Closed (superseded) |
+| #140 gds-analysis | **Closed** |
+| #141 R(x) + X_C | **Closed** |
+| #142 D'F + controllability | Open (research frontier) |
+
+### Observations
+
+1. gds-sim has zero dependency on gds-framework. This is correct
+   architecture — gds-sim is a generic trajectory executor, gds-analysis
+   is the GDS-specific bridge. The adapter pattern keeps both packages
+   clean.
+
+2. The `_step_once()` implementation creates a temporary Model per input
+   sample, which is simple but not performant for large input spaces.
+   A future optimization would batch inputs or use gds-sim's parameter
+   sweep directly.
+
+3. `reachable_set()` is trajectory-based (Monte Carlo), not symbolic.
+   It cannot prove that a state is *unreachable* — only that it wasn't
+   reached in the sampled inputs. For formal reachability guarantees,
+   symbolic tools (Z3, JuliaReach) would be needed.
+
+4. Steps 6-7 (contingent derivative, controllability) are genuinely
+   research-level. They require convergence analysis and Lipschitz
+   conditions that go beyond trajectory sampling.
 
 ---
