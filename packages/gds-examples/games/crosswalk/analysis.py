@@ -128,7 +128,7 @@ def main():
             state,
             input_samples=input_samples,
             state_key="Street.traffic_state",
-        )
+        ).states
         reached_vals = sorted({r["Street.traffic_state"] for r in reached})
         reached_names = [STATE_NAMES[v] for v in reached_vals]
         print(f"  R({STATE_NAMES[start_state]:>8}) = {{{', '.join(reached_names)}}}")
@@ -211,7 +211,7 @@ def main():
         {"Street.traffic_state": -1},
         input_samples=input_samples,
         state_key="Street.traffic_state",
-    )
+    ).states
     accident_reachable = {r["Street.traffic_state"] for r in accident_reached}
     if 1 not in accident_reachable:
         print("  VERIFIED: Flowing (+1) is unreachable from Accident (-1) in one step.")

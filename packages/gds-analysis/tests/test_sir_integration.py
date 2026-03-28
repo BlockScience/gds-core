@@ -270,7 +270,7 @@ class TestSIREndToEnd:
             state,
             input_samples=samples,
             state_key="Infected.count",
-        )
+        ).states
         assert len(reached) >= 1
 
     def test_reachability_graph(self) -> None:

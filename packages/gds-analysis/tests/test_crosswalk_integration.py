@@ -241,7 +241,7 @@ class TestCrosswalkEndToEnd:
             state,
             input_samples=samples,
             state_key="Street.traffic_state",
-        )
+        ).states
         assert all(r["Street.traffic_state"] == 0 for r in reached)
 
     def test_accident_reachable_via_jaywalking(self) -> None:
@@ -254,7 +254,7 @@ class TestCrosswalkEndToEnd:
             state,
             input_samples=samples,
             state_key="Street.traffic_state",
-        )
+        ).states
         assert any(r["Street.traffic_state"] == -1 for r in reached)
 
     def test_flowing_unreachable_from_accident(self) -> None:
@@ -276,7 +276,7 @@ class TestCrosswalkEndToEnd:
             state,
             input_samples=samples,
             state_key="Street.traffic_state",
-        )
+        ).states
         reached_states = {r["Street.traffic_state"] for r in reached}
         assert 1 not in reached_states, (
             "Flowing (+1) should be unreachable from Accident (-1)"
@@ -292,7 +292,7 @@ class TestCrosswalkEndToEnd:
             state,
             input_samples=samples,
             state_key="Street.traffic_state",
-        )
+        ).states
         assert all(r["Street.traffic_state"] == 1 for r in reached)
 
     def test_all_three_states_reachable_from_flowing(self) -> None:
@@ -309,7 +309,7 @@ class TestCrosswalkEndToEnd:
             state,
             input_samples=samples,
             state_key="Street.traffic_state",
-        )
+        ).states
         reached_states = {r["Street.traffic_state"] for r in reached}
         assert reached_states == {-1, 0, 1}
 

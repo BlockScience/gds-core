@@ -200,7 +200,7 @@ def main():
         initial,
         input_samples=samples,
         state_key="Infected.count",
-    )
+    ).states
     print(f"  {len(reached)} distinct next states found:")
     for r in sorted(reached, key=lambda x: x.get("Infected.count", 0)):
         s = r.get("Susceptible.count", 0)

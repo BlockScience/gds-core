@@ -48,7 +48,7 @@ class TestReachableSet:
             state,
             input_samples=samples,
             state_key="Room.temperature",
-        )
+        ).states
         assert len(reached) == 1
         assert reached[0]["Room.temperature"] != 20.0
 
@@ -65,7 +65,7 @@ class TestReachableSet:
             state,
             input_samples=samples,
             state_key="Room.temperature",
-        )
+        ).states
         assert len(reached) == 3
 
     def test_duplicate_inputs_deduplicated(self, thermostat_spec: GDSSpec) -> None:
@@ -80,7 +80,7 @@ class TestReachableSet:
             state,
             input_samples=samples,
             state_key="Room.temperature",
-        )
+        ).states
         assert len(reached) == 1
 
     def test_empty_inputs(self, thermostat_spec: GDSSpec) -> None:
@@ -89,8 +89,60 @@ class TestReachableSet:
             model,
             {"Room.temperature": 20.0},
             input_samples=[],
-        )
+        ).states
         assert reached == []
+
+    def test_result_metadata(self, thermostat_spec: GDSSpec) -> None:
+        """ReachabilityResult carries coverage metadata."""
+        model = self._make_model(thermostat_spec)
+        state = {"Room.temperature": 20.0}
+        samples = [{"command": 0.0}, {"command": 1.0}, {"command": 1.0}]
+        result = reachable_set(
+            model,
+            state,
+            input_samples=samples,
+            state_key="Room.temperature",
+        )
+        assert result.n_samples == 3
+        assert result.n_distinct == 2  # duplicate deduped
+        assert len(result.states) == 2
+        assert result.is_exhaustive is False
+
+    def test_exhaustive_flag(self, thermostat_spec: GDSSpec) -> None:
+        model = self._make_model(thermostat_spec)
+        result = reachable_set(
+            model,
+            {"Room.temperature": 20.0},
+            input_samples=[{"command": 1.0}],
+            exhaustive=True,
+        )
+        assert result.is_exhaustive is True
+
+    def test_float_tolerance(self, thermostat_spec: GDSSpec) -> None:
+        """Float tolerance collapses near-identical states."""
+        model = self._make_model(thermostat_spec)
+        state = {"Room.temperature": 20.0}
+        # These produce slightly different floats
+        samples = [
+            {"command": 1.0000001},
+            {"command": 1.0000002},
+        ]
+        # Without tolerance: may produce 2 distinct states
+        r1 = reachable_set(
+            model,
+            state,
+            input_samples=samples,
+            state_key="Room.temperature",
+        )
+        # With tolerance=4: rounds to 4 decimal places, should collapse
+        r2 = reachable_set(
+            model,
+            state,
+            input_samples=samples,
+            state_key="Room.temperature",
+            float_tolerance=4,
+        )
+        assert r2.n_distinct <= r1.n_distinct
 
 
 class TestReachableGraph:
