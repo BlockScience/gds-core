@@ -11,12 +11,18 @@ from hypothesis import strategies as st
 import gds
 from gds import (
     BoundaryAction,
+    CanonicalGDS,
     GDSSpec,
     Mechanism,
     Policy,
     SpecWiring,
+    SystemIR,
+    VerificationReport,
     Wire,
+    compile_system,
     interface,
+    project_canonical,
+    verify,
 )
 
 # ---------------------------------------------------------------------------
@@ -65,11 +71,7 @@ def gds_specs(draw, min_blocks=3, max_blocks=5) -> GDSSpec:
     """
     # --- Types ---
     n_types = draw(st.integers(min_value=1, max_value=3))
-    type_names = draw(
-        st.lists(
-            _ident, min_size=n_types, max_size=n_types, unique=True
-        )
-    )
+    type_names = draw(st.lists(_ident, min_size=n_types, max_size=n_types, unique=True))
     types = [
         gds.typedef(
             tname,
@@ -82,9 +84,7 @@ def gds_specs(draw, min_blocks=3, max_blocks=5) -> GDSSpec:
     # --- Spaces ---
     n_spaces = draw(st.integers(min_value=1, max_value=2))
     space_names = draw(
-        st.lists(
-            _ident, min_size=n_spaces, max_size=n_spaces, unique=True
-        )
+        st.lists(_ident, min_size=n_spaces, max_size=n_spaces, unique=True)
     )
     spaces = []
     for sname in space_names:
@@ -97,30 +97,20 @@ def gds_specs(draw, min_blocks=3, max_blocks=5) -> GDSSpec:
                 unique=True,
             )
         )
-        fields = {
-            fname: draw(st.sampled_from(types))
-            for fname in field_names
-        }
+        fields = {fname: draw(st.sampled_from(types)) for fname in field_names}
         spaces.append(gds.space(sname, **fields))
 
     # --- Entity ---
     entity_name = draw(_ident)
     n_vars = draw(st.integers(min_value=1, max_value=2))
-    var_names = draw(
-        st.lists(
-            _ident, min_size=n_vars, max_size=n_vars, unique=True
-        )
-    )
+    var_names = draw(st.lists(_ident, min_size=n_vars, max_size=n_vars, unique=True))
     variables = {
-        vname: gds.state_var(draw(st.sampled_from(types)))
-        for vname in var_names
+        vname: gds.state_var(draw(st.sampled_from(types))) for vname in var_names
     }
     entity = gds.entity(entity_name, **variables)
 
     # --- Blocks ---
-    n_blocks = draw(
-        st.integers(min_value=min_blocks, max_value=max_blocks)
-    )
+    n_blocks = draw(st.integers(min_value=min_blocks, max_value=max_blocks))
     port_names = draw(
         st.lists(
             _port_name,
@@ -130,9 +120,7 @@ def gds_specs(draw, min_blocks=3, max_blocks=5) -> GDSSpec:
         )
     )
     block_names = draw(
-        st.lists(
-            _ident, min_size=n_blocks, max_size=n_blocks, unique=True
-        )
+        st.lists(_ident, min_size=n_blocks, max_size=n_blocks, unique=True)
     )
 
     blocks = []
@@ -199,3 +187,47 @@ def gds_specs(draw, min_blocks=3, max_blocks=5) -> GDSSpec:
     spec.register_wiring(wiring)
 
     return spec
+
+
+# ---------------------------------------------------------------------------
+# Derived objects (from GDSSpec)
+# ---------------------------------------------------------------------------
+
+
+@st.composite
+def system_irs(draw) -> SystemIR:
+    """Generate a SystemIR by composing blocks from a random GDSSpec.
+
+    Composes blocks sequentially with >> (port overlap is guaranteed
+    by gds_specs' port-name chain) and compiles to SystemIR.
+    """
+    spec = draw(gds_specs())
+    blocks = list(spec.blocks.values())
+    composed = blocks[0]
+    for b in blocks[1:]:
+        composed = composed >> b
+    return compile_system(spec.name, composed)
+
+
+@st.composite
+def specs_with_canonical(draw) -> tuple[GDSSpec, CanonicalGDS]:
+    """Generate a (GDSSpec, CanonicalGDS) pair."""
+    spec = draw(gds_specs())
+    return spec, project_canonical(spec)
+
+
+@st.composite
+def specs_with_report(draw) -> tuple[GDSSpec, SystemIR, VerificationReport]:
+    """Generate a (GDSSpec, SystemIR, VerificationReport) triple.
+
+    The report will contain G-002 findings on BoundaryAction blocks
+    (they have no forward_in by design). This is expected.
+    """
+    spec = draw(gds_specs())
+    blocks = list(spec.blocks.values())
+    composed = blocks[0]
+    for b in blocks[1:]:
+        composed = composed >> b
+    ir = compile_system(spec.name, composed)
+    report = verify(ir)
+    return spec, ir, report
