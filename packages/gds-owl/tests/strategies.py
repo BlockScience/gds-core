@@ -24,6 +24,7 @@ from gds import (
     project_canonical,
     verify,
 )
+from gds.blocks.base import Block
 
 # ---------------------------------------------------------------------------
 # Atomic strategies
@@ -47,6 +48,19 @@ _port_name = st.text(
 
 # Python types that round-trip cleanly through OWL (gds-owl built-in type map)
 _python_types = st.sampled_from([int, float, str, bool])
+
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+
+def _compose_sequential(blocks: list[Block]) -> Block:
+    """Compose blocks sequentially with >>."""
+    composed = blocks[0]
+    for b in blocks[1:]:
+        composed = composed >> b
+    return composed
 
 
 # ---------------------------------------------------------------------------
@@ -147,11 +161,10 @@ def gds_specs(draw, min_blocks=3, max_blocks=5) -> GDSSpec:
 
     # Last block: Mechanism (forward_in from previous)
     update_var = draw(st.sampled_from(list(variables.keys())))
-    last_in = port_names[-2] if n_blocks > 2 else port_names[0]
     blocks.append(
         Mechanism(
             name=block_names[-1],
-            interface=interface(forward_in=[last_in]),
+            interface=interface(forward_in=[port_names[-2]]),
             updates=[(entity_name, update_var)],
         )
     )
@@ -202,10 +215,7 @@ def system_irs(draw) -> SystemIR:
     by gds_specs' port-name chain) and compiles to SystemIR.
     """
     spec = draw(gds_specs())
-    blocks = list(spec.blocks.values())
-    composed = blocks[0]
-    for b in blocks[1:]:
-        composed = composed >> b
+    composed = _compose_sequential(list(spec.blocks.values()))
     return compile_system(spec.name, composed)
 
 
@@ -221,13 +231,11 @@ def specs_with_report(draw) -> tuple[GDSSpec, SystemIR, VerificationReport]:
     """Generate a (GDSSpec, SystemIR, VerificationReport) triple.
 
     The report will contain G-002 findings on BoundaryAction blocks
-    (they have no forward_in by design). This is expected.
+    (no forward_in) and Mechanism blocks (no forward_out). This is
+    expected — these roles have incomplete signatures by design.
     """
     spec = draw(gds_specs())
-    blocks = list(spec.blocks.values())
-    composed = blocks[0]
-    for b in blocks[1:]:
-        composed = composed >> b
+    composed = _compose_sequential(list(spec.blocks.values()))
     ir = compile_system(spec.name, composed)
     report = verify(ir)
     return spec, ir, report

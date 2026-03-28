@@ -2,8 +2,9 @@
 
 - TestSpecRoundTripPBT: random GDSSpec -> Turtle -> GDSSpec structural fidelity
 - TestSHACLConformance: exported RDF passes SHACL validation (separate for perf)
-- TestDerivedPropertyPreservation: spec round-trip preserves downstream
-  operations (compile, canonical, verify)
+- TestSPARQLConformance: SPARQL queries return expected results (no pyshacl needed)
+- TestDerivedPropertyPreservation: SystemIR/Canonical/Report round-trips
+- TestStrategyInvariants: structural invariants of generated specs
 
 See: docs/research/verification-plan.md (Phase 3)
      docs/research/formal-representability.md (Remark 2.1)
@@ -11,6 +12,7 @@ See: docs/research/verification-plan.md (Phase 3)
 
 import importlib.util
 import os
+from collections import Counter
 
 import pytest
 from hypothesis import given, settings
@@ -230,9 +232,18 @@ class TestSHACLConformance:
         conforms, _, text = validate_graph(g)
         assert conforms, f"SHACL validation failed:\n{text}"
 
+
+# ---------------------------------------------------------------------------
+# SPARQL Conformance (Phase 3c — no pyshacl dependency)
+# ---------------------------------------------------------------------------
+
+
+class TestSPARQLConformance:
+    """SPARQL queries over exported RDF return expected results."""
+
     @given(spec=gds_specs())
     @settings(max_examples=30)
-    def test_sparql_blocks_by_role_matches(self, spec: GDSSpec) -> None:
+    def test_blocks_by_role_matches(self, spec: GDSSpec) -> None:
         """SPARQL blocks_by_role returns same blocks as the spec."""
         from gds_owl.sparql import run_query
 
@@ -248,13 +259,8 @@ class TestSHACLConformance:
 
 
 class TestDerivedPropertyPreservation:
-    """Verify that spec round-trip preserves enough structure for
-    downstream operations to produce equivalent results.
-
-    Pattern:
-        spec -> compile/canonical/verify -> result
-        spec -> OWL -> spec2 -> compile/canonical/verify -> result2
-        assert result ~ result2
+    """Verify that OWL round-trip of SystemIR, CanonicalGDS, and
+    VerificationReport preserves structural content.
     """
 
     # --- SystemIR preservation ---
@@ -275,9 +281,12 @@ class TestDerivedPropertyPreservation:
 
     @given(ir=system_irs())
     @settings(max_examples=50)
-    def test_system_ir_wiring_count_survives(self, ir: SystemIR) -> None:
+    def test_system_ir_wiring_content_survives(self, ir: SystemIR) -> None:
+        """Wiring source/target pairs survive round-trip."""
         ir2 = _ir_round_trip(ir)
-        assert len(ir2.wirings) == len(ir.wirings)
+        orig = {(w.source, w.target) for w in ir.wirings}
+        new = {(w.source, w.target) for w in ir2.wirings}
+        assert new == orig
 
     @given(ir=system_irs())
     @settings(max_examples=50)
@@ -321,18 +330,29 @@ class TestDerivedPropertyPreservation:
 
     @given(triple=specs_with_report())
     @settings(max_examples=50)
-    def test_report_finding_check_ids_survive(
+    def test_report_findings_survive(
         self, triple: tuple[GDSSpec, SystemIR, VerificationReport]
     ) -> None:
+        """Finding count and check_id distribution both survive."""
         _, _, report = triple
         report2 = _report_round_trip(report)
-        orig_ids = {f.check_id for f in report.findings}
-        new_ids = {f.check_id for f in report2.findings}
-        assert new_ids == orig_ids
+        assert len(report2.findings) == len(report.findings)
+        orig_counts = Counter(f.check_id for f in report.findings)
+        new_counts = Counter(f.check_id for f in report2.findings)
+        assert new_counts == orig_counts
+
+
+# ---------------------------------------------------------------------------
+# Strategy Invariants
+# ---------------------------------------------------------------------------
+
+
+class TestStrategyInvariants:
+    """Structural invariants of generated specs — not round-trip tests."""
 
     @given(triple=specs_with_report())
     @settings(max_examples=50)
-    def test_report_g002_expected_failures(
+    def test_g002_failures_on_expected_blocks_only(
         self, triple: tuple[GDSSpec, SystemIR, VerificationReport]
     ) -> None:
         """G-002 (signature completeness) failures are expected on
@@ -341,9 +361,7 @@ class TestDerivedPropertyPreservation:
         """
         spec, _, report = triple
         g002_failed = [
-            f
-            for f in report.findings
-            if f.check_id == "G-002" and not f.passed
+            f for f in report.findings if f.check_id == "G-002" and not f.passed
         ]
         expected_incomplete = {
             name
@@ -353,6 +371,25 @@ class TestDerivedPropertyPreservation:
         for finding in g002_failed:
             flagged = set(finding.source_elements)
             assert flagged <= expected_incomplete, (
-                f"G-002 failed on unexpected blocks: "
-                f"{flagged - expected_incomplete}"
+                f"G-002 failed on unexpected blocks: {flagged - expected_incomplete}"
             )
+
+    @given(triple=specs_with_report())
+    @settings(max_examples=50)
+    def test_g002_invariant_survives_round_trip(
+        self, triple: tuple[GDSSpec, SystemIR, VerificationReport]
+    ) -> None:
+        """The G-002 invariant still holds after report round-trip."""
+        spec, _, report = triple
+        report2 = _report_round_trip(report)
+        g002_failed = [
+            f for f in report2.findings if f.check_id == "G-002" and not f.passed
+        ]
+        expected_incomplete = {
+            name
+            for name, block in spec.blocks.items()
+            if isinstance(block, (BoundaryAction, Mechanism))
+        }
+        for finding in g002_failed:
+            flagged = set(finding.source_elements)
+            assert flagged <= expected_incomplete
