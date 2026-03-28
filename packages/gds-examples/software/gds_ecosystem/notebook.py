@@ -67,24 +67,21 @@ def imports():
 
 @app.cell
 def intro(mo):
-    mo.md(
-        """
-        # GDS Ecosystem Self-Model
+    mo.md("""# GDS Ecosystem Self-Model
 
-        The GDS framework models **itself** using three of its own
-        software architecture diagram types. This is dog-fooding:
-        the framework's DSLs, compilers, and verification checks
-        are applied to the framework's own package structure.
+The GDS framework models **itself** using three of its own
+software architecture diagram types. This is dog-fooding:
+the framework's DSLs, compilers, and verification checks
+are applied to the framework's own package structure.
 
-        Each diagram type reveals a different canonical form:
+Each diagram type reveals a different canonical form:
 
-        | Diagram | Canonical | What it reveals |
-        |---------|-----------|-----------------|
-        | Component | h = g | Package API dependencies (stateless) |
-        | DFD | h = f . g | User data pipeline (full dynamics) |
-        | ERD | h = f | Pydantic model graph (pure state) |
-        """
-    )
+| Diagram | Canonical | What it reveals |
+|---------|-----------|-----------------|
+| Component | h = g | Package API dependencies (stateless) |
+| DFD | h = f . g | User data pipeline (full dynamics) |
+| ERD | h = f | Pydantic model graph (pure state) |
+""")
     return
 
 
@@ -92,7 +89,7 @@ def intro(mo):
 def component_model(Component, ComponentModel, Connector, InterfaceDef, mo):
     mo.md("## 1. Component Diagram — Package Dependencies")
 
-    _model = ComponentModel(
+    comp_model = ComponentModel(
         name="GDS Ecosystem",
         description="Package dependency graph",
         components=[
@@ -224,12 +221,12 @@ def component_model(Component, ComponentModel, Connector, InterfaceDef, mo):
             ),
         ],
     )
-    return (_model,)
+    return (comp_model,)
 
 
 @app.cell
 def component_results(
-    _model,
+    comp_model,
     compile_component,
     compile_component_to_system,
     mo,
@@ -237,14 +234,12 @@ def component_results(
     system_to_mermaid,
     verify,
 ):
-    _spec = compile_component(_model)
-    _ir = compile_component_to_system(_model)
+    _spec = compile_component(comp_model)
+    _ir = compile_component_to_system(comp_model)
     _report = verify(_ir)
     _canonical = project_canonical(_spec)
 
-    _sv = ", ".join(
-        f"{e}.{v}" for e, v in _canonical.state_variables
-    )
+    _sv = ", ".join(f"{e}.{v}" for e, v in _canonical.state_variables)
     _mf = ", ".join(_canonical.mechanism_blocks) or "(none)"
     mo.md(
         f"""
@@ -553,23 +548,20 @@ def erd_model(
 
 @app.cell
 def summary(mo):
-    mo.md(
-        """
-        ## Canonical Spectrum
+    mo.md("""## Canonical Spectrum
 
-        | Diagram | |X| | |f| | |g| | Form | Character |
-        |---------|-----|-----|-----|------|-----------|
-        | Component | 0 | 0 | 6 | h = g | Stateless API composition |
-        | DFD | 4 | 4 | 7 | h = f . g | Full dynamical pipeline |
-        | ERD | 20 | 9 | 0 | h = f | Pure state (closed system) |
+| Diagram | dim(X) | dim(f) | dim(g) | Form | Character |
+|---------|--------|--------|--------|------|-----------|
+| Component | 0 | 0 | 6 | h = g | Stateless API composition |
+| DFD | 4 | 4 | 7 | h = f . g | Full dynamical pipeline |
+| ERD | 20 | 9 | 0 | h = f | Pure state (closed system) |
 
-        The three canonical forms span the full spectrum of GDS
-        dynamical character — from stateless (games-like) through full
-        dynamics (control-like) to pure state (data model). This
-        validates that GDS's canonical decomposition h = f . g is
-        genuinely universal across diagram types.
-        """
-    )
+The three canonical forms span the full spectrum of GDS
+dynamical character -- from stateless (games-like) through full
+dynamics (control-like) to pure state (data model). This
+validates that GDS's canonical decomposition h = f . g is
+genuinely universal across diagram types.
+""")
     return
 
 
