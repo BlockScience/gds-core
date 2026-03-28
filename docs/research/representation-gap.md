@@ -170,11 +170,13 @@ boundary, seen from the outside.
 
 The canonical spectrum across five domains revealed a structural divide:
 
-| Domain | |X| | |f| | Form | Character |
+| Domain | dim(X) | dim(f) | Form | Character |
 |---|---|---|---|---|
 | OGS (games) | 0 | 0 | h = g | Stateless — pure maps |
 | Control | n | n | h = f . g | Stateful — observation + state update |
 | StockFlow | n | n | h = f . g | Stateful — accumulation dynamics |
+| Software (DFD/SM/C4/ERD) | 0 or n | 0 or n | varies | Diagram-dependent |
+| Business (CLD/SCN/VSM) | 0 or n | 0 or n | varies | Domain-dependent |
 
 Games compute equilibria. They don't write to persistent state. Even corecursive
 loops (repeated games) carry information forward as *observations*, not as
