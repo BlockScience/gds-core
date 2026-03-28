@@ -75,10 +75,12 @@ def linearize(
     for name in model.symbolic_params:
         subs[param_syms[name]] = param_values.get(name, 0.0)
 
-    # Parse state equations
+    # Parse state equations using safe parser (no eval, no builtins)
+    from sympy.parsing.sympy_parser import parse_expr
+
     eq_map: dict[str, Any] = {}
     for eq in model.state_equations:
-        eq_map[eq.state_name] = sympy.sympify(eq.expr_str, locals=all_syms)
+        eq_map[eq.state_name] = parse_expr(eq.expr_str, local_dict=all_syms)
 
     # A matrix: df_i/dx_j
     A = _jacobian(eq_map, state_names, state_syms, subs)
@@ -90,7 +92,7 @@ def linearize(
     out_map: dict[str, Any] = {}
     output_names: list[str] = []
     for eq in model.output_equations:
-        out_map[eq.sensor_name] = sympy.sympify(eq.expr_str, locals=all_syms)
+        out_map[eq.sensor_name] = parse_expr(eq.expr_str, local_dict=all_syms)
         output_names.append(eq.sensor_name)
 
     # C matrix: dh_i/dx_j

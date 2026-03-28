@@ -38,10 +38,12 @@ def compile_to_ode(
 
     all_syms = {**state_syms, **input_syms, **param_syms}
 
-    # Parse expressions
+    # Parse expressions using safe parser (no eval, no builtins)
+    from sympy.parsing.sympy_parser import parse_expr
+
     eq_map: dict[str, Any] = {}
     for eq in model.state_equations:
-        expr = sympy.sympify(eq.expr_str, locals=all_syms)
+        expr = parse_expr(eq.expr_str, local_dict=all_syms)
         eq_map[eq.state_name] = expr
 
     # Build ordered RHS vector

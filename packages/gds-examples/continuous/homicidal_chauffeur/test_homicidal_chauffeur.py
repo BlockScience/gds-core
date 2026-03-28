@@ -22,9 +22,7 @@ from typing import Any
 
 import pytest
 
-from gds_continuous import ODEModel, ODESimulation
-
-from .model import (
+from continuous.homicidal_chauffeur.model import (
     build_backward_simulation,
     compute_isochrone,
     costate_norm_sq,
@@ -32,6 +30,7 @@ from .model import (
     hc_forward,
     terminal_conditions,
 )
+from gds_continuous import ODEModel, ODESimulation
 
 # ---------------------------------------------------------------------------
 # HC-R1: Symbolic derivation matches hand-coded
@@ -44,7 +43,7 @@ class TestSymbolicDerivation:
     def test_lambdified_vs_handcoded(self) -> None:
         """HC-T1: Lambdified and hand-coded RHS agree."""
         pytest.importorskip("sympy")
-        from .model import derive_optimal_rhs
+        from continuous.homicidal_chauffeur.model import derive_optimal_rhs
 
         rhs_sym, _ = derive_optimal_rhs()
 
