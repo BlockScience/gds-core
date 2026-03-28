@@ -422,27 +422,27 @@ This connects directly to RQ1 (MIMO semantics) in research-boundaries.md.
 ## 5. Dependency Graph
 
 ```
-Step 1: AdmissibleInputConstraint (U_x declaration)   -- DONE (gds-framework v0.2.3)
-Step 2: TransitionSignature (f|_x declaration)         -- DONE (gds-framework v0.2.3)
+Step 1: AdmissibleInputConstraint (U_x declaration)   -- DONE (gds-framework)
+Step 2: TransitionSignature (f|_x declaration)         -- DONE (gds-framework)
     |
     v
-Step 3: StateMetric (d_X on X)                        -- requires runtime
+Step 3: StateMetric (d_X on X)                        -- DONE (gds-framework)
     |
     v
-Step 4: Reachable Set R(x)                            -- requires Steps 1, 3
+Step 4: Reachable Set R(x)                            -- DONE (gds-analysis)
     |
     v
-Step 5: Configuration Space X_C                       -- requires Step 4
+Step 5: Configuration Space X_C                       -- DONE (gds-analysis)
     |
     v
 Step 6: Contingent Derivative D'F                     -- research frontier
 Step 7: Local Controllability                          -- research frontier
 ```
 
-Steps 1-2 are implemented in gds-framework with full OWL/SHACL support
-in gds-owl. Steps 3-5 require runtime evaluation and belong in gds-sim
-or a new gds-analysis package. Steps 6-7 are research-level and may
-warrant a dedicated analytical package or external tooling integration.
+Steps 1-3 are structural annotations in gds-framework with full OWL/SHACL
+support in gds-owl. Steps 4-5 are runtime analysis in gds-analysis, which
+bridges gds-framework to gds-sim. Steps 6-7 are research-level and may
+require external tooling (SymPy, JuliaReach).
 
 ---
 
@@ -452,13 +452,13 @@ warrant a dedicated analytical package or external tooling integration.
 |---|---|---|
 | 1 (U_x) | gds-framework (constraints.py, spec.py) | **Done** — SC-008, OWL, SHACL |
 | 2 (f\|_x signature) | gds-framework (constraints.py, spec.py, canonical.py) | **Done** — SC-009, OWL, SHACL |
-| 3 (metric) | gds-sim or gds-analysis | Requires concrete state values |
-| 4 (R(x)) | gds-analysis (new) | Dynamical computation |
-| 5 (X_C) | gds-analysis | Dynamical computation |
-| 6 (D'F) | gds-analysis | Research frontier |
-| 7 (controllability) | gds-analysis | Research frontier |
+| 3 (metric) | gds-framework (constraints.py, spec.py) | **Done** — StateMetric, OWL, SHACL |
+| 4 (R(x)) | gds-analysis (reachability.py) | **Done** — `reachable_set()`, `ReachabilityResult` |
+| 5 (X_C) | gds-analysis (reachability.py) | **Done** — `configuration_space()` (iterative Tarjan SCC) |
+| 6 (D'F) | gds-analysis (future) | Research frontier |
+| 7 (controllability) | gds-analysis (future) | Research frontier |
 
-A new `gds-analysis` package would depend on both `gds-framework`
+The `gds-analysis` package depends on both `gds-framework`
 (for GDSSpec, CanonicalGDS) and `gds-sim` (for state evaluation), sitting
 at the top of the dependency graph:
 
