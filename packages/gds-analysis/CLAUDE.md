@@ -6,17 +6,19 @@
 
 - **Import**: `import gds_analysis`
 - **Dependencies**: `gds-framework>=0.2.3`, `gds-sim>=0.1.0`
+- **Optional**: `[continuous]` for `gds-continuous[scipy]` + numpy (backward reachability)
 
 ## Architecture
 
-Four modules, each bridging one aspect of structural specification to runtime:
+Five modules, each bridging one aspect of structural specification to runtime:
 
 | Module | Function | Paper reference |
 |--------|----------|-----------------|
 | `adapter.py` | `spec_to_model(spec, policies, sufs, ...)` → `gds_sim.Model` | — |
 | `constraints.py` | `guarded_policy(policy_fn, constraint)` → wrapped policy | Def 2.5 |
-| `metrics.py` | `trajectory_distances(results, spec)` → distance matrix | — |
-| `reachability.py` | `reachable_set(spec, model, state, inputs)` → R(x) | Def 4.1, 4.2 |
+| `metrics.py` | `trajectory_distances(results, spec)` → distance matrix | Assumption 3.2 |
+| `reachability.py` | `reachable_set(model, state, inputs)` → R(x) | Def 4.1, 4.2 |
+| `backward_reachability.py` | `backward_reachable_set(dynamics, ...)` → B(T) | Def 4.1 (backward) |
 
 ### spec_to_model adapter
 

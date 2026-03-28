@@ -153,7 +153,7 @@ are inherently coupled.
 
 | Artifact | Location | Format |
 |---|---|---|
-| R3 undecidability proof | `docs/research/verification/r3-undecidability.tex` | LaTeX |
+| R3 undecidability proof | `docs/research/verification/r3-undecidability.md` | Markdown + LaTeX |
 | R1/R2 completeness argument | `docs/research/verification/representability-proof.md` | Markdown |
 
 ### Dependencies
@@ -243,7 +243,9 @@ Prove: if the constraint set `C(x, t; g)` is compact, convex, and continuous,
 then an attainability correspondence exists.
 
 This is a runtime/R3 concern -- it requires evaluating `f` on concrete state.
-Implementation target: future `gds-analysis` package.
+The `gds-analysis` package now exists with reachability (`reachable_set`,
+`configuration_space`, `backward_reachable_set`) but existence proofs
+require additional analytical machinery beyond trajectory sampling.
 
 ### 4b. Local Controllability (Paper Theorem 4.4)
 
@@ -253,8 +255,9 @@ is 0-controllable from a neighborhood around equilibrium.
 ### 4c. Connection to Bridge Proposal
 
 Steps 3-7 of the bridge proposal in [paper-implementation-gap.md](paper-implementation-gap.md)
-map to this phase. Steps 1-2 (AdmissibleInputConstraint, TransitionSignature)
-are already implemented and provide the structural skeleton.
+map to this phase. Steps 1-5 are complete (AdmissibleInputConstraint,
+TransitionSignature, StateMetric, reachable_set, configuration_space).
+Steps 6-7 remain open (#142).
 
 ### Dependencies
 
