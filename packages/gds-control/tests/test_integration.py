@@ -52,6 +52,25 @@ def open_loop_model():
     )
 
 
+class TestTransitionSignatures:
+    def test_siso_signature(self, siso_model):
+        spec = compile_model(siso_model)
+        assert len(spec.transition_signatures) == 1
+        ts = spec.transition_signatures["x Dynamics"]
+        assert ("x", "value") in ts.reads
+        assert "K" in ts.depends_on_blocks
+
+    def test_mimo_signatures(self, mimo_model):
+        spec = compile_model(mimo_model)
+        assert len(spec.transition_signatures) == 2
+        ts1 = spec.transition_signatures["x1 Dynamics"]
+        assert ("x1", "value") in ts1.reads
+        assert "K1" in ts1.depends_on_blocks
+        ts2 = spec.transition_signatures["x2 Dynamics"]
+        assert ("x2", "value") in ts2.reads
+        assert "K2" in ts2.depends_on_blocks
+
+
 class TestSISOIntegration:
     def test_compile_and_canonical(self, siso_model):
         spec = compile_model(siso_model)
