@@ -90,7 +90,7 @@ From the architecture document — these are non-negotiable:
 
 ## Open Research Directions
 
-See [Research Boundaries and Open Questions](research-boundaries.md) for detailed analysis of:
+See [Research Boundaries and Open Questions](../research/research-boundaries.md) for detailed analysis of:
 
 1. **MIMO semantics** — scalar ports vs vector-valued spaces
 2. **Timestep semantics** — what `.loop()` means across DSLs when execution is introduced
