@@ -15,4 +15,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: uv sync --all-packages
-      - run: uv tool run pip-audit
+      # CVE-2026-4539: pygments 2.19.2 (latest) — no fix available yet.
+      # Transitive dep from pytest, mkdocs-material, marimo, rich.
+      # Remove this ignore when pygments releases a patched version.
+      - run: uv tool run pip-audit --ignore-vuln CVE-2026-4539
