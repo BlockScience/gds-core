@@ -6,10 +6,11 @@ using the distance functions declared in GDSSpec.state_metrics.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from gds import GDSSpec  # noqa: TC002
-from gds.constraints import StateMetric  # noqa: TC002
+if TYPE_CHECKING:
+    from gds import GDSSpec
+    from gds.constraints import StateMetric
 
 
 def trajectory_distances(
@@ -44,7 +45,8 @@ def trajectory_distances(
         for i in range(len(trajectory) - 1):
             x_t = _extract_metric_state(sm, trajectory[i])
             x_next = _extract_metric_state(sm, trajectory[i + 1])
-            assert sm.distance is not None
+            if sm.distance is None:
+                raise ValueError(f"State metric '{sm.name}' has no distance callable")
             distances.append(sm.distance(x_t, x_next))
         result[sm.name] = distances
 
