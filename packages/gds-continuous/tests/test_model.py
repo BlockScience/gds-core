@@ -119,7 +119,6 @@ class TestODESimulation:
         assert sim.solver == "RK45"
         assert sim.rtol == 1e-6
         assert sim.atol == 1e-9
-        assert sim.runs == 1
         assert sim.t_eval is None
 
     def test_custom_solver(self, decay_model: ODEModel) -> None:

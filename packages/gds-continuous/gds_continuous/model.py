@@ -92,7 +92,6 @@ class ODESimulation(BaseModel):
     rtol: float = 1e-6
     atol: float = 1e-9
     max_step: float = float("inf")
-    runs: int = 1
 
     def run(self) -> Any:
         """Integrate and return ODEResults."""

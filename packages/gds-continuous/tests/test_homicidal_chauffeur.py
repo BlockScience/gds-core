@@ -5,13 +5,13 @@ gds-continuous, proving the ODE engine handles a real differential
 game from Isaacs (1951).
 
 The 4D characteristic ODE system:
-    ẋ₁ = -φ*x₂ + w*sin(ψ*)     φ* = -sign(σ), σ = p₂x₁ - p₁x₂
-    ẋ₂ =  φ*x₁ + w*cos(ψ*) - 1  ψ* = atan2(p₁, p₂)
-    ṗ₁ = -φ*p₂
-    ṗ₂ =  φ*p₁
+    x1' = -phi*x2 + w*sin(psi*), phi* = -sign(sigma), sigma = p2*x1 - p1*x2
+    x2' =  phi*x1 + w*cos(psi*) - 1, psi* = atan2(p1, p2)
+    p1' = -phi*p2
+    p2' =  phi*p1
 
 References:
-    - R. Isaacs, Differential Games (1965), pp. 297–350
+    - R. Isaacs, Differential Games (1965), pp. 297-350
     - A.W. Merz, PhD Thesis, Stanford (1971)
     - github.com/mzargham/hc-marimo
 """
@@ -26,15 +26,12 @@ import pytest
 
 from gds_continuous import ODEModel, ODESimulation
 
-
 # ---------------------------------------------------------------------------
 # HC dynamics as ODEFunction callables
 # ---------------------------------------------------------------------------
 
 
-def hc_forward(
-    t: float, y: list[float], params: dict[str, Any]
-) -> list[float]:
+def hc_forward(t: float, y: list[float], params: dict[str, Any]) -> list[float]:
     """Forward 4D characteristic ODE for the Homicidal Chauffeur."""
     x1, x2, p1, p2 = y
     w = params["w"]
@@ -53,9 +50,7 @@ def hc_forward(
     return [float(x1d), float(x2d), float(p1d), float(p2d)]
 
 
-def hc_backward(
-    t: float, y: list[float], params: dict[str, Any]
-) -> list[float]:
+def hc_backward(t: float, y: list[float], params: dict[str, Any]) -> list[float]:
     """Backward integration (negate forward dynamics)."""
     fwd = hc_forward(t, y, params)
     return [-v for v in fwd]
@@ -73,9 +68,7 @@ def compute_terminal_conditions(
     return [x1_T, x2_T, p1_T, p2_T]
 
 
-def hamiltonian_star(
-    x1: float, x2: float, p1: float, p2: float, w: float
-) -> float:
+def hamiltonian_star(x1: float, x2: float, p1: float, p2: float, w: float) -> float:
     """Optimal Hamiltonian H* along a trajectory point."""
     sigma = p2 * x1 - p1 * x2
     norm_p = math.sqrt(p1**2 + p2**2)
@@ -99,7 +92,7 @@ class TestHamiltonianConservation:
 
         model = ODEModel(
             state_names=["x1", "x2", "p1", "p2"],
-            initial_state=dict(zip(["x1", "x2", "p1", "p2"], y0)),
+            initial_state=dict(zip(["x1", "x2", "p1", "p2"], y0, strict=True)),
             rhs=hc_backward,
             params={"w": [w_val]},
         )
@@ -138,7 +131,7 @@ class TestCostateNormConservation:
 
         model = ODEModel(
             state_names=["x1", "x2", "p1", "p2"],
-            initial_state=dict(zip(["x1", "x2", "p1", "p2"], y0)),
+            initial_state=dict(zip(["x1", "x2", "p1", "p2"], y0, strict=True)),
             rhs=hc_backward,
             params={"w": [w_val]},
         )
@@ -176,7 +169,7 @@ class TestCaptureCondition:
 
         model_back = ODEModel(
             state_names=["x1", "x2", "p1", "p2"],
-            initial_state=dict(zip(["x1", "x2", "p1", "p2"], y0_terminal)),
+            initial_state=dict(zip(["x1", "x2", "p1", "p2"], y0_terminal, strict=True)),
             rhs=hc_backward,
             params={"w": [w_val]},
         )
@@ -200,7 +193,7 @@ class TestCaptureCondition:
 
         model_fwd = ODEModel(
             state_names=["x1", "x2", "p1", "p2"],
-            initial_state=dict(zip(["x1", "x2", "p1", "p2"], y0_far)),
+            initial_state=dict(zip(["x1", "x2", "p1", "p2"], y0_far, strict=True)),
             rhs=hc_forward,
             params={"w": [w_val]},
         )
@@ -228,12 +221,10 @@ class TestStationaryEvader:
     def test_w_zero_straight_capture(self) -> None:
         """With w=0 and evader on the x2-axis, pursuer drives straight down."""
 
-        def hc_w0(
-            t: float, y: list[float], params: dict[str, Any]
-        ) -> list[float]:
-            x1, x2, p1, p2 = y
-            # With w=0: ẋ₁ = -φ*x₂, ẋ₂ = φ*x₁ - 1
-            # For straight approach from above: φ=0, ẋ₂ = -1
+        def hc_w0(t: float, y: list[float], params: dict[str, Any]) -> list[float]:
+            _x1, _x2, _p1, _p2 = y
+            # With w=0: x1'=-phi*x2, x2'=phi*x1-1
+            # For straight approach from above: phi=0, x2'=-1
             return [0.0, -1.0, 0.0, 0.0]
 
         initial_dist = 3.0
@@ -267,7 +258,7 @@ class TestParameterSweep:
 
         model = ODEModel(
             state_names=["x1", "x2", "p1", "p2"],
-            initial_state=dict(zip(["x1", "x2", "p1", "p2"], y0)),
+            initial_state=dict(zip(["x1", "x2", "p1", "p2"], y0, strict=True)),
             rhs=hc_backward,
             params={"w": w_values},
         )

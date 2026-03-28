@@ -30,12 +30,12 @@ classifiers = [
 dependencies = [
     "gds-framework>=0.2.3",
     "gds-control>=0.1.0",
-    "gds-continuous>=0.1.0",
     "pydantic>=2.10",
 ]
 
 [project.optional-dependencies]
 sympy = ["sympy>=1.13", "numpy>=1.26"]
+continuous = ["gds-continuous>=0.1.0"]
 
 [project.urls]
 Homepage = "https://github.com/BlockScience/gds-core"

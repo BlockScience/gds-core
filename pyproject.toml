@@ -38,6 +38,7 @@ business = ["gds-business>=0.1.0"]
 sim = ["gds-sim>=0.1.0"]
 continuous = ["gds-continuous>=0.1.0"]
 symbolic = ["gds-symbolic>=0.1.0"]
+analysis = ["gds-analysis>=0.1.0"]
 psuu = ["gds-psuu>=0.1.0"]
 # Formal methods
 owl = ["gds-owl>=0.1.0"]
@@ -63,6 +64,7 @@ all = [
     "gds-sim>=0.1.0",
     "gds-continuous>=0.1.0",
     "gds-symbolic>=0.1.0",
+    "gds-analysis>=0.1.0",
     "gds-psuu>=0.1.0",
     "gds-owl>=0.1.0",
     "gds-examples>=0.1.0",
@@ -92,6 +94,7 @@ gds-examples = { workspace = true }
 gds-sim = { workspace = true }
 gds-continuous = { workspace = true }
 gds-symbolic = { workspace = true }
+gds-analysis = { workspace = true }
 gds-psuu = { workspace = true }
 gds-owl = { workspace = true }
 
