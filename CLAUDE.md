@@ -87,7 +87,7 @@ gds-framework  ←  core engine (pydantic only, no upstream deps)
 
 gds-sim            ←  discrete-time simulation (standalone, pydantic only)
     ↑
-    ├── gds-analysis   ←  spec→sim bridge, reachability (gds-framework + gds-sim)
+    ├── gds-analysis   ←  spec→sim bridge, reachability (gds-framework + gds-sim + gds-continuous[opt])
     └── gds-psuu       ←  parameter sweep + Optuna (gds-sim)
 
 gds-continuous     ←  continuous-time ODE engine (standalone, pydantic only) [scipy]

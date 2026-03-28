@@ -455,6 +455,7 @@ require external tooling (SymPy, JuliaReach).
 | 3 (metric) | gds-framework (constraints.py, spec.py) | **Done** — StateMetric, OWL, SHACL |
 | 4 (R(x)) | gds-analysis (reachability.py) | **Done** — `reachable_set()`, `ReachabilityResult` |
 | 5 (X_C) | gds-analysis (reachability.py) | **Done** — `configuration_space()` (iterative Tarjan SCC) |
+| 5b (B(T)) | gds-analysis (backward_reachability.py) | **Done** — `backward_reachable_set()` + `extract_isochrones()` |
 | 6 (D'F) | gds-analysis (future) | Research frontier |
 | 7 (controllability) | gds-analysis (future) | Research frontier |
 
