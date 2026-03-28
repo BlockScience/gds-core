@@ -118,6 +118,14 @@ specifications: you can represent everything about a system except what
 its programs actually do. The canonical decomposition h = f ∘ g makes this
 boundary explicit and exploitable.
 
+> **Paper alignment note.** Rice's theorem applies here because the
+> *software implementation* uses arbitrary Python callables for f_behav.
+> The paper's mathematical proofs (Theorem 3.6, existence) assume the
+> constraint set is compact, convex, and continuous (Assumption 3.5) —
+> a much more restricted class than Turing-complete programs. The R3
+> boundary reflects the implementation's scope, not the paper's
+> mathematical scope.
+
 ---
 
 ## 1. Preliminaries
@@ -131,6 +139,14 @@ algebraic properties (associativity of >> and |, commutativity of |) by
 construction, but the full categorical axioms (interchange law, coherence
 conditions, traced monoidal structure for feedback) have not been formally
 verified.
+
+> **Paper alignment note.** The foundational paper (Zargham & Shorish 2022)
+> defines GDS via standard function composition h(x) = f(x, g(x)) and does
+> not mandate categorical structure. The paper explicitly contrasts ACT
+> (Applied Category Theory) with GDS, noting ACT "can be difficult to
+> implement computationally." The categorical semantics here are a
+> *framework design choice* for compositionality, not a mathematical
+> requirement of the paper's GDS definition.
 
 The components are:
 
@@ -516,6 +532,13 @@ semantics (what h actually computes given inputs) is R3.
 pattern).** An AdmissibleInputConstraint (Paper Def 2.5: U_x) decomposes
 as:
 
+> **Paper alignment note.** The paper defines the Admissible Input Map as
+> a single function U: X -> P(U) (Def 2.5) with no structural/behavioral
+> decomposition. The split below into U_x_struct (dependency graph) and
+> U_x_behav (constraint predicate) is a *framework design choice* for
+> ontological representation, enabling the dependency graph to be
+> serialized as R1 while the predicate remains R3.
+
 ```
 U_x_struct : A -> P(E x V)
     The dependency relation: "BoundaryAction B's admissible outputs
@@ -537,6 +560,11 @@ is a BoundaryAction, depends_on references valid entity.variable pairs).
 
 **Property 4.6 (Transition Signatures follow the same pattern).**
 A TransitionSignature (Paper Def 2.7: f|_x) provides:
+
+> **Paper alignment note.** The paper defines f|_x : U_x -> X (Def 2.7) as
+> a single restricted map. The decomposition into f_read (which variables
+> are read) and f_block_deps (which blocks feed this mechanism) is a
+> *framework design choice* to capture data-flow dependencies structurally.
 
 ```
 f_read : Sig -> P(E x V)
@@ -643,7 +671,7 @@ G_struct concepts and their tiers:
 - Space/entity structure: R1 (Property 4.1)
 - Admissibility dependency graph (U_x_struct): R1 (Property 4.5)
 - Transition read dependencies (f_read): R1 (Property 4.6)
-- State metric variable declarations (d_X_struct): R1 (Assumption 3.2)
+- State metric variable declarations (d_X_struct): R1 (Assumption 3.2) [*]
 - Acyclicity: R2 (Section 5.1, G-006)
 - Completeness/determinism: R2 (Section 5.2, SC-001, SC-002)
 - Reference validation (dangling wirings): R2 (Section 5.1, G-004)
@@ -652,8 +680,14 @@ G_behav concepts and their tiers:
 - Transition functions: R3 (Property 4.4, f_behav)
 - Constraint predicates: R3 (Property 4.2, general case)
 - Admissibility predicates (U_x_behav): R3 (Property 4.5)
-- State metric distance callable (d_X_behav): R3 (Assumption 3.2)
+- State metric distance callable (d_X_behav): R3 (Assumption 3.2) [*]
 - Auto-wiring process: R3 (Property 3.2)
+
+> [*] **Paper alignment note.** The paper defines d_X : X x X -> R
+> (Assumption 3.2) as a single metric with no structural/behavioral
+> decomposition. The split into variable declarations (R1) and distance
+> callable (R3) follows the same framework pattern as Properties 4.5-4.6
+> — an ontological design choice, not a paper requirement.
 - Construction validation: R3 (Proposition 3.4)
 - Scheduling semantics: R3 (not stored in GDSSpec — external)
 
