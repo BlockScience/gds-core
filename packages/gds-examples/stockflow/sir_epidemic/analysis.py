@@ -196,7 +196,6 @@ def main():
         for d in [0.0, 0.3, 1.0, 5.0, 10.0]
     ]
     reached = reachable_set(
-        spec,
         model,
         initial,
         input_samples=samples,

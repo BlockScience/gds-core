@@ -44,7 +44,6 @@ class TestReachableSet:
         state = {"Room.temperature": 20.0}
         samples = [{"command": 1.0}]
         reached = reachable_set(
-            thermostat_spec,
             model,
             state,
             input_samples=samples,
@@ -62,7 +61,6 @@ class TestReachableSet:
             {"command": 2.0},
         ]
         reached = reachable_set(
-            thermostat_spec,
             model,
             state,
             input_samples=samples,
@@ -78,7 +76,6 @@ class TestReachableSet:
             {"command": 1.0},
         ]
         reached = reachable_set(
-            thermostat_spec,
             model,
             state,
             input_samples=samples,
@@ -89,7 +86,6 @@ class TestReachableSet:
     def test_empty_inputs(self, thermostat_spec: GDSSpec) -> None:
         model = self._make_model(thermostat_spec)
         reached = reachable_set(
-            thermostat_spec,
             model,
             {"Room.temperature": 20.0},
             input_samples=[],
@@ -113,7 +109,6 @@ class TestReachableGraph:
     def test_depth_1(self, thermostat_spec: GDSSpec) -> None:
         model = self._make_model(thermostat_spec)
         graph = reachable_graph(
-            thermostat_spec,
             model,
             [{"Room.temperature": 20.0}],
             input_samples=[{"command": 1.0}, {"command": -1.0}],
@@ -125,7 +120,6 @@ class TestReachableGraph:
     def test_depth_2_expands(self, thermostat_spec: GDSSpec) -> None:
         model = self._make_model(thermostat_spec)
         graph_1 = reachable_graph(
-            thermostat_spec,
             model,
             [{"Room.temperature": 20.0}],
             input_samples=[{"command": 1.0}],
@@ -133,7 +127,6 @@ class TestReachableGraph:
             state_key="Room.temperature",
         )
         graph_2 = reachable_graph(
-            thermostat_spec,
             model,
             [{"Room.temperature": 20.0}],
             input_samples=[{"command": 1.0}],
@@ -194,7 +187,6 @@ class TestConfigurationSpace:
             enforce_constraints=False,
         )
         graph = reachable_graph(
-            thermostat_spec,
             model,
             [{"Room.temperature": 20.0}],
             input_samples=[
