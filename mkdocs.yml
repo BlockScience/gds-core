@@ -384,6 +384,7 @@ nav:
       - Paper Implementation Gap: research/paper-implementation-gap.md
       - View Stratification: guides/view-stratification.md
       - Ecosystem: framework/ecosystem.md
+      - Semantic Web Integration: research/semantic-web-summary.md
       - Formal Verification:
           - Verification Plan: research/verification-plan.md
           - R3 Non-Representability: research/verification/r3-undecidability.md
