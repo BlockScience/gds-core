@@ -18,9 +18,8 @@ def integrate_simulation(sim: ODESimulation) -> ODEResults:
 
     results_parts: list[ODEResults] = []
     for subset_idx, params in enumerate(sim.model._param_subsets):
-        for run_idx in range(sim.runs):
-            part = _integrate_single(sim, params, subset_idx, run_idx)
-            results_parts.append(part)
+        part = _integrate_single(sim, params, subset_idx)
+        results_parts.append(part)
 
     return ODEResults.merge(results_parts)
 
@@ -37,7 +36,6 @@ def _integrate_single(
     sim: ODESimulation,
     params: Params,
     subset_idx: int,
-    run_idx: int,
 ) -> ODEResults:
     """Single solve_ivp call for one (subset, run) pair."""
     from scipy.integrate import solve_ivp
@@ -83,6 +81,19 @@ def _integrate_single(
         model._state_order,
         model.output_names if model.output_fn else None,
     )
-    results.append_solution(sol.t, sol.y, run=run_idx, subset=subset_idx)
+
+    if model.output_fn:
+        for j in range(len(sol.t)):
+            state = [float(sol.y[i][j]) for i in range(len(model._state_order))]
+            outputs = model.output_fn(float(sol.t[j]), state, params)
+            results.append(
+                float(sol.t[j]),
+                state,
+                run=0,
+                subset=subset_idx,
+                outputs=outputs,
+            )
+    else:
+        results.append_solution(sol.t, sol.y, run=0, subset=subset_idx)
 
     return results

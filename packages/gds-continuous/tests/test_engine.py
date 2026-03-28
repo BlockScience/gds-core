@@ -111,27 +111,6 @@ class TestParameterSweep:
         assert subset1_final[0]["x"] == pytest.approx(math.exp(-2.0), abs=1e-5)
 
 
-class TestMultipleRuns:
-    """Multiple runs of the same model."""
-
-    def test_deterministic_runs_identical(self, decay_sim: ODESimulation) -> None:
-        sim = ODESimulation(
-            model=decay_sim.model,
-            t_span=decay_sim.t_span,
-            t_eval=[0.0, 1.0],
-            runs=3,
-        )
-        results = sim.run()
-        # 1 subset * 3 runs * 2 time points = 6 rows
-        assert len(results) == 6
-
-        rows = results.to_list()
-        run0 = [r["x"] for r in rows if r["run"] == 0]
-        run1 = [r["x"] for r in rows if r["run"] == 1]
-        run2 = [r["x"] for r in rows if r["run"] == 2]
-        assert run0 == run1 == run2
-
-
 class TestSolverSelection:
     """Different solver methods."""
 
@@ -189,6 +168,39 @@ class TestEventDetection:
         final_time = results.times[-1]
         assert final_time == pytest.approx(5.0, abs=0.01)
         assert results.state_array("x")[-1] == pytest.approx(5.0, abs=0.01)
+
+
+class TestOutputFunction:
+    """output_fn evaluation along trajectories."""
+
+    def test_output_fn_called(self) -> None:
+        """output_fn should produce values in the results."""
+
+        def rhs(t: float, y: list[float], p: dict[str, Any]) -> list[float]:
+            return [-y[0]]
+
+        def out_fn(t: float, y: list[float], p: dict[str, Any]) -> list[float]:
+            return [y[0] ** 2]
+
+        model = ODEModel(
+            state_names=["x"],
+            initial_state={"x": 2.0},
+            rhs=rhs,
+            output_fn=out_fn,
+            output_names=["x_sq"],
+        )
+        sim = ODESimulation(
+            model=model,
+            t_span=(0.0, 1.0),
+            t_eval=[0.0, 0.5, 1.0],
+        )
+        results = sim.run()
+
+        rows = results.to_list()
+        assert rows[0]["x_sq"] == pytest.approx(4.0)  # 2.0^2
+        for row in rows:
+            assert row["x_sq"] is not None
+            assert row["x_sq"] == pytest.approx(row["x"] ** 2, abs=1e-6)
 
 
 class TestAutoTimePoints:
