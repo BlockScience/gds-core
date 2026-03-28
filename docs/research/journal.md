@@ -326,8 +326,89 @@ partitions diverge — proving non-tautology.
 - [x] ~~Write R1/R2 decidability bounds (Phase 2b)~~
 - [x] ~~Write partition independence argument (Phase 2c)~~
 - [ ] Extend `gds_specs` to generate specs with parallel block groups
-- [ ] Add SystemIR, CanonicalGDS, and VerificationReport PBT round-trips
-- [ ] Add SHACL/SPARQL validation gate before reimport (Phase 3c)
 - [ ] Investigate Coq/ViCAR for mechanized interchange law proof (Phase 1b)
+
+---
+
+## Entry 005 — 2026-03-28
+
+**Subject:** Phase 3c-d — SHACL/SPARQL validation gate + derived property
+preservation tests
+
+### Motivation
+
+Phase 3a-b (GDSSpec round-trip PBT) was complete but lacked:
+- SHACL validation of exported RDF before reimport (3c)
+- Round-trip coverage for SystemIR, CanonicalGDS, VerificationReport (3d)
+
+### Method
+
+#### Phase 3c: Validation Gates
+
+Added two separate test classes to avoid coupling SPARQL tests to pyshacl:
+
+- **TestSHACLConformance** (pyshacl-gated, 30 examples): validates exported
+  GDSSpec and SystemIR RDF against structural SHACL shapes
+- **TestSPARQLConformance** (no gate, 30 examples): verifies `blocks_by_role`
+  query returns expected block names
+
+#### Phase 3d: Derived Property Preservation
+
+New strategies in `strategies.py`:
+- `system_irs()`: compose blocks with `>>`, `compile_system()`
+- `specs_with_canonical()`: `project_canonical()` on random spec
+- `specs_with_report()`: `verify()` on compiled random spec
+- `_compose_sequential()`: shared helper for block composition
+
+**TestDerivedPropertyPreservation** (8 tests, 50 examples each):
+- SystemIR: name, block names, wiring content (source/target pairs),
+  composition type
+- CanonicalGDS: boundary/policy/mechanism block sets, state variables
+- VerificationReport: system name, finding count + check_id distribution
+  (Counter-based, catches collapsed duplicates)
+
+**TestStrategyInvariants** (2 tests, 50 examples each):
+- G-002 failures only on BoundaryAction + Mechanism (expected by design)
+- Same invariant holds after report round-trip
+
+Commits: `a90cad8`, `e51d53f`
+
+### Audit and Fixes
+
+6 findings from code review:
+
+| # | Severity | Issue | Fix |
+|---|---|---|---|
+| 1 | Important | SPARQL test gated behind HAS_PYSHACL | Moved to own TestSPARQLConformance class |
+| 2 | Important | G-002 test didn't round-trip, misplaced | Split into TestStrategyInvariants + round-trip version |
+| 3 | Important | Finding set comparison lost multiplicity | Counter + len() assertion |
+| 4 | Important | SystemIR wiring content not checked | Added source/target pair comparison |
+| 5 | Minor | Dead else branch (min_blocks=3) | Removed |
+| 6 | Minor | Duplicated composition logic | Extracted `_compose_sequential()` |
+
+### Outcome
+
+| Class | Tests | Examples | Purpose |
+|---|---|---|---|
+| TestSpecRoundTripPBT | 13 | 100 each | GDSSpec structural fidelity |
+| TestSHACLConformance | 2 | 30 each | SHACL shape validation |
+| TestSPARQLConformance | 1 | 30 each | SPARQL query correctness |
+| TestDerivedPropertyPreservation | 8 | 50 each | IR/Canonical/Report round-trips |
+| TestStrategyInvariants | 2 | 50 each | G-002 invariant + survival |
+| **Total** | **26** | **~2,060** | |
+
+Combined with Phase 1a (13 algebra tests, ~2,600 examples), total PBT
+coverage is **39 tests generating ~4,660 random examples**.
+
+### Issues Closed
+
+- #137 (Phase 3: Property-based round-trip testing for OWL export/import)
+
+### Remaining Open Issues
+
+| Issue | Phase | Status |
+|---|---|---|
+| #135 | 1b-c: Coq mechanized proofs | Open (long-term, needs Coq expertise) |
+| #138 | 4: Dynamical invariants | Open (blocked on gds-analysis package) |
 
 ---
