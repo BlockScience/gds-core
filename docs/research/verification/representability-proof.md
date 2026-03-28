@@ -145,12 +145,12 @@ G_{\text{struct}} = \{c \in \text{GDS} \mid c \text{ is determined by } g, f_{\t
 $$
 
 $$
-G_{\text{behav}} = \{c \in \text{GDS} \mid c \text{ depends on evaluating } f_{\text{behav}}, \text{ a } \texttt{Callable}, \text{ or a computation beyond SPARQL}\}
+G_{\text{behav}} = \{c \in \text{GDS} \mid c \text{ depends on evaluating } f_{\text{behav}}, \text{ a } \texttt{Callable}, \text{ or a computation requiring mutable intermediate state or ordered multi-pass processing}\}
 $$
 
 This definition depends on the canonical decomposition and the
 computational character of the concept. It does not reference OWL, SHACL,
-or SPARQL directly.
+or SPARQL — only the intrinsic computational requirements of the concept.
 
 **Remark.** Definition C.1 places auto-wiring and construction validation
 in $G_{\text{behav}}$ because they involve computation (tokenization, set

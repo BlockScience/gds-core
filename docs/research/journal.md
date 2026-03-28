@@ -185,3 +185,149 @@ Commit: `835ac83`
 - [ ] Write R3 undecidability reduction (Phase 2a)
 
 ---
+
+## Entry 003 — 2026-03-28
+
+**Subject:** Phase 1a + Phase 3 — audit fixes and CI reproducibility
+
+### Motivation
+
+Code review of PBT tests identified 7 issues (2 critical, 4 important,
+1 minor). Hypothesis tests also needed deterministic seeds for CI
+reproducibility.
+
+### Fixes Applied
+
+| # | Severity | Issue | Fix |
+|---|---|---|---|
+| 1 | Critical | `stackable_pair` duplicate port names | `port_tuples` now accepts `exclude` param; shared token excluded |
+| 2 | Critical | Missing backward port assertions for `>>` | Added `backward_in` + `backward_out` assertions |
+| 3 | Important | Identity tests only covered right-identity | Split into 4 tests: left/right for both `>>` and `\|` |
+| 4 | Important | `gds_specs` generated 0 Policies 25% of the time | Changed `min_blocks=2` to `min_blocks=3` |
+| 5 | Important | Vacuous lossiness test | Removed (fixture test in `test_roundtrip.py` covers real lossiness) |
+| 6 | Important | Wire round-trip only checked count | Now checks `(source, target, space)` set equality |
+| 7 | Minor | Inline import of `Mechanism` | Moved to module level |
+
+### Reproducibility
+
+Added Hypothesis profiles for deterministic CI:
+
+- `ci` profile: `derandomize=True`, `database=None` — same inputs every
+  run, no `.hypothesis/` database needed
+- `dev` profile: randomized (default) — broader exploration locally
+- CI workflow sets `HYPOTHESIS_PROFILE=ci` env var
+- Both profiles auto-loaded via `settings.load_profile(os.getenv(...))`
+
+Commit: `65cd552`
+
+### Updated Test Counts
+
+| Suite | Tests | Random examples |
+|---|---|---|
+| Composition algebra (Phase 1a) | 13 (+2 identity tests) | ~2,600 |
+| OWL round-trip (Phase 3) | 13 (-1 vacuous, +1 wire content) | ~1,300 |
+
+---
+
+## Entry 004 — 2026-03-28
+
+**Subject:** Phase 2 — formal proofs for R1/R2/R3 representability
+
+### Motivation
+
+The R1/R2/R3 taxonomy in `formal-representability.md` is acknowledged as
+a designed classification (Check 6.1). Phase 2 elevates it to a theorem
+with formal proofs.
+
+### Method
+
+Produced two documents in `docs/research/verification/`:
+
+**`r3-undecidability.md`** — R3 non-representability proofs.
+
+Key structural improvement: R3 has two distinct sub-classifications:
+
+- **R3-undecidable**: concepts whose semantic properties are undecidable
+  (Rice's theorem / halting problem). Applies to `f_behav`, `TypeDef.constraint`,
+  `U_x_behav`.
+- **R3-separation**: decidable computations that exceed SPARQL's model.
+  Applies to auto-wiring (O(n) but needs NFC + multi-pass splitting) and
+  construction validation (polynomial but needs tokenize()).
+
+Six propositions proved:
+1. `f_behav` — Rice's theorem (R3-undecidable)
+2. `TypeDef.constraint` — Rice's + halting problem (R3-undecidable)
+3. `U_x_behav` — Rice's theorem (R3-undecidable)
+4. Auto-wiring — SPARQL expressiveness gap (R3-separation)
+5. Construction validation — current: R3-separation; extensible: R3-undecidable
+6. Scheduling — not in data model (trivially R3)
+
+**`representability-proof.md`** — R1/R2 decidability + partition
+independence.
+
+- Part A: 9 R1 concepts with constructive witnesses (export functions +
+  13 SHACL-core shapes)
+- Part B: 4 R2 concepts with SPARQL witnesses (transitive closure,
+  negation-as-failure, aggregation)
+- Part C: Theorem C.3 proving $G_{\text{struct}} = \text{R1} \cup
+  \text{R2}$ and $G_{\text{behav}} = \text{R3}$
+
+Commit: `384e32c`
+
+### Audit and Revisions
+
+Two rounds of review identified 9 issues total:
+
+**Round 1 (8 findings):**
+
+| # | Severity | Issue | Fix |
+|---|---|---|---|
+| 1 | Critical | R3 definition inconsistency between documents | Aligned to Def 2.2; introduced R3-undecidable/R3-separation |
+| 2 | Critical | Auto-wiring called "undecidable" but is O(n) | Reclassified as R3-separation |
+| 3 | Critical | Construction validation proved general case only | Split current (decidable) vs extensible (undecidable) |
+| 4 | Important | "OWL (R1)" should be "R1 ∪ R2" | Fixed in Theorem C.3 reverse containment |
+| 5 | Important | Missing Rice's theorem in forward containment | Added explicit invocation |
+| 6 | Important | SHACL-core qualifier dropped in Part B | Consistent throughout; added SHACL-SPARQL note |
+| 7 | Minor | Fragile line-number references | Replaced with function names |
+| 8 | Minor | Redundant argument in Prop 6 | Simplified to "not in data model" |
+
+Commit: `3072f5c`
+
+**Round 2 (1 finding):**
+
+Definition C.1 mentioned "computation beyond SPARQL" while claiming not to
+reference SPARQL — a self-contradiction that weakened the non-tautology
+argument. Fixed by replacing with intrinsic computational characterization:
+"computation requiring mutable intermediate state or ordered multi-pass
+processing." This makes the counterfactual genuine: extending SPARQL with
+NFC primitives would move auto-wiring from R3 to R2, but it stays in
+$G_{\text{behav}}$ (still requires multi-pass processing), so the
+partitions diverge — proving non-tautology.
+
+### Observations
+
+1. The R3-undecidable/R3-separation distinction is a genuine structural
+   improvement. It clarifies that auto-wiring is a *design choice* (use
+   Python string processing) not a *mathematical necessity* (undecidable
+   problem). A framework with built-in SPARQL tokenization primitives
+   would have a different boundary.
+
+2. Theorem C.3 now depends on two GDS design choices: (a) arbitrary
+   `Callable` for behavioral components, (b) Python string processing for
+   auto-wiring. Changing either would require revising the theorem.
+
+3. The constructive witnesses (export functions + SHACL shapes + SPARQL
+   templates) serve double duty: they are both the *proof* of
+   representability and the *implementation* of it.
+
+### Next Steps
+
+- [x] ~~Write R3 undecidability reduction (Phase 2a)~~
+- [x] ~~Write R1/R2 decidability bounds (Phase 2b)~~
+- [x] ~~Write partition independence argument (Phase 2c)~~
+- [ ] Extend `gds_specs` to generate specs with parallel block groups
+- [ ] Add SystemIR, CanonicalGDS, and VerificationReport PBT round-trips
+- [ ] Add SHACL/SPARQL validation gate before reimport (Phase 3c)
+- [ ] Investigate Coq/ViCAR for mechanized interchange law proof (Phase 1b)
+
+---
