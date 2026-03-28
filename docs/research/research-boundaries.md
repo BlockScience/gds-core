@@ -450,9 +450,9 @@ Neither question requires immediate resolution. Both are triggered by concrete f
 |---|---|
 | Building a structural controllability analyzer | RQ1 (MIMO semantics) |
 | Building a shared simulation harness | RQ2 (timestep semantics) |
-| Adding a continuous-time DSL | RQ1 + RQ2 |
+| Adding a continuous-time DSL | RQ1 + RQ2 | **Done** — `gds-continuous` |
 | Adding a hybrid systems DSL | RQ1 + RQ2 |
-| Extracting state-space matrices (A, B, C, D) | RQ1 |
+| Extracting state-space matrices (A, B, C, D) | RQ1 | **Done** — `gds-symbolic` linearize |
 | Consolidating OGS PatternIR into GDSSpec | RQ3 (refactoring decision) |
 | Adding a stateless DSL (signal processing, Bayesian networks) | RQ3 (validates X=∅ pattern) |
 
