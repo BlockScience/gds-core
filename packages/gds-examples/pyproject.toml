@@ -35,6 +35,8 @@ dependencies = [
     "gds-stockflow>=0.1.0",
     "gds-games>=0.3.0",
     "gds-software>=0.1.0",
+    "gds-continuous>=0.1.0",
+    "gds-symbolic>=0.1.0",
 ]
 
 [project.urls]
@@ -49,6 +51,8 @@ gds-control = { workspace = true }
 gds-stockflow = { workspace = true }
 gds-games = { workspace = true }
 gds-software = { workspace = true }
+gds-continuous = { workspace = true }
+gds-symbolic = { workspace = true }
 
 [build-system]
 requires = ["hatchling"]
