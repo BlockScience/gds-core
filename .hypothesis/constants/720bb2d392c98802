@@ -1,4 +1,0 @@
-# file: /home/rohan/Documents/Github/blockscience/gds-core/packages/gds-framework/gds/serialize.py
-# hypothesis_version: 6.151.9
-
-['blocks', 'boundary_block', 'bounds', 'constraints', 'depends_on', 'depends_on_blocks', 'description', 'entities', 'generic', 'has_constraint', 'kind', 'mechanism', 'name', 'optional', 'options', 'parameters', 'params_used', 'preserves_invariant', 'python_type', 'reads', 'schema', 'source', 'space', 'spaces', 'symbol', 'target', 'type', 'typedef', 'types', 'units', 'updates', 'variables', 'wires', 'wirings']

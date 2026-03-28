@@ -94,7 +94,13 @@ def extract_payoff_matrices(ir: PatternIR) -> PayoffMatrices:
     ValueError
         If the PatternIR does not represent a valid 2-player normal-form game.
     """
-    import numpy as np
+    try:
+        import numpy as np
+    except ImportError as exc:
+        raise ImportError(
+            "numpy is required for payoff matrix extraction. "
+            "Install with: uv add gds-games[nash]"
+        ) from exc
 
     if not ir.action_spaces or len(ir.action_spaces) != 2:
         msg = f"Expected exactly 2 action spaces, got {len(ir.action_spaces or [])}"
@@ -116,13 +122,31 @@ def extract_payoff_matrices(ir: PatternIR) -> PayoffMatrices:
     B = np.zeros((m, n))
 
     # Build lookup from (action1, action2) -> terminal condition
+    populated: set[tuple[int, int]] = set()
     for tc in ir.terminal_conditions:
         if player1 not in tc.actions or player2 not in tc.actions:
-            continue
+            msg = (
+                f"Terminal condition '{tc.name}' missing actions "
+                f"for {player1} and/or {player2}. "
+                f"Got actions: {list(tc.actions.keys())}"
+            )
+            raise ValueError(msg)
         a1 = tc.actions[player1]
         a2 = tc.actions[player2]
-        if a1 not in actions1 or a2 not in actions2:
-            continue
+        if a1 not in actions1:
+            msg = (
+                f"Terminal condition '{tc.name}': "
+                f"unrecognized action '{a1}' for {player1}. "
+                f"Valid actions: {actions1}"
+            )
+            raise ValueError(msg)
+        if a2 not in actions2:
+            msg = (
+                f"Terminal condition '{tc.name}': "
+                f"unrecognized action '{a2}' for {player2}. "
+                f"Valid actions: {actions2}"
+            )
+            raise ValueError(msg)
 
         i = actions1.index(a1)
         j = actions2.index(a2)
@@ -137,6 +161,21 @@ def extract_payoff_matrices(ir: PatternIR) -> PayoffMatrices:
 
         A[i, j] = tc.payoffs[player1]
         B[i, j] = tc.payoffs[player2]
+        populated.add((i, j))
+
+    # Validate that all action profile entries are populated
+    expected = {(i, j) for i in range(m) for j in range(n)}
+    missing = expected - populated
+    if missing:
+        missing_profiles = [
+            f"({actions1[i]}, {actions2[j]})" for i, j in sorted(missing)
+        ]
+        msg = (
+            f"Incomplete payoff matrix: {len(missing)} of "
+            f"{m * n} action profiles have no terminal condition. "
+            f"Missing: {', '.join(missing_profiles)}"
+        )
+        raise ValueError(msg)
 
     return PayoffMatrices(
         A=A,

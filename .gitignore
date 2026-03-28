@@ -28,6 +28,7 @@ uv.lock
 .pytest_cache/
 htmlcov/
 .mypy_cache/
+.hypothesis/
 
 # MkDocs
 site/

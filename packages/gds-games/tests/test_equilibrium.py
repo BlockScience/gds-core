@@ -265,3 +265,45 @@ class TestComputeNash:
     def test_unknown_method(self) -> None:
         with pytest.raises(ValueError, match="Unknown method"):
             compute_nash(_prisoners_dilemma_ir(), method="bogus")
+
+
+class TestIncompleteGames:
+    """Validate errors on malformed games."""
+
+    def test_missing_terminal_condition(self) -> None:
+        """Incomplete payoff matrix (missing action profile) raises."""
+        ir = _prisoners_dilemma_ir()
+        # Remove one terminal condition → incomplete matrix
+        ir.terminal_conditions = ir.terminal_conditions[:3]
+        with pytest.raises(ValueError, match="Incomplete payoff matrix"):
+            extract_payoff_matrices(ir)
+
+    def test_unrecognized_action(self) -> None:
+        """Terminal condition with typo in action name raises."""
+        ir = _prisoners_dilemma_ir()
+        tc = ir.terminal_conditions[0]
+        players = list(tc.actions.keys())
+        bad_tc = type(tc)(
+            name=tc.name,
+            actions={players[0]: "TYPO_ACTION", players[1]: tc.actions[players[1]]},
+            outcome=tc.outcome,
+            payoffs=tc.payoffs,
+        )
+        ir.terminal_conditions[0] = bad_tc
+        with pytest.raises(ValueError, match="unrecognized action"):
+            extract_payoff_matrices(ir)
+
+    def test_missing_player_in_actions(self) -> None:
+        """Terminal condition missing a player's action raises."""
+        ir = _prisoners_dilemma_ir()
+        tc = ir.terminal_conditions[0]
+        players = list(tc.actions.keys())
+        bad_tc = type(tc)(
+            name=tc.name,
+            actions={players[0]: tc.actions[players[0]]},
+            outcome=tc.outcome,
+            payoffs=tc.payoffs,
+        )
+        ir.terminal_conditions[0] = bad_tc
+        with pytest.raises(ValueError, match="missing actions"):
+            extract_payoff_matrices(ir)
