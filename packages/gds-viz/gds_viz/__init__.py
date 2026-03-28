@@ -17,3 +17,12 @@ __all__ = [
     "system_to_mermaid",
     "trace_to_mermaid",
 ]
+
+
+def __getattr__(name: str) -> object:
+    """Lazy import for optional phase portrait module."""
+    if name == "phase_portrait":
+        from gds_viz.phase import phase_portrait
+
+        return phase_portrait
+    raise AttributeError(f"module 'gds_viz' has no attribute {name!r}")

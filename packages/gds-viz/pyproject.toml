@@ -33,6 +33,9 @@ dependencies = [
     "gds-framework>=0.2.3",
 ]
 
+[project.optional-dependencies]
+phase = ["matplotlib>=3.8", "numpy>=1.26", "gds-continuous>=0.1.0"]
+
 [project.urls]
 Homepage = "https://github.com/BlockScience/gds-core"
 Repository = "https://github.com/BlockScience/gds-core"
@@ -50,6 +53,7 @@ packages = ["gds_viz"]
 
 [tool.uv.sources]
 gds-framework = { workspace = true }
+gds-continuous = { workspace = true }
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -74,4 +78,7 @@ dev = [
     "pytest>=8.0",
     "pytest-cov>=6.0",
     "ruff>=0.8",
+    "matplotlib>=3.8",
+    "numpy>=1.26",
+    "scipy>=1.13",
 ]
