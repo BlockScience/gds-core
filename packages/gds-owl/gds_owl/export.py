@@ -405,6 +405,33 @@ def spec_to_graph(
             g.add((ts_uri, GDS_CORE["hasReadEntry"], entry))
         g.add((spec_uri, GDS_CORE["hasTransitionSignature"], ts_uri))
 
+    # State metrics
+    for sm_name, sm in spec.state_metrics.items():
+        sm_uri = _uri(ns, "state_metric", sm_name)
+        g.add((sm_uri, RDF.type, GDS_CORE["StateMetric"]))
+        g.add((sm_uri, GDS_CORE["name"], Literal(sm_name)))
+        if sm.metric_type:
+            g.add(
+                (sm_uri, GDS_CORE["metricType"], Literal(sm.metric_type))
+            )
+        g.add(
+            (
+                sm_uri,
+                GDS_CORE["metricHasDistance"],
+                Literal(sm.distance is not None, datatype=XSD.boolean),
+            )
+        )
+        g.add((sm_uri, GDS_CORE["description"], Literal(sm.description)))
+        for entity_name, var_name in sm.variables:
+            entry = BNode()
+            g.add((entry, RDF.type, GDS_CORE["MetricVariableEntry"]))
+            g.add((entry, GDS_CORE["metricEntity"], Literal(entity_name)))
+            g.add(
+                (entry, GDS_CORE["metricVariable"], Literal(var_name))
+            )
+            g.add((sm_uri, GDS_CORE["hasMetricVariable"], entry))
+        g.add((spec_uri, GDS_CORE["hasStateMetric"], sm_uri))
+
     return g
 
 
