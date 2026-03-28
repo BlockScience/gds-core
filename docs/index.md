@@ -65,28 +65,52 @@ Install just what you need: `uv add gds-core[control,continuous]`
 
 ## Architecture
 
-```
-gds-framework  ←  core engine (pydantic only)
-    ↑
-    ├── gds-viz        ←  Mermaid diagrams + phase portraits [matplotlib]
-    ├── gds-games      ←  game theory DSL + Nash equilibrium [nashpy]
-    ├── gds-stockflow  ←  stock-flow DSL
-    ├── gds-control    ←  control systems DSL
-    ├── gds-software   ←  software architecture DSL
-    ├── gds-business   ←  business dynamics DSL (CLD, SCN, VSM)
-    └── gds-owl        ←  OWL/SHACL/SPARQL export (rdflib, pyshacl)
-         ↑
-    gds-symbolic       ←  SymPy bridge (extends gds-control) [sympy]
-         ↑
-    gds-examples       ←  tutorials (depends on most DSLs + viz)
+```mermaid
+graph TD
+    classDef core fill:#e0e7ff,stroke:#4f46e5,stroke-width:2px,color:#1e1b4b
+    classDef dsl fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#78350f
+    classDef sim fill:#d1fae5,stroke:#059669,stroke-width:2px,color:#064e3b
+    classDef tool fill:#f3e8ff,stroke:#7c3aed,stroke-width:2px,color:#4c1d95
+    classDef ext fill:#e5e7eb,stroke:#6b7280,stroke-width:1px,color:#374151
 
-gds-sim            ←  discrete-time simulation (standalone, pydantic only)
-    ↑
-    ├── gds-analysis   ←  spec→sim bridge, reachability
-    └── gds-psuu       ←  parameter sweep + Optuna
+    FW["gds-framework<br/><small>core engine (pydantic only)</small>"]:::core
 
-gds-continuous     ←  continuous-time ODE engine (standalone) [scipy]
+    VIZ["gds-viz<br/><small>Mermaid + phase portraits</small>"]:::tool
+    OWL["gds-owl<br/><small>OWL / SHACL / SPARQL</small>"]:::tool
+
+    GAMES["gds-games<br/><small>game theory DSL</small>"]:::dsl
+    SF["gds-stockflow<br/><small>stock-flow DSL</small>"]:::dsl
+    CTRL["gds-control<br/><small>control systems DSL</small>"]:::dsl
+    SW["gds-software<br/><small>software architecture DSL</small>"]:::dsl
+    BIZ["gds-business<br/><small>business dynamics DSL</small>"]:::dsl
+
+    SYM["gds-symbolic<br/><small>SymPy + Hamiltonian</small>"]:::tool
+    EX["gds-examples<br/><small>tutorials + notebooks</small>"]:::ext
+
+    SIM["gds-sim<br/><small>discrete-time simulation</small>"]:::sim
+    AN["gds-analysis<br/><small>reachability + metrics</small>"]:::sim
+    PSUU["gds-psuu<br/><small>parameter sweep</small>"]:::sim
+
+    CONT["gds-continuous<br/><small>ODE engine (scipy)</small>"]:::sim
+
+    FW --> VIZ
+    FW --> OWL
+    FW --> GAMES
+    FW --> SF
+    FW --> CTRL
+    FW --> SW
+    FW --> BIZ
+    CTRL --> SYM
+    FW --> EX
+    VIZ --> EX
+
+    FW --> AN
+    SIM --> AN
+    SIM --> PSUU
+    CONT --> AN
 ```
+
+**Legend:** :blue_square: Core | :yellow_square: Domain DSLs | :green_square: Simulation & Analysis | :purple_square: Tooling
 
 ## License
 
