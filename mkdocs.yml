@@ -119,6 +119,9 @@ plugins:
           - {psuu/getting-started.md: "Installation + first parameter sweep"}
           - psuu/guide/*.md
           - psuu/api/*.md
+        Case Studies:
+          - {case-studies/index.md: "Real-world projects built on the GDS ecosystem"}
+          - {case-studies/axelrod.md: "Axelrod tournament — one model, many views with gds-games, gds-sim, gds-psuu, gds-viz"}
         Ecosystem:
           - {framework/ecosystem.md: "All packages, their imports, and dependency relationships"}
 
@@ -351,6 +354,9 @@ nav:
               - gds_psuu.optimizers: psuu/api/optimizers.md
               - gds_psuu.sweep: psuu/api/sweep.md
               - gds_psuu.results: psuu/api/results.md
+  - Case Studies:
+      - case-studies/index.md
+      - Axelrod Tournament: case-studies/axelrod.md
   - Design & Research:
       - Layer 0 Milestone: guides/architecture-milestone-layer0.md
       - DSL Roadmap: guides/dsl-roadmap.md
