@@ -10,14 +10,17 @@ using the structural skeleton.
 
 from __future__ import annotations
 
-from typing import Any
+import warnings
+from typing import TYPE_CHECKING, Any
 
-from gds import GDSSpec  # noqa: TC002
-from gds.blocks.roles import BoundaryAction, Mechanism, Policy
+from gds.blocks.roles import BoundaryAction, ControlAction, Mechanism, Policy
 from gds_sim import Model
 from gds_sim.types import StateUpdateBlock
 
 from gds_analysis.constraints import guarded_policy
+
+if TYPE_CHECKING:
+    from gds import GDSSpec
 
 
 def spec_to_model(
@@ -38,7 +41,7 @@ def spec_to_model(
         structural annotations.
     policies
         Mapping of block name -> policy callable. Required for every
-        BoundaryAction and Policy block.
+        BoundaryAction, Policy, and ControlAction block.
     sufs
         Mapping of block name -> state update callable. Required for
         every Mechanism block.
@@ -48,7 +51,8 @@ def spec_to_model(
     params
         Parameter sweep dict (passed through to gds_sim.Model).
     enforce_constraints
-        If True, wrap policies with AdmissibleInputConstraint guards.
+        If True, wrap BoundaryAction policies with
+        AdmissibleInputConstraint guards.
 
     Returns
     -------
@@ -101,17 +105,16 @@ def _build_state_update_blocks(
 ) -> list[StateUpdateBlock]:
     """Map spec blocks to gds-sim StateUpdateBlocks.
 
-    Follows the GDS tiered pattern:
-    - Tier 1: BoundaryAction + Policy blocks → policies
-    - Tier 2: Mechanism blocks → state update functions
-
-    Each wiring group becomes one StateUpdateBlock.
+    All blocks are packed into a single StateUpdateBlock. All policies
+    run in parallel (signal aggregation via dict.update), then all SUFs
+    run. Multi-wiring topologies with sequential tier dependencies are
+    not yet modeled — this is a known simplification.
     """
     block_policies: dict[str, Any] = {}
     block_sufs: dict[str, Any] = {}
 
     for name, block in spec.blocks.items():
-        if isinstance(block, (BoundaryAction, Policy)):
+        if isinstance(block, (BoundaryAction, Policy, ControlAction)):
             if name not in policies:
                 raise ValueError(
                     f"Missing policy function for block '{name}' "
@@ -120,6 +123,21 @@ def _build_state_update_blocks(
             fn = policies[name]
             if enforce_constraints and isinstance(block, BoundaryAction):
                 fn = _apply_constraint_guard(spec, name, fn)
+            elif enforce_constraints and not isinstance(block, BoundaryAction):
+                # Warn if constraints were registered for non-BoundaryAction
+                mismatched = [
+                    ac
+                    for ac in spec.admissibility_constraints.values()
+                    if ac.boundary_block == name
+                ]
+                if mismatched:
+                    warnings.warn(
+                        f"AdmissibleInputConstraint targets block "
+                        f"'{name}' ({type(block).__name__}), but "
+                        f"constraints are only enforced on "
+                        f"BoundaryAction blocks.",
+                        stacklevel=3,
+                    )
             block_policies[name] = fn
 
         elif isinstance(block, Mechanism):
