@@ -142,7 +142,9 @@ class TestReachableSet:
             state_key="Room.temperature",
             float_tolerance=4,
         )
-        assert r2.n_distinct <= r1.n_distinct
+        # Commands differ by ~1e-7; after SUF the temperature diff is
+        # ~1e-8. Rounding to 4 decimal places collapses them.
+        assert r2.n_distinct == 1
 
 
 class TestReachableGraph:
