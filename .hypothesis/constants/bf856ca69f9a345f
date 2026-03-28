@@ -1,4 +1,0 @@
-# file: /home/rohan/Documents/Github/blockscience/gds-core/packages/gds-owl/gds_owl/serialize.py
-# hypothesis_version: 6.151.9
-
-['json-ld', 'nt', 'turtle']

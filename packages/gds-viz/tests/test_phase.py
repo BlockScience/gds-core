@@ -8,6 +8,7 @@ import pytest
 
 matplotlib = pytest.importorskip("matplotlib")
 numpy = pytest.importorskip("numpy")
+gds_continuous = pytest.importorskip("gds_continuous")
 
 from gds_continuous import ODEModel  # noqa: E402
 from gds_viz.phase import (  # noqa: E402

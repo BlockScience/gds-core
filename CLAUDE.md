@@ -4,20 +4,26 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-`gds-core` — monorepo for the Generalized Dynamical Systems ecosystem. Typed compositional specifications for complex systems, grounded in [GDS theory](https://doi.org/10.57938/e8d456ea-d975-4111-ac41-052ce73cb0cc). Seven packages managed as a uv workspace.
+`gds-core` — monorepo for the Generalized Dynamical Systems ecosystem. Typed compositional specifications for complex systems, grounded in [GDS theory](https://doi.org/10.57938/e8d456ea-d975-4111-ac41-052ce73cb0cc). Fourteen packages managed as a uv workspace.
 
 ## Packages
 
-| Package | Import | Location |
-|---------|--------|----------|
-| gds-framework | `gds` | `packages/gds-framework/` |
-| gds-viz | `gds_viz` | `packages/gds-viz/` |
-| gds-games | `ogs` | `packages/gds-games/` |
-| gds-stockflow | `stockflow` | `packages/gds-stockflow/` |
-| gds-control | `gds_control` | `packages/gds-control/` |
-| gds-software | `gds_software` | `packages/gds-software/` |
-| gds-sim | `gds_sim` | `packages/gds-sim/` |
-| gds-examples | — | `packages/gds-examples/` |
+| Package | Import | Location | Role |
+|---------|--------|----------|------|
+| gds-framework | `gds` | `packages/gds-framework/` | Core engine |
+| gds-viz | `gds_viz` | `packages/gds-viz/` | Mermaid + phase portraits |
+| gds-games | `ogs` | `packages/gds-games/` | Game theory DSL |
+| gds-stockflow | `stockflow` | `packages/gds-stockflow/` | Stock-flow DSL |
+| gds-control | `gds_control` | `packages/gds-control/` | Control systems DSL |
+| gds-software | `gds_software` | `packages/gds-software/` | Software architecture DSL |
+| gds-business | `gds_business` | `packages/gds-business/` | Business dynamics DSL |
+| gds-sim | `gds_sim` | `packages/gds-sim/` | Discrete-time simulation |
+| gds-continuous | `gds_continuous` | `packages/gds-continuous/` | Continuous-time ODE engine |
+| gds-symbolic | `gds_symbolic` | `packages/gds-symbolic/` | SymPy bridge for control |
+| gds-analysis | `gds_analysis` | `packages/gds-analysis/` | Spec-to-sim bridge |
+| gds-psuu | `gds_psuu` | `packages/gds-psuu/` | Parameter sweep + Optuna |
+| gds-owl | `gds_owl` | `packages/gds-owl/` | OWL/SHACL/SPARQL export |
+| gds-examples | — | `packages/gds-examples/` | Tutorials + examples |
 
 ## Commands
 
@@ -32,14 +38,18 @@ uv run --package gds-games pytest packages/gds-games/tests -v
 uv run --package gds-stockflow pytest packages/gds-stockflow/tests -v
 uv run --package gds-control pytest packages/gds-control/tests -v
 uv run --package gds-software pytest packages/gds-software/tests -v
-uv run --package gds-examples pytest packages/gds-examples -v
+uv run --package gds-continuous pytest packages/gds-continuous/tests -v
+uv run --package gds-symbolic pytest packages/gds-symbolic/tests -v
+uv run --package gds-analysis pytest packages/gds-analysis/tests -v
 uv run --package gds-sim pytest packages/gds-sim/tests -v
+uv run --package gds-owl pytest packages/gds-owl/tests -v
+uv run --package gds-examples pytest packages/gds-examples -v
 
 # Run a single test
 uv run --package gds-framework pytest packages/gds-framework/tests/test_blocks.py::TestStackComposition::test_rshift_operator -v
 
 # Run all tests across all packages
-uv run --package gds-framework pytest packages/gds-framework/tests packages/gds-viz/tests packages/gds-games/tests packages/gds-stockflow/tests packages/gds-control/tests packages/gds-software/tests packages/gds-examples packages/gds-sim/tests -v
+uv run --package gds-framework pytest packages/gds-framework/tests packages/gds-viz/tests packages/gds-games/tests packages/gds-stockflow/tests packages/gds-control/tests packages/gds-software/tests packages/gds-continuous/tests packages/gds-symbolic/tests packages/gds-analysis/tests packages/gds-sim/tests packages/gds-owl/tests packages/gds-examples -v
 
 # Lint & format
 uv run ruff check packages/
@@ -61,17 +71,26 @@ This is a **uv workspace** monorepo. The root `pyproject.toml` declares `package
 ### Dependency Graph
 
 ```
-gds-framework  ←  core engine (no GDS dependencies)
+gds-framework  ←  core engine (pydantic only, no upstream deps)
     ↑
-gds-viz        ←  visualization (depends on gds-framework)
-gds-games      ←  game theory DSL (depends on gds-framework)
-gds-stockflow  ←  stock-flow DSL (depends on gds-framework)
-gds-control    ←  control systems DSL (depends on gds-framework)
-gds-software   ←  software architecture DSL (depends on gds-framework)
-    ↑
-gds-examples   ←  tutorials (depends on gds-framework + gds-viz)
+    ├── gds-viz        ←  Mermaid diagrams + phase portraits [matplotlib]
+    ├── gds-games      ←  game theory DSL + Nash equilibrium [nashpy]
+    ├── gds-stockflow  ←  stock-flow DSL
+    ├── gds-control    ←  control systems DSL
+    ├── gds-software   ←  software architecture DSL
+    ├── gds-business   ←  business dynamics DSL (CLD, SCN, VSM)
+    └── gds-owl        ←  OWL/SHACL/SPARQL export (rdflib, pyshacl)
+         ↑
+    gds-symbolic       ←  SymPy bridge (extends gds-control) [sympy]
+         ↑
+    gds-examples       ←  tutorials (depends on most DSLs + viz)
 
-gds-sim        ←  simulation engine (standalone — no gds-framework dep, only pydantic)
+gds-sim            ←  discrete-time simulation (standalone, pydantic only)
+    ↑
+    ├── gds-analysis   ←  spec→sim bridge, reachability (gds-framework + gds-sim)
+    └── gds-psuu       ←  parameter sweep + Optuna (gds-sim)
+
+gds-continuous     ←  continuous-time ODE engine (standalone, pydantic only) [scipy]
 ```
 
 ### gds-framework: Two-Layer Design
@@ -86,7 +105,7 @@ These layers are loosely coupled — you can use the composition algebra without
 
 ### Domain DSL Pattern
 
-Four domain DSLs (stockflow, control, games, software) compile to GDS. The stockflow, control, and software packages follow a shared pattern:
+Five domain DSLs (stockflow, control, games, software, business) compile to GDS. The stockflow, control, software, and business packages follow a shared pattern:
 
 1. **Elements** — frozen Pydantic models for user-facing declarations (not GDS blocks)
 2. **Model** — mutable container with `@model_validator` construction-time validation

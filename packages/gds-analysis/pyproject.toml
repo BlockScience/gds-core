@@ -32,6 +32,9 @@ dependencies = [
     "gds-sim>=0.1.0",
 ]
 
+[project.optional-dependencies]
+continuous = ["gds-continuous[scipy]>=0.1.0", "numpy>=1.26"]
+
 [project.urls]
 Homepage = "https://github.com/BlockScience/gds-core"
 Repository = "https://github.com/BlockScience/gds-core"

@@ -1,4 +1,0 @@
-# file: /home/rohan/Documents/Github/blockscience/gds-core/packages/gds-framework/gds/types/typedef.py
-# hypothesis_version: 6.151.9
-
-[0.0, 1.0, 'A value in [0, 1]', 'AgentID', 'NonNegativeFloat', 'PositiveInt', 'Probability', 'Timestamp', 'TokenAmount', 'seconds', 'tokens']

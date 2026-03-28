@@ -127,13 +127,6 @@ class TestReachableSet:
             {"command": 1.0000001},
             {"command": 1.0000002},
         ]
-        # Without tolerance: may produce 2 distinct states
-        r1 = reachable_set(
-            model,
-            state,
-            input_samples=samples,
-            state_key="Room.temperature",
-        )
         # With tolerance=4: rounds to 4 decimal places, should collapse
         r2 = reachable_set(
             model,

@@ -616,3 +616,176 @@ gds-analysis now has 52 tests at 94% coverage. The API is cleaner
 (coverage metadata), and the float fingerprinting is robust.
 
 ---
+
+## Entry 008 — 2026-03-28
+
+**Subject:** Session scorecard — full verification + analysis arc
+
+### What Landed (Single Session)
+
+**Verification Framework (Phases 1a, 2, 3):**
+- 13 algebra PBT tests (interchange law, associativity, commutativity,
+  identity) with Hypothesis CI reproducibility profiles
+- R3 undecidability proofs (6 propositions, R3-undecidable/R3-separation
+  sub-classification) + R1/R2 decidability bounds + Theorem C.3 partition
+  independence
+- 26 OWL round-trip PBT tests (SHACL gate, SPARQL conformance, derived
+  property preservation, strategy invariants)
+
+**Bridge Proposal Steps 1-5:**
+- Step 1: AdmissibleInputConstraint (prior)
+- Step 2: TransitionSignature (prior)
+- Step 3: StateMetric (this session)
+- Step 4: `reachable_set()` with ReachabilityResult metadata
+- Step 5: `configuration_space()` via iterative Tarjan SCC
+
+**gds-analysis Package (new):**
+- `spec_to_model()` adapter: GDSSpec → gds_sim.Model
+- `guarded_policy()`: runtime constraint enforcement with `depends_on`
+  projection
+- `trajectory_distances()`: StateMetric computation on trajectories
+- `reachable_set()` / `reachable_graph()` / `configuration_space()`:
+  reachability analysis with float tolerance and exhaustive/sampled
+  distinction
+- 52 tests, 94% coverage
+
+**Ecosystem Extensions (closed today):**
+- #77: Nashpy equilibrium computation (11 tests)
+- #122: gds-continuous ODE engine (49 tests)
+- #125: SymPy symbolic math (29 tests)
+- #126: Phase portrait visualization (10 tests)
+
+**Integration Examples:**
+- SIR epidemic: spec → simulate → conservation check → distances →
+  reachable set
+- Crosswalk: spec → simulate → Markov transition verification →
+  reachability graph → SCC (configuration space)
+- Heating-cooling example (9 tests)
+
+**Quality:**
+- 3 rounds of code review on PBT tests
+- 2 independent audits (software architecture + data science methodology)
+  with all Phase 1-2 fixes applied
+- CI fix: gds-viz phase portrait tests now skip when gds-continuous
+  unavailable (was failing CI on main)
+
+**Research Documentation:**
+- Verification plan (4 phases)
+- Formal proofs (R3 undecidability + representability bounds)
+- Research journal (8 entries)
+- 5 GitHub issues created and closed, 3 new issues for future work
+
+### Issue Scorecard
+
+| Issue | Title | Status |
+|---|---|---|
+| #134 | Phase 1a: Interchange law PBT | Closed |
+| #135 | Phase 1b-c: Coq mechanized proofs | Open (long-term) |
+| #136 | Phase 2: R1/R2/R3 as theorem | Closed |
+| #137 | Phase 3: Round-trip PBT | Closed |
+| #138 | Phase 4: Dynamical invariants | Closed (superseded) |
+| #139 | Verification + StateMetric PR | Merged to main |
+| #140 | gds-analysis package | Closed |
+| #141 | Reachable set R(x) + X_C | Closed |
+| #142 | Contingent derivative (Steps 6-7) | Open (research) |
+| #146 | gds-analysis + audits PR | Merged to main |
+
+### Remaining Open
+
+| Issue | Title | Blocker |
+|---|---|---|
+| #76 | Lean 4 export | Toolchain |
+| #123 | Continuous-time differential games | Research |
+| #124 | Optimal control / Hamiltonian | Research |
+| #127 | Backward reachable set (gds-control) | gds-analysis |
+| #135 | Coq mechanized proofs | Toolchain |
+| #142 | Contingent derivative + controllability | Research |
+| #143 | Package consolidation | Architecture decision |
+
+### Key Observations
+
+1. The bridge proposal (Steps 1-5) is now structurally complete. The
+   gap between the paper's mathematical definitions and the code is
+   closed for the non-research items. Steps 6-7 remain genuinely
+   research-level (contingent derivative, controllability).
+
+2. gds-analysis connects gds-framework to gds-sim without either
+   package knowing about the other. The adapter pattern preserves
+   the clean dependency graph.
+
+3. The verification framework provides three layers of confidence:
+   - PBT (Hypothesis): empirical confidence across random inputs
+   - Formal proofs (markdown + LaTeX): mathematical arguments
+   - SHACL/SPARQL validation: ontological consistency
+
+4. The R3-undecidable/R3-separation distinction is a genuine
+   contribution — it clarifies which GDS design choices create the
+   representability boundary and which could be moved by extending
+   the formalism.
+
+---
+
+## Entry 009 — 2026-03-28
+
+**Subject:** Final audit fixes + Hamiltonian mechanics (#124)
+
+### Audit Fixes
+
+Addressed final audit findings from the dev-vs-main diff review:
+
+- **F841 lint**: removed unused `r1` variable in float tolerance test
+- **.hypothesis/ committed**: removed from tracking, added to `.gitignore`
+  (47 constants + example files were machine-specific cache)
+- **ogs/equilibrium.py** (2 medium findings):
+  - `extract_payoff_matrices()` now raises `ValueError` on unrecognized
+    actions instead of silently skipping (→ zero payoff)
+  - Validates payoff matrix completeness — raises on missing action
+    profiles instead of silent zeros
+  - Numpy import guarded with helpful `ImportError`
+  - 3 new tests: incomplete TC, typo action, missing player
+
+### Hamiltonian Mechanics (#124)
+
+Added `hamiltonian.py` module to gds-symbolic, implementing Pontryagin's
+Maximum Principle via symbolic differentiation:
+
+- **`HamiltonianSpec`**: Lagrangian `L(x, u, t)`, terminal cost, control
+  bounds, free-final-time flag
+- **`derive_hamiltonian()`**: builds H = L + p^T f symbolically, computes
+  costate dynamics dp/dt = -dH/dx via `sympy.diff`, lambdifies the
+  augmented (x, p) system to a plain Python ODE callable
+- **`derive_from_model()`**: convenience wrapper for `SymbolicControlModel`
+- **`verify_conservation()`**: checks H = const along a trajectory (for
+  optimality verification)
+
+10 new tests: 1D LQR, 2D harmonic oscillator, parameterized dynamics,
+missing state equations, SymbolicControlModel integration, conservation
+checks, and end-to-end ODE integration (derive → integrate → verify).
+
+### Issue Status
+
+| Issue | Status |
+|---|---|
+| #124 Hamiltonian mechanics | **Closed** |
+| #127 Backward reachable sets | Open (next) |
+| #123 Continuous-time games | Open (needs design) |
+| #143 Package consolidation | Open (architecture) |
+| #135 Coq proofs | Open (tooling) |
+| #142 Controllability | Open (research) |
+| #76 Lean 4 export | Open (tooling) |
+
+### Session Totals (Full Day)
+
+| Metric | Count |
+|---|---|
+| Issues closed | 10 (#77, #122, #124, #125, #126, #134, #136, #137, #140, #141) |
+| Issues superseded | 1 (#138) |
+| New packages | 2 (gds-analysis, gds-continuous) |
+| New modules | 3 (hamiltonian.py, reachability.py, equilibrium.py) |
+| New tests written | ~160 |
+| Formal proofs | 2 documents (R3 undecidability + representability bounds) |
+| Audits completed | 5 (3 code reviews + 2 independent audits) |
+| Journal entries | 9 |
+| PRs merged to main | 4 (#133, #139, #146, pending) |
+
+---
