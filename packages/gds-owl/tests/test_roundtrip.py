@@ -90,9 +90,7 @@ class TestSpecRoundTrip:
         for td in spec2.types.values():
             assert td.constraint is None
 
-    def test_admissibility_constraints_survive(
-        self, thermostat_spec: GDSSpec
-    ) -> None:
+    def test_admissibility_constraints_survive(self, thermostat_spec: GDSSpec) -> None:
         from gds.constraints import AdmissibleInputConstraint
 
         thermostat_spec.register_admissibility(
@@ -112,9 +110,7 @@ class TestSpecRoundTrip:
         assert ac.description == "Sensor reads room temp"
         assert ac.constraint is None  # lossy
 
-    def test_transition_signatures_survive(
-        self, thermostat_spec: GDSSpec
-    ) -> None:
+    def test_transition_signatures_survive(self, thermostat_spec: GDSSpec) -> None:
         from gds.constraints import TransitionSignature
 
         thermostat_spec.register_transition_signature(

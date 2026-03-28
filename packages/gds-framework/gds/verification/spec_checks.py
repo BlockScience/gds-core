@@ -385,9 +385,7 @@ def check_transition_reads(spec: GDSSpec) -> list[Finding]:
 
         for entity_name, var_name in ts.reads:
             if entity_name not in spec.entities:
-                issues.append(
-                    f"'{ts.mechanism}': reads unknown entity '{entity_name}'"
-                )
+                issues.append(f"'{ts.mechanism}': reads unknown entity '{entity_name}'")
             elif var_name not in spec.entities[entity_name].variables:
                 issues.append(
                     f"'{ts.mechanism}': reads unknown variable "

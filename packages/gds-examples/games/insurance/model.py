@@ -287,8 +287,9 @@ def build_spec() -> GDSSpec:
             name="solvency_constraint",
             boundary_block="Claim Arrival",
             depends_on=[("Insurer", "reserve")],
-            constraint=lambda state, u: u.get("amount", 0)
-            <= state["Insurer"]["reserve"],
+            constraint=lambda state, u: (
+                u.get("amount", 0) <= state["Insurer"]["reserve"]
+            ),
             description="Claim amount cannot exceed insurer reserve (solvency)",
         )
     )

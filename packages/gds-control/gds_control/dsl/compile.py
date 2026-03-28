@@ -383,9 +383,7 @@ def compile_model(model: ControlModel) -> GDSSpec:
 
     for state in model.states:
         driving_controllers = [
-            ctrl.name
-            for ctrl in model.controllers
-            if state.name in ctrl.drives
+            ctrl.name for ctrl in model.controllers if state.name in ctrl.drives
         ]
         spec.register_transition_signature(
             TransitionSignature(
