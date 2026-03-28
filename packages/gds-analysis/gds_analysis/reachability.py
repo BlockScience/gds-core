@@ -4,94 +4,141 @@ Paper Definition 4.1: R(x) = union over u in U_x of {f(x, u)}
 
 Given a state x, the reachable set R(x) is the set of all states
 reachable in one step by applying any admissible input. For discrete
-input spaces, this can be computed exactly by enumeration. For
-continuous spaces, Monte Carlo sampling approximates R(x).
+input spaces with exhaustive enumeration, R(x) is exact. For
+continuous spaces, Monte Carlo sampling approximates R(x) without
+coverage guarantees.
 
 Paper Definition 4.2: X_C is the configuration space -- the largest
 set of mutually reachable states (largest SCC of the reachability graph).
+
+Note: configuration_space operates on the sampled graph, not the true
+transition structure. Missing edges (unsampled inputs) may split or
+merge SCCs. For discrete systems, provide exhaustive input samples.
 """
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from dataclasses import dataclass, field
+from typing import Any
 
 from gds_sim import Model, Simulation
-
-if TYPE_CHECKING:
-    from gds import GDSSpec
 
 _META_KEYS = frozenset({"timestep", "substep", "run", "subset"})
 
 
+@dataclass
+class ReachabilityResult:
+    """Result of a reachable set computation with coverage metadata.
+
+    Attributes
+    ----------
+    states
+        Distinct reached states.
+    n_samples
+        Number of input samples tried.
+    n_distinct
+        Number of distinct states found.
+    is_exhaustive
+        Whether the caller declared the input samples as exhaustive.
+        When True, ``states`` is the exact R(x). When False, it is
+        a lower bound (unsampled inputs may reach additional states).
+    """
+
+    states: list[dict[str, Any]] = field(default_factory=list)
+    n_samples: int = 0
+    n_distinct: int = 0
+    is_exhaustive: bool = False
+
+
 def reachable_set(
-    spec: GDSSpec,
     model: Model,
     state: dict[str, Any],
     *,
     input_samples: list[dict[str, Any]],
     state_key: str | None = None,
-) -> list[dict[str, Any]]:
+    exhaustive: bool = False,
+    float_tolerance: float | None = None,
+) -> ReachabilityResult:
     """Compute the reachable set R(x) by running one timestep per input.
 
     Parameters
     ----------
-    spec
-        GDSSpec (used for structural metadata; not directly executed).
     model
         A gds_sim.Model with policies and SUFs already wired.
     state
         The current state x from which to compute reachability.
     input_samples
         List of input dicts to try. Each dict overrides the policy
-        outputs for one simulation step. For BoundaryAction blocks,
-        these represent exogenous inputs u.
+        outputs for one simulation step. For discrete state spaces,
+        pass exhaustive inputs and set ``exhaustive=True`` for exact
+        R(x). For continuous spaces, results are approximate (no
+        coverage guarantee).
     state_key
         If provided, extract only this key from each reached state
         for comparison. Otherwise return full state dicts.
+    exhaustive
+        If True, declares that ``input_samples`` covers the full
+        input space. The result's ``is_exhaustive`` flag is set
+        accordingly. This is a caller assertion, not verified.
+    float_tolerance
+        If provided, round float values to this number of decimal
+        places before fingerprinting. This prevents distinct
+        fingerprints from float rounding noise. For example,
+        ``float_tolerance=6`` rounds to 6 decimal places.
 
     Returns
     -------
-    List of distinct reached states (one per input sample that
-    produced a unique next state).
+    ReachabilityResult
+        Contains the distinct reached states plus coverage metadata.
     """
     reached: list[dict[str, Any]] = []
     seen: set[tuple[Any, ...]] = set()
 
     for sample in input_samples:
         next_state = _step_once(model, state, sample)
-        fingerprint = _state_fingerprint(next_state, state_key)
+        fingerprint = _state_fingerprint(next_state, state_key, float_tolerance)
         if fingerprint not in seen:
             seen.add(fingerprint)
             reached.append(next_state)
 
-    return reached
+    return ReachabilityResult(
+        states=reached,
+        n_samples=len(input_samples),
+        n_distinct=len(reached),
+        is_exhaustive=exhaustive,
+    )
 
 
 def reachable_graph(
-    spec: GDSSpec,
     model: Model,
     initial_states: list[dict[str, Any]],
     *,
     input_samples: list[dict[str, Any]],
     max_depth: int = 1,
     state_key: str | None = None,
+    exhaustive: bool = False,
+    float_tolerance: float | None = None,
 ) -> dict[tuple[Any, ...], list[tuple[Any, ...]]]:
     """Build a reachability graph by BFS from initial states.
 
     Parameters
     ----------
-    spec
-        GDSSpec for structural metadata.
     model
         A gds_sim.Model with policies and SUFs wired.
     initial_states
         Starting states for the BFS.
     input_samples
         Inputs to try at each state (same set applied everywhere).
+        For discrete systems, use exhaustive enumeration for exact
+        graphs. For continuous systems, results are approximate.
     max_depth
         Maximum BFS depth (number of steps from initial states).
     state_key
         Key to extract for state fingerprinting.
+    exhaustive
+        Passed through to ``reachable_set`` at each node.
+    float_tolerance
+        Passed through to ``reachable_set`` at each node.
 
     Returns
     -------
@@ -105,21 +152,24 @@ def reachable_graph(
     for _ in range(max_depth):
         next_frontier: list[dict[str, Any]] = []
         for state in frontier:
-            fp = _state_fingerprint(state, state_key)
+            fp = _state_fingerprint(state, state_key, float_tolerance)
             if fp in visited:
                 continue
             visited.add(fp)
 
-            neighbors = reachable_set(
-                spec,
+            result = reachable_set(
                 model,
                 state,
                 input_samples=input_samples,
                 state_key=state_key,
+                exhaustive=exhaustive,
+                float_tolerance=float_tolerance,
             )
-            neighbor_fps = [_state_fingerprint(n, state_key) for n in neighbors]
+            neighbor_fps = [
+                _state_fingerprint(n, state_key, float_tolerance) for n in result.states
+            ]
             graph[fp] = neighbor_fps
-            next_frontier.extend(neighbors)
+            next_frontier.extend(result.states)
 
         frontier = next_frontier
         if not frontier:
@@ -139,6 +189,10 @@ def configuration_space(
     the configuration space X_C.
 
     Uses iterative Tarjan's algorithm (no recursion limit).
+
+    Note: SCCs are only as complete as the input graph. For sampled
+    (non-exhaustive) graphs, missing edges may cause SCCs to be
+    smaller than the true configuration space.
     """
     index_counter = 0
     stack: list[tuple[Any, ...]] = []
@@ -179,7 +233,6 @@ def configuration_space(
             if found_unvisited:
                 continue
 
-            # All neighbors processed — check for SCC root.
             if lowlink[v] == index[v]:
                 scc: set[tuple[Any, ...]] = set()
                 while True:
@@ -191,7 +244,6 @@ def configuration_space(
                 sccs.append(scc)
 
             work.pop()
-            # Update parent's lowlink.
             if work:
                 parent = work[-1][0]
                 lowlink[parent] = min(lowlink[parent], lowlink[v])
@@ -210,7 +262,6 @@ def _step_once(
     runs for 1 timestep, and returns the resulting state with metadata
     keys stripped.
     """
-    # Strip any metadata keys from incoming state (from prior BFS steps).
     clean_state = {k: v for k, v in state.items() if k not in _META_KEYS}
 
     def _override_policy(st: dict, params: dict, **kw: Any) -> dict:
@@ -234,15 +285,37 @@ def _step_once(
     results = sim.run()
     rows = results.to_list()
     raw = rows[-1] if rows else dict(clean_state)
-    # Strip gds-sim metadata keys from the result.
     return {k: v for k, v in raw.items() if k not in _META_KEYS}
 
 
 def _state_fingerprint(
     state: dict[str, Any],
     state_key: str | None,
+    float_tolerance: float | None = None,
 ) -> tuple[Any, ...]:
-    """Create a hashable fingerprint of a state for deduplication."""
+    """Create a hashable fingerprint of a state for deduplication.
+
+    Parameters
+    ----------
+    state
+        State dict to fingerprint.
+    state_key
+        If provided, fingerprint only this key.
+    float_tolerance
+        If provided (as number of decimal places), round float values
+        before fingerprinting to absorb rounding noise.
+    """
     if state_key is not None:
-        return (state_key, state.get(state_key))
-    return tuple(sorted((k, v) for k, v in state.items() if k not in _META_KEYS))
+        val = state.get(state_key)
+        if float_tolerance is not None and isinstance(val, float):
+            val = round(val, int(float_tolerance))
+        return (state_key, val)
+
+    items = []
+    for k, v in sorted(state.items()):
+        if k in _META_KEYS:
+            continue
+        if float_tolerance is not None and isinstance(v, float):
+            v = round(v, int(float_tolerance))
+        items.append((k, v))
+    return tuple(items)

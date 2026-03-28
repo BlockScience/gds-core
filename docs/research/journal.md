@@ -547,3 +547,72 @@ Commit: `081cb9c`
    conditions that go beyond trajectory sampling.
 
 ---
+
+## Entry 007 — 2026-03-28
+
+**Subject:** gds-analysis audits and Phase 1-2 fixes
+
+### Motivation
+
+Two independent audits (software architecture + data science methodology)
+identified 9+8 findings across gds-analysis. Phase 1 and Phase 2 items
+addressed in this session.
+
+### Software Architecture Audit (7 findings)
+
+| # | Finding | Severity |
+|---|---|---|
+| 1 | Adapter collapses topology (single StateUpdateBlock) | Documented |
+| 2 | State key convention undocumented | **Fixed** |
+| 3 | Phantom `spec` parameter in reachability | **Fixed** |
+| 4 | No batch execution for reachability | Documented (future) |
+| 5 | guarded_policy wrapping invisible | Minor (has `__wrapped__`) |
+| 6 | No bridge/analysis module separation | Documented (future) |
+| 7 | PBT strategies linear-only | Documented (future) |
+
+### Data Science Audit (8 findings)
+
+| # | Finding | Severity |
+|---|---|---|
+| 1 | No coverage guarantee for Monte Carlo reachability | **Fixed** (ReachabilityResult) |
+| 2 | Euclidean distance meaningless on discrete states | Documented |
+| 3 | SIR discrete-time lacks stability analysis | Low risk (1e-6 tolerance has 5 orders headroom) |
+| 4 | SCC only valid for sampled graph | **Fixed** (documented caveat) |
+| 5 | Unreachability by enumeration not proof | **Fixed** (exhaustive flag + comments) |
+| 6 | PBT low coverage (same as SW #7) | Documented |
+| 7 | No baseline for trajectory distances | Future |
+| 8 | 1e-6 conservation tolerance unjustified | Low risk |
+
+### Fixes Applied
+
+**Phase 1 (commits `a304d86`):**
+- Removed phantom `spec` parameter from `reachable_set()` and
+  `reachable_graph()` (15 call sites updated)
+- Documented state key convention ("Entity.Variable") in adapter docstring
+- Added multi-update Mechanism warning
+- Documented exhaustive/sampled distinction in all reachability docstrings
+
+**Phase 2 (commits `250308b`, `4c5967e`):**
+- `ReachabilityResult` dataclass: `states`, `n_samples`, `n_distinct`,
+  `is_exhaustive` metadata for coverage tracking
+- `float_tolerance` parameter: rounds float values before fingerprinting to
+  absorb rounding noise (number of decimal places)
+- `exhaustive=True` flag on crosswalk tests (3 inputs are provably
+  exhaustive for the discrete space)
+- Tightened float tolerance test assertion to `assertEqual(n_distinct, 1)`
+
+**Prior audit fixes (commit `85e2f4a`):**
+- `_step_once` strips metadata keys from state dicts
+- ControlAction blocks handled by adapter
+- `depends_on` projected at runtime in constraint enforcement
+- Iterative Tarjan SCC (no recursion limit)
+- `assert` replaced with `ValueError` in metrics
+- Docstring corrections
+
+### Outcome
+
+gds-analysis now has 52 tests at 94% coverage. The API is cleaner
+(no phantom parameters), the reachability results are interpretable
+(coverage metadata), and the float fingerprinting is robust.
+
+---

@@ -62,3 +62,17 @@ __all__ = [
     "InputType",
     "CompositionType",
 ]
+
+
+def __getattr__(name: str) -> object:
+    """Lazy import for optional equilibrium module."""
+    if name in (
+        "compute_nash",
+        "extract_payoff_matrices",
+        "NashResult",
+        "PayoffMatrices",
+    ):
+        from ogs import equilibrium
+
+        return getattr(equilibrium, name)
+    raise AttributeError(f"module 'ogs' has no attribute {name!r}")

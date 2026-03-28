@@ -42,6 +42,7 @@ class TerminalCondition(BaseModel):
     outcome: str
     description: str = ""
     payoff_description: str = ""
+    payoffs: dict[str, float] = Field(default_factory=dict)
 
 
 class ActionSpace(BaseModel):
