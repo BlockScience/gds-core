@@ -111,10 +111,10 @@ fields survive. Known lossy fields:
 
 | Metric | Count |
 |---|---|
-| R1 concepts (fully representable) | 12 |
+| R1 concepts (fully representable) | 13 |
 | R2 concepts (SPARQL-needed) | 3 |
-| R3 concepts (not representable) | 6 |
-| SHACL shapes | 13 |
+| R3 concepts (not representable) | 7 |
+| SHACL shapes | 18 |
 | SPARQL templates | 7 |
 | Verification checks expressible in SHACL | 6 of 15 |
 | Verification checks expressible in SPARQL | 6 more |

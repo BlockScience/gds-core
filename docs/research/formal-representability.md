@@ -175,7 +175,7 @@ Token overlap is the auto-wiring predicate:
 compatible(p1, p2) := tokenize(p1.name) ∩ tokenize(p2.name) != empty
 ```
 
-**Definition 1.3 (GDSSpec).** A specification is an 8-tuple:
+**Definition 1.3 (GDSSpec).** A specification is an 9-tuple:
 
 ```
 S = (T, Sp, E, B, W, Theta, A, Sig)
@@ -190,7 +190,7 @@ A     : Name -> AdmissibleInputConstraint   (state-dependent input constraints)
 Sig   : MechName -> TransitionSignature     (mechanism read dependencies)
 ```
 
-While presented as an 8-tuple, these components are cross-referencing:
+While presented as an 9-tuple, these components are cross-referencing:
 blocks reference types, wirings reference blocks, entities reference types,
 admissibility constraints reference boundary blocks and entity variables,
 transition signatures reference mechanisms and entity variables.
@@ -443,7 +443,7 @@ Specifically:
 
 ## 4. Layer 1 Representability: Specification Framework
 
-**Property 4.1 (GDSSpec Structure is R1).** The 8-tuple
+**Property 4.1 (GDSSpec Structure is R1).** The 9-tuple
 S = (T, Sp, E, B, W, Theta, A, Sig) round-trips through OWL losslessly
 for all structural fields.
 

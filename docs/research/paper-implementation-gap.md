@@ -266,26 +266,21 @@ states are from each other.
 
 **Paper reference:** Assumption 3.2 -- d_X : X x X -> R, a metric.
 
-**Concrete design:**
+**Implemented** in `gds-framework` (`constraints.py`):
 
 ```python
-@dataclass(frozen=True)
-class StateMetric:
-    """A metric on the state space, enabling distance-based analysis."""
+class StateMetric(BaseModel, frozen=True):
     name: str
-    metric: Callable[[dict, dict], float]   # (state_1, state_2) -> distance
-    covers: list[str]                        # entity.variable names in scope
+    variables: list[tuple[str, str]]          # (entity, variable) pairs
+    metric_type: str = ""                     # annotation: "euclidean", etc.
+    distance: Callable[[Any, Any], float] | None = None  # R3 lossy
     description: str = ""
 ```
 
-For common cases, provide built-in metrics:
+Runtime analysis in `gds-analysis` (`metrics.py`):
 
 ```python
-# Euclidean metric over all numeric state variables
-euclidean_state_metric(spec: GDSSpec) -> StateMetric
-
-# Weighted metric with per-variable scaling
-weighted_state_metric(spec: GDSSpec, weights: dict[str, float]) -> StateMetric
+trajectory_distances(spec, trajectory, metric_name=None) -> dict[str, list[float]]
 ```
 
 **Impact:**
@@ -307,28 +302,24 @@ set of immediately reachable next states.
 
 **Paper reference:** Definition 4.1 -- R(x) = union_{u in U_x} {f(x, u)}.
 
-**Concrete design:**
+**Implemented** in `gds-analysis` (`reachability.py`):
 
 ```python
 def reachable_set(
-    spec: GDSSpec,
-    state: dict,
-    f: Callable[[dict, dict], dict],   # state update function
-    input_sampler: Callable[[], Iterable[dict]],  # enumerates/samples U_x
-) -> set[dict]:
-    """Compute R(x) by evaluating f(x, u) for all admissible u."""
+    model: Model,
+    state: dict[str, Any],
+    *,
+    input_samples: list[dict[str, Any]],
+    state_key: str | None = None,
+    exhaustive: bool = False,
+    float_tolerance: float | None = None,
+) -> ReachabilityResult:
 ```
 
-For finite/discrete input spaces, this is exact enumeration. For
-continuous input spaces, this requires sampling or symbolic analysis.
-
-**Impact:**
-- First dynamical analysis capability
-- Enables "what-if" analysis: "from this state, what states can I reach?"
-- Foundation for configuration space (Step 5)
-
-**Prerequisite:** Steps 1 (U_x), 3 (metric for measuring distance).
-Requires gds-sim or equivalent runtime.
+For discrete input spaces, pass exhaustive samples with `exhaustive=True`.
+For continuous spaces, results are approximate (no coverage guarantee).
+Returns `ReachabilityResult` with `states`, `n_samples`, `n_distinct`,
+`is_exhaustive` metadata.
 
 ### Step 5: Configuration Space X_C
 
@@ -338,22 +329,17 @@ the set of states from which any other state in X_C is reachable.
 **Paper reference:** Definition 4.2 -- X_C subset X such that for each
 x in X_C, there exists x_0 and a reachable sequence reaching x.
 
-**Concrete design:**
+**Implemented** in `gds-analysis` (`reachability.py`):
 
 ```python
-def configuration_space(
-    spec: GDSSpec,
-    f: Callable,
-    input_sampler: Callable,
-    initial_states: Iterable[dict],
-    max_depth: int = 100,
-) -> set[frozenset]:
-    """Compute X_C via BFS/DFS over R(x) from initial states."""
+def reachable_graph(model, initial_states, *, input_samples, max_depth, ...) -> dict
+def configuration_space(graph: dict) -> list[set]:
+    """Iterative Tarjan SCC. Returns SCCs sorted by size (largest = X_C)."""
 ```
 
-For finite state spaces, this is graph search over the reachability
-graph. For continuous state spaces, this requires approximation
-(grid-based, interval arithmetic, or abstraction).
+`reachable_graph` builds the adjacency dict via BFS; `configuration_space`
+finds strongly connected components. For discrete systems with exhaustive
+input samples, the result is exact.
 
 **Impact:**
 - Answers "is the target state reachable from the initial condition?"
@@ -476,11 +462,12 @@ gds-framework  <--  gds-sim  <--  gds-analysis
 
 Some paper concepts are intentionally absent for good architectural reasons:
 
-1. **Continuous-time dynamics (xdot = f(x(t)))** -- The paper presents this
-   as an alternative representation. The software is discrete-time by design.
-   Continuous-time would require a fundamentally different execution model.
-   Per RQ2 in research-boundaries.md, temporal semantics should remain
-   domain-local.
+1. ~~**Continuous-time dynamics (xdot = f(x(t)))**~~ -- **Now implemented.**
+   The `gds-continuous` package provides an ODE engine (RK45, Radau, BDF,
+   etc.) with event detection and parameter sweeps. `gds-analysis` uses it
+   for backward reachability. `gds-symbolic` compiles symbolic ODEs to
+   `gds-continuous` callables via lambdify. The discrete/continuous split
+   is bridged, not absent.
 
 2. **The full attainability correspondence F as an axiomatic foundation** --
    The paper notes (Section 3.2) that Roxin's original work defined GDS via
