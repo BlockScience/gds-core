@@ -102,7 +102,11 @@ def graph_to_spec(
         Wire,
     )
     from gds.blocks.roles import BoundaryAction, Mechanism, Policy
-    from gds.constraints import AdmissibleInputConstraint, TransitionSignature
+    from gds.constraints import (
+        AdmissibleInputConstraint,
+        StateMetric,
+        TransitionSignature,
+    )
     from gds.spaces import Space
     from gds.state import Entity, StateVariable
     from gds.types.interface import Interface, port
@@ -366,6 +370,29 @@ def graph_to_spec(
                 reads=reads,
                 depends_on_blocks=depends_on_blocks,
                 preserves_invariant=invariant,
+            )
+        )
+
+    # Import state metrics
+    sm_uris = list(g.objects(spec_uri, GDS_CORE["hasStateMetric"]))
+    for sm_uri in sm_uris:
+        if not isinstance(sm_uri, URIRef):
+            continue
+        sm_name = _str(g, sm_uri, GDS_CORE["name"])
+        sm_type = _str(g, sm_uri, GDS_CORE["metricType"])
+        sm_desc = _str(g, sm_uri, GDS_CORE["description"])
+        variables: list[tuple[str, str]] = []
+        for entry in g.objects(sm_uri, GDS_CORE["hasMetricVariable"]):
+            ent = _str(g, entry, GDS_CORE["metricEntity"])
+            var = _str(g, entry, GDS_CORE["metricVariable"])
+            variables.append((ent, var))
+        spec.register_state_metric(
+            StateMetric(
+                name=sm_name,
+                variables=variables,
+                metric_type=sm_type,
+                distance=None,  # R3 lossy
+                description=sm_desc,
             )
         )
 

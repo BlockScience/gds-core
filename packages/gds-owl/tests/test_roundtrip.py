@@ -128,6 +128,27 @@ class TestSpecRoundTrip:
         assert set(ts.depends_on_blocks) == {"Controller"}
         assert ts.preserves_invariant == "temp >= 0"
 
+    def test_state_metrics_survive(self, thermostat_spec: GDSSpec) -> None:
+        from gds.constraints import StateMetric
+
+        thermostat_spec.register_state_metric(
+            StateMetric(
+                name="temp_distance",
+                variables=[("Room", "temperature")],
+                metric_type="euclidean",
+                distance=lambda a, b: abs(a - b),
+                description="Temperature distance metric",
+            )
+        )
+        spec2 = self._round_trip(thermostat_spec)
+        assert "temp_distance" in spec2.state_metrics
+        sm = spec2.state_metrics["temp_distance"]
+        assert sm.name == "temp_distance"
+        assert set(sm.variables) == {("Room", "temperature")}
+        assert sm.metric_type == "euclidean"
+        assert sm.description == "Temperature distance metric"
+        assert sm.distance is None  # R3 lossy
+
 
 class TestSystemIRRoundTrip:
     def _round_trip(self, ir: SystemIR) -> SystemIR:

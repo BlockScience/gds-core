@@ -107,7 +107,7 @@ plugins:
           - guides/interoperability.md
           - guides/architecture-milestone-layer0.md
           - guides/dsl-roadmap.md
-          - guides/research-boundaries.md
+          - research/research-boundaries.md
           - guides/view-stratification.md
         OWL (gds-owl):
           - {owl/index.md: "OWL/SHACL/SPARQL for GDS specifications — semantic web interoperability"}
@@ -329,7 +329,7 @@ nav:
           - Getting Started: owl/getting-started.md
           - User Guide:
               - Representability: owl/guide/representability.md
-              - Formal Analysis: owl/guide/formal-representability.md
+              - Formal Analysis: research/formal-representability.md
           - API Reference:
               - gds_owl: owl/api/init.md
               - gds_owl.ontology: owl/api/ontology.md
@@ -360,6 +360,6 @@ nav:
   - Design & Research:
       - Layer 0 Milestone: guides/architecture-milestone-layer0.md
       - DSL Roadmap: guides/dsl-roadmap.md
-      - Research Boundaries: guides/research-boundaries.md
+      - Research Boundaries: research/research-boundaries.md
       - View Stratification: guides/view-stratification.md
       - Ecosystem: framework/ecosystem.md

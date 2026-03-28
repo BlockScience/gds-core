@@ -229,6 +229,20 @@ def build_structural_shapes() -> Graph:
         message="TransitionSignature must have a mechanismName",
     )
 
+    # StateMetric: must have name
+    sm_shape = GDS_SHAPE["StateMetricShape"]
+    g.add((sm_shape, RDF.type, SH.NodeShape))
+    g.add((sm_shape, SH.targetClass, GDS_CORE["StateMetric"]))
+    _add_property_shape(
+        g,
+        sm_shape,
+        GDS_CORE["name"],
+        min_count=1,
+        max_count=1,
+        datatype=XSD.string,
+        message="StateMetric must have a name",
+    )
+
     # BlockIR: must have name
     bir_shape = GDS_SHAPE["BlockIRShape"]
     g.add((bir_shape, RDF.type, SH.NodeShape))
