@@ -42,3 +42,7 @@ Thumbs.db
 
 # Pyright
 .pyright/
+
+# Claude Code
+.claude/
+__marimo__/
