@@ -241,6 +241,7 @@ class TestCrosswalkEndToEnd:
             state,
             input_samples=samples,
             state_key="Street.traffic_state",
+            exhaustive=True,
         ).states
         assert all(r["Street.traffic_state"] == 0 for r in reached)
 
@@ -254,6 +255,7 @@ class TestCrosswalkEndToEnd:
             state,
             input_samples=samples,
             state_key="Street.traffic_state",
+            exhaustive=True,
         ).states
         assert any(r["Street.traffic_state"] == -1 for r in reached)
 
@@ -276,6 +278,7 @@ class TestCrosswalkEndToEnd:
             state,
             input_samples=samples,
             state_key="Street.traffic_state",
+            exhaustive=True,
         ).states
         reached_states = {r["Street.traffic_state"] for r in reached}
         assert 1 not in reached_states, (
@@ -292,6 +295,7 @@ class TestCrosswalkEndToEnd:
             state,
             input_samples=samples,
             state_key="Street.traffic_state",
+            exhaustive=True,
         ).states
         assert all(r["Street.traffic_state"] == 1 for r in reached)
 
@@ -309,6 +313,7 @@ class TestCrosswalkEndToEnd:
             state,
             input_samples=samples,
             state_key="Street.traffic_state",
+            exhaustive=True,
         ).states
         reached_states = {r["Street.traffic_state"] for r in reached}
         assert reached_states == {-1, 0, 1}
