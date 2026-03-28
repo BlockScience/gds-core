@@ -7,16 +7,20 @@ reachable in one step by applying any admissible input. For discrete
 input spaces, this can be computed exactly by enumeration. For
 continuous spaces, Monte Carlo sampling approximates R(x).
 
-Paper Definition 4.2: X_C ⊆ X is the configuration space — the
-largest set of mutually reachable states.
+Paper Definition 4.2: X_C is the configuration space -- the largest
+set of mutually reachable states (largest SCC of the reachability graph).
 """
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from gds import GDSSpec  # noqa: TC002
 from gds_sim import Model, Simulation
+
+if TYPE_CHECKING:
+    from gds import GDSSpec
+
+_META_KEYS = frozenset({"timestep", "substep", "run", "subset"})
 
 
 def reachable_set(
@@ -40,7 +44,7 @@ def reachable_set(
     input_samples
         List of input dicts to try. Each dict overrides the policy
         outputs for one simulation step. For BoundaryAction blocks,
-        these represent exogenous inputs u ∈ U_x.
+        these represent exogenous inputs u.
     state_key
         If provided, extract only this key from each reached state
         for comparison. Otherwise return full state dicts.
@@ -134,42 +138,63 @@ def configuration_space(
     Returns SCCs sorted by size (largest first). The largest SCC is
     the configuration space X_C.
 
-    Uses Tarjan's algorithm.
+    Uses iterative Tarjan's algorithm (no recursion limit).
     """
-    index_counter = [0]
+    index_counter = 0
     stack: list[tuple[Any, ...]] = []
     lowlink: dict[tuple[Any, ...], int] = {}
     index: dict[tuple[Any, ...], int] = {}
     on_stack: set[tuple[Any, ...]] = set()
     sccs: list[set[tuple[Any, ...]]] = []
 
-    def strongconnect(v: tuple[Any, ...]) -> None:
-        index[v] = index_counter[0]
-        lowlink[v] = index_counter[0]
-        index_counter[0] += 1
-        stack.append(v)
-        on_stack.add(v)
+    for root in graph:
+        if root in index:
+            continue
 
-        for w in graph.get(v, []):
-            if w not in index:
-                strongconnect(w)
-                lowlink[v] = min(lowlink[v], lowlink[w])
-            elif w in on_stack:
-                lowlink[v] = min(lowlink[v], index[w])
+        # Iterative Tarjan using an explicit work stack.
+        work: list[tuple[tuple[Any, ...], list[tuple[Any, ...]]]] = [
+            (root, list(graph.get(root, [])))
+        ]
 
-        if lowlink[v] == index[v]:
-            scc: set[tuple[Any, ...]] = set()
-            while True:
-                w = stack.pop()
-                on_stack.discard(w)
-                scc.add(w)
-                if w == v:
+        while work:
+            v, neighbors = work[-1]
+
+            if v not in index:
+                index[v] = index_counter
+                lowlink[v] = index_counter
+                index_counter += 1
+                stack.append(v)
+                on_stack.add(v)
+
+            found_unvisited = False
+            while neighbors:
+                w = neighbors.pop()
+                if w not in index:
+                    work.append((w, list(graph.get(w, []))))
+                    found_unvisited = True
                     break
-            sccs.append(scc)
+                elif w in on_stack:
+                    lowlink[v] = min(lowlink[v], index[w])
 
-    for v in graph:
-        if v not in index:
-            strongconnect(v)
+            if found_unvisited:
+                continue
+
+            # All neighbors processed — check for SCC root.
+            if lowlink[v] == index[v]:
+                scc: set[tuple[Any, ...]] = set()
+                while True:
+                    w = stack.pop()
+                    on_stack.discard(w)
+                    scc.add(w)
+                    if w == v:
+                        break
+                sccs.append(scc)
+
+            work.pop()
+            # Update parent's lowlink.
+            if work:
+                parent = work[-1][0]
+                lowlink[parent] = min(lowlink[parent], lowlink[v])
 
     return sorted(sccs, key=len, reverse=True)
 
@@ -182,8 +207,11 @@ def _step_once(
     """Run the model for exactly one timestep with overridden inputs.
 
     Creates a temporary model whose policies return the override dict,
-    runs for 1 timestep, and returns the resulting state.
+    runs for 1 timestep, and returns the resulting state with metadata
+    keys stripped.
     """
+    # Strip any metadata keys from incoming state (from prior BFS steps).
+    clean_state = {k: v for k, v in state.items() if k not in _META_KEYS}
 
     def _override_policy(st: dict, params: dict, **kw: Any) -> dict:
         return policy_override
@@ -198,14 +226,16 @@ def _step_once(
         )
 
     temp_model = Model(
-        initial_state=dict(state),
+        initial_state=dict(clean_state),
         state_update_blocks=override_blocks,
         params={},
     )
     sim = Simulation(model=temp_model, timesteps=1, runs=1)
     results = sim.run()
     rows = results.to_list()
-    return rows[-1] if rows else dict(state)
+    raw = rows[-1] if rows else dict(clean_state)
+    # Strip gds-sim metadata keys from the result.
+    return {k: v for k, v in raw.items() if k not in _META_KEYS}
 
 
 def _state_fingerprint(
@@ -215,10 +245,4 @@ def _state_fingerprint(
     """Create a hashable fingerprint of a state for deduplication."""
     if state_key is not None:
         return (state_key, state.get(state_key))
-    return tuple(
-        sorted(
-            (k, v)
-            for k, v in state.items()
-            if not k.startswith(("timestep", "substep", "run", "subset"))
-        )
-    )
+    return tuple(sorted((k, v) for k, v in state.items() if k not in _META_KEYS))
