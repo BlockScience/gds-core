@@ -789,3 +789,200 @@ checks, and end-to-end ODE integration (derive → integrate → verify).
 | PRs merged to main | 4 (#133, #139, #146, pending) |
 
 ---
+
+## Entry 010 — 2026-03-29
+
+**Subject:** Chief Engineer roadmap review, T0-3 implementation, fishery case study
+
+### Motivation
+
+The Chief Engineer (Zargham) delivered a comprehensive architectural review
+of gds-core, identifying 15 improvement items across 4 tiers. The review
+was grounded in the GDS paper (Zargham & Shorish 2022) and evaluated each
+item against four criteria: Soundness (C1), Completeness (C2), Production
+Readiness (C3), Leverage (C4).
+
+Key findings from the review:
+- **ControlAction is unused** across all 7 DSLs — conceals a missing output
+  map `y = C(x, d)` and blocks observability analysis
+- **The core is time-agnostic** but documentation undermines this with
+  discrete-index notation — OGS is the existence proof
+- **Structural verification ≠ behavioral verification** — practitioners
+  could misinterpret `verify()` pass as broader assurance than provided
+- **PSUU and ParameterSchema are disconnected** — sweeps can silently
+  explore values outside declared bounds
+
+The review also proposed the extended canonical form
+`(X, U_c, W, D, Y, Θ, g, f, C)` incorporating disturbance partition and
+output map — both achievable without changing the Layer 0 algebra.
+
+### Actions
+
+#### 1. Roadmap Integration and Phase Planning
+
+Brought the review into `docs/research/improvement-roadmap.md`, reconciled
+against actual codebase state (the review was written from documentation,
+not code):
+
+- Corrected test count from "347" to ~2,292 across 14 packages
+- Corrected check count from 13 to 15 (review missed SC-008, SC-009)
+- Documented already-implemented features the review didn't know about:
+  AdmissibleInputConstraint, TransitionSignature, StateMetric, SC-008/SC-009,
+  forward+backward reachability in gds-analysis
+- Organized 15 items into 5 phases with detailed step-by-step plans,
+  deliverable checklists, and a dependency graph
+- Added "Scientific Argument and Evidence Strategy" section: 5-level
+  evidence progression (structural → formal → semantic → behavioral →
+  cross-domain), per-phase verification strategies, three showcase artifacts
+
+Created 15 GitHub issues (#155–#169) with labels for tier, phase, and type.
+Each issue includes Scientific Context, Verification Strategy, and Showcase
+sections.
+
+#### 2. Gordon-Schaefer Fishery Case Study
+
+Designed and built a single case study that exercises 13 of 15 roadmap items
+naturally. The fishery model (Gordon 1954, Schaefer 1957, Clark 1990)
+demonstrates the tragedy of the commons — the Nash equilibrium depletes the
+stock below the socially optimal level, and this is a dynamically stable
+outcome.
+
+Three progressive variants:
+- **V1 (Unregulated):** Raw GDS model + StockFlow DSL variant. 8 TypeDefs,
+  n+1 entities, 4-tier composition tree with `.loop()`. 69 passing tests
+  including analytical benchmark validation (N_MSY, N_inf, N_nash, effort
+  ratio, tragedy limit).
+- **V2 (Regulated):** Adds ControlAction output map (Catch Observation) and
+  Regulator Policy. Exercises controller-plant duality.
+- **V3 (Disturbed):** Stub for environmental shock with disturbance tags.
+  Blocked on T1-3.
+
+Design document: `docs/research/fishery-case-study.md` (17 sections covering
+entities, parameters, analytical benchmarks, block architecture, OGS game
+formulation, cross-lens queries, behavioral verification, structural
+reachability, execution contracts, PSUU sweeps).
+
+#### 3. T0-3 Implementation: ControlAction / Output Map (Y, C)
+
+Four iterations with three rounds of audit:
+
+**Core implementation:**
+- Added `ControlAction.observes: list[tuple[str, str]]` field paralleling
+  `Mechanism.updates` — declares which state variables the output map reads
+- Added `CanonicalGDS.output_ports` (Y) and `output_map` (C) with correct
+  `(entity, variable)` typing
+- Updated `project_canonical()` to extract from `block.observes`
+- Updated `formula()` to render `y = C(x, d)` / `y = C_θ(x, d)`
+- SC-010: ControlAction forward-path routing check (WARNING severity).
+  Operates on SpecWiring only — feedback routing via `.feedback()` is
+  correctly ignored since it never appears in SpecWiring.
+- SC-011: ControlAction observes reference validation (ERROR severity).
+  Validates (entity, variable) pairs exist, paralleling SC-009 for
+  TransitionSignature.
+
+**Backfills:** All 4 existing ControlAction blocks now declare `observes`:
+- thermostat: `[("Room", "temperature")]`
+- insurance: `[("Insurer", "reserve"), ("Insurer", "premium_pool")]`
+- crosswalk (model + gds-analysis test): `[("Street", "traffic_state")]`
+- fishery V2: `[("Fish Population", "level")]`
+
+**Verification:**
+- Correspondence proof test: ControlAction output port tokens match
+  BoundaryAction output tokens at `>>` boundary (isomorphism)
+- SC-010 falsification: forward-path violation (fail) + feedback-path
+  allowance (pass)
+- SC-011: valid refs, unknown entity, unknown variable, empty observes
+- Fishery V2: spec construction, canonical output_ports, output_map
+  structural assertion, SC-010 pass
+
+**Documentation:**
+- `docs/research/controller-plant-duality.md`: mathematical proposition,
+  role tables from both perspectives, extended canonical form, observability
+  connection, SC-010 rationale, fishery worked example, canonical spectrum
+  with |C| column
+- Module docstring updated to `(X, U, D, Y, Θ, g, f, C)`
+
+### Outcome
+
+**Test counts (end of session):**
+
+| Suite | Tests | Change |
+|---|---|---|
+| gds-framework | 516 | +42 |
+| Fishery V1 | 54 | new |
+| Fishery V2 | 9 | new |
+| Fishery DSL | 15 | new |
+| Insurance | 29 | 0 (no regression) |
+| Thermostat | 28 | 0 (no regression) |
+| Crosswalk | 28 | 0 (no regression) |
+
+**New artifacts:**
+
+| Artifact | Location |
+|---|---|
+| Improvement roadmap (15 items, 5 phases) | `docs/research/improvement-roadmap.md` |
+| Fishery case study design | `docs/research/fishery-case-study.md` |
+| Controller-plant duality doc | `docs/research/controller-plant-duality.md` |
+| Fishery V1 raw GDS model | `stockflow/fishery/model.py` |
+| Fishery V1 StockFlow DSL | `stockflow/fishery_dsl/model.py` |
+| Fishery V2 regulated | `stockflow/fishery/v2_regulated.py` |
+| Fishery V3 disturbed (stub) | `stockflow/fishery/v3_disturbed.py` |
+| 15 GitHub issues | #155–#169 |
+
+**Issues:**
+
+| Issue | Title | Status |
+|---|---|---|
+| #155 | T0-1: Check specifications | Open |
+| #156 | T0-2: Requirement traceability | Open |
+| #157 | T0-3: ControlAction / output map | **Done** |
+| #158 | T0-4: Temporal agnosticism | Open |
+| #159 | T1-1: ExecutionContract | Open |
+| #160 | T1-2: PSUU ↔ Θ | Open |
+| #161 | T1-3: Disturbance formalization | Open |
+| #162 | T1-4: Assurance triangle | Open |
+| #163–#166 | T2-1 through T2-4 | Open |
+| #167–#169 | T3-1 through T3-3 | Open (triggered) |
+
+### Observations
+
+1. **The review was written from docs, not code.** This explains why it
+   missed AdmissibleInputConstraint, TransitionSignature, SC-008/SC-009,
+   and the reachability analysis in gds-analysis. Reconciliation against
+   the actual codebase was essential before treating the review as a
+   work plan.
+
+2. **Three audit rounds caught progressively deeper issues.** Round 1:
+   missing export, wrong output_map type. Round 2: backfill gap, missing
+   validation check. Round 3: confirmed correctness, added correspondence
+   proof. The iterative audit pattern validates itself.
+
+3. **`ControlAction.observes` completes the read/write symmetry.**
+   Mechanisms declare writes (`updates`), ControlActions declare reads
+   (`observes`), TransitionSignatures declare mechanism reads (`reads`).
+   The structural skeleton now captures the full data dependency graph
+   of the canonical form.
+
+4. **The fishery is the integration test for the roadmap.** Each variant
+   unlocks as roadmap items complete: V1 works now, V2 exercises T0-3
+   (done), V3 needs T1-3, cross-lens queries need T2-3. The analytical
+   benchmarks (Gordon-Schaefer closed forms) provide ground truth for
+   every simulation result.
+
+5. **Cross-built equivalence is architecturally blocked for ControlAction.**
+   The control DSL compiles sensors to Policy, not ControlAction — this
+   is a design choice, not a bug. The correspondence proof (port token
+   isomorphism at `>>` boundaries) is the substitute verification strategy.
+
+### References
+
+- Gordon, H.S. (1954). "The Economic Theory of a Common-Property Resource:
+  The Fishery." *JPE*, 62(2), 124-142.
+- Schaefer, M.B. (1957). "Some Considerations of Population Dynamics and
+  Economics in Relation to the Management of the Commercial Marine
+  Fisheries." *J. Fish. Res. Board Can.*, 14(5), 669-681.
+- Clark, C.W. (1990). *Mathematical Bioeconomics*, 2nd ed. Wiley.
+- Zargham, M. & Shorish, J. (2022). "Generalized Dynamical Systems, Part I:
+  Foundations." DOI: 10.57938/e8d456ea-d975-4111-ac41-052ce73cb0cc.
+
+---

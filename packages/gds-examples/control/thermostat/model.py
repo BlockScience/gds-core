@@ -171,6 +171,7 @@ room_plant = ControlAction(
         forward_out=(port("Room State"),),
         backward_out=(port("Energy Cost"),),  # Sends feedback to controller
     ),
+    observes=[("Room", "temperature")],
     tags={"domain": "Plant"},
 )
 
