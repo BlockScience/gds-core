@@ -166,6 +166,7 @@ safety_check = ControlAction(
         forward_in=["Crossing Decision"],
         forward_out=["Safety Signal"],
     ),
+    observes=[("Street", "traffic_state")],
     params_used=["crosswalk_location"],
     tags={"domain": "Infrastructure"},
 )

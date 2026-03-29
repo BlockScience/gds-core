@@ -174,6 +174,7 @@ premium_calculation = ControlAction(
         forward_in=(port("Risk Score"),),
         forward_out=(port("Premium Decision"),),
     ),
+    observes=[("Insurer", "reserve"), ("Insurer", "premium_pool")],
     params_used=["base_premium_rate", "deductible", "coverage_limit"],
     tags={"domain": "Underwriting"},
 )

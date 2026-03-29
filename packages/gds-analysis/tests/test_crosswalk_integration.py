@@ -67,6 +67,7 @@ def _build_crosswalk_spec() -> GDSSpec:
             forward_in=["Crossing Decision"],
             forward_out=["Safety Signal"],
         ),
+        observes=[("Street", "traffic_state")],
         params_used=["crosswalk_location"],
     )
     transition = Mechanism(
