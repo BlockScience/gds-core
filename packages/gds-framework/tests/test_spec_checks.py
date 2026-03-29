@@ -2,7 +2,7 @@
 
 import pytest
 
-from gds.blocks.roles import Mechanism, Policy
+from gds.blocks.roles import BoundaryAction, ControlAction, Mechanism, Policy
 from gds.spec import GDSSpec, SpecWiring, Wire
 from gds.state import Entity, StateVariable
 from gds.types.interface import Interface, port
@@ -10,6 +10,8 @@ from gds.types.typedef import TypeDef
 from gds.verification.findings import Severity
 from gds.verification.spec_checks import (
     check_completeness,
+    check_control_action_observes,
+    check_control_action_routing,
     check_determinism,
     check_reachability,
     check_type_safety,
@@ -227,3 +229,231 @@ class TestTypeSafety:
         findings = check_type_safety(spec)
         passed = [f for f in findings if f.passed]
         assert len(passed) >= 1
+
+
+# ══════════════════════════════════════════════════════════════
+# SC-010: ControlAction Routing
+# ══════════════════════════════════════════════════════════════
+
+
+class TestControlActionRouting:
+    """SC-010: ControlAction output must not wire to Policy/BoundaryAction."""
+
+    def test_no_control_action_passes(self):
+        """Specs without ControlAction get an INFO pass."""
+        spec = GDSSpec(name="Test")
+        p = Policy(
+            name="P",
+            interface=Interface(
+                forward_in=(port("in"),),
+                forward_out=(port("out"),),
+            ),
+        )
+        spec.register_block(p)
+        findings = check_control_action_routing(spec)
+        assert all(f.passed for f in findings)
+        assert findings[0].check_id == "SC-010"
+
+    def test_valid_routing_ca_to_mechanism(self):
+        """ControlAction -> Mechanism is valid."""
+        spec = GDSSpec(name="Test")
+        ca = ControlAction(
+            name="Observe",
+            interface=Interface(
+                forward_in=(port("State"),),
+                forward_out=(port("Signal"),),
+            ),
+        )
+        m = Mechanism(
+            name="Update",
+            interface=Interface(forward_in=(port("Signal"),)),
+            updates=[],
+        )
+        spec.register_block(ca)
+        spec.register_block(m)
+        spec.register_wiring(
+            SpecWiring(
+                name="Forward",
+                block_names=["Observe", "Update"],
+                wires=[Wire(source="Observe", target="Update")],
+            )
+        )
+        findings = check_control_action_routing(spec)
+        assert all(f.passed for f in findings)
+
+    def test_invalid_routing_ca_to_policy(self):
+        """ControlAction -> Policy in forward path is a WARNING."""
+        spec = GDSSpec(name="Test")
+        ca = ControlAction(
+            name="Observe",
+            interface=Interface(
+                forward_in=(port("State"),),
+                forward_out=(port("Signal"),),
+            ),
+        )
+        p = Policy(
+            name="Decide",
+            interface=Interface(
+                forward_in=(port("Signal"),),
+                forward_out=(port("Action"),),
+            ),
+        )
+        spec.register_block(ca)
+        spec.register_block(p)
+        spec.register_wiring(
+            SpecWiring(
+                name="BadRoute",
+                block_names=["Observe", "Decide"],
+                wires=[Wire(source="Observe", target="Decide")],
+            )
+        )
+        findings = check_control_action_routing(spec)
+        failed = [f for f in findings if not f.passed]
+        assert len(failed) == 1
+        assert failed[0].check_id == "SC-010"
+        assert failed[0].severity == Severity.WARNING
+
+    def test_invalid_routing_ca_to_boundary(self):
+        """ControlAction -> BoundaryAction in forward path is a WARNING."""
+        spec = GDSSpec(name="Test")
+        ca = ControlAction(
+            name="Observe",
+            interface=Interface(
+                forward_in=(port("State"),),
+                forward_out=(port("Signal"),),
+            ),
+        )
+        ba = BoundaryAction(
+            name="Input",
+            interface=Interface(forward_out=(port("Data"),)),
+        )
+        spec.register_block(ca)
+        spec.register_block(ba)
+        spec.register_wiring(
+            SpecWiring(
+                name="BadRoute",
+                block_names=["Observe", "Input"],
+                wires=[Wire(source="Observe", target="Input")],
+            )
+        )
+        findings = check_control_action_routing(spec)
+        failed = [f for f in findings if not f.passed]
+        assert len(failed) == 1
+
+    def test_feedback_path_not_in_spec_wiring(self):
+        """Feedback routing (.feedback()) is NOT in SpecWiring, so SC-010 allows it.
+
+        SpecWiring only contains forward-path wires. Feedback routing happens
+        at the composition layer and never appears as a Wire in SpecWiring.
+        This test verifies SC-010 correctly ignores feedback by showing that
+        a spec with ControlAction -> Mechanism wiring (forward) passes even
+        when a feedback composition exists at the composition layer.
+        """
+        spec = GDSSpec(name="Test")
+        ca = ControlAction(
+            name="Observe",
+            interface=Interface(
+                forward_in=(port("State"),),
+                forward_out=(port("Signal"),),
+            ),
+        )
+        p = Policy(
+            name="Decide",
+            interface=Interface(
+                forward_in=(port("Other"),),
+                forward_out=(port("Command"),),
+            ),
+        )
+        m = Mechanism(
+            name="Update",
+            interface=Interface(forward_in=(port("Signal"),)),
+            updates=[],
+        )
+        spec.register_block(ca)
+        spec.register_block(p)
+        spec.register_block(m)
+        # Forward-path wiring: CA -> Mechanism (valid)
+        # No wire from CA -> Policy in SpecWiring
+        # (feedback from CA -> Policy would be via .feedback() at composition layer)
+        spec.register_wiring(
+            SpecWiring(
+                name="Forward",
+                block_names=["Observe", "Decide", "Update"],
+                wires=[Wire(source="Observe", target="Update")],
+            )
+        )
+        findings = check_control_action_routing(spec)
+        assert all(f.passed for f in findings)
+
+
+# ══════════════════════════════════════════════════════════════
+# SC-011: ControlAction Observes References
+# ══════════════════════════════════════════════════════════════
+
+
+class TestControlActionObserves:
+    """SC-011: ControlAction.observes must reference valid entity vars."""
+
+    def test_no_control_action_passes(self):
+        spec = GDSSpec(name="Test")
+        findings = check_control_action_observes(spec)
+        assert all(f.passed for f in findings)
+        assert findings[0].check_id == "SC-011"
+
+    def test_valid_observes(self, pop_type):
+        spec = GDSSpec(name="Test")
+        entity = Entity(
+            name="Room",
+            variables={"temp": StateVariable(name="temp", typedef=pop_type)},
+        )
+        spec.register_entity(entity)
+        ca = ControlAction(
+            name="Sensor",
+            interface=Interface(
+                forward_in=(port("State"),),
+                forward_out=(port("Reading"),),
+            ),
+            observes=[("Room", "temp")],
+        )
+        spec.register_block(ca)
+        findings = check_control_action_observes(spec)
+        assert all(f.passed for f in findings)
+
+    def test_unknown_entity(self, pop_type):
+        spec = GDSSpec(name="Test")
+        ca = ControlAction(
+            name="Bad",
+            observes=[("Ghost", "x")],
+        )
+        spec.register_block(ca)
+        findings = check_control_action_observes(spec)
+        failed = [f for f in findings if not f.passed]
+        assert len(failed) == 1
+        assert failed[0].check_id == "SC-011"
+        assert failed[0].severity == Severity.ERROR
+        assert "Ghost" in failed[0].message
+
+    def test_unknown_variable(self, pop_type):
+        spec = GDSSpec(name="Test")
+        entity = Entity(
+            name="Room",
+            variables={"temp": StateVariable(name="temp", typedef=pop_type)},
+        )
+        spec.register_entity(entity)
+        ca = ControlAction(
+            name="Bad",
+            observes=[("Room", "pressure")],
+        )
+        spec.register_block(ca)
+        findings = check_control_action_observes(spec)
+        failed = [f for f in findings if not f.passed]
+        assert len(failed) == 1
+        assert "Room.pressure" in failed[0].message
+
+    def test_empty_observes_passes(self):
+        """ControlAction with observes=[] is valid (no references to check)."""
+        spec = GDSSpec(name="Test")
+        ca = ControlAction(name="Empty")
+        spec.register_block(ca)
+        findings = check_control_action_observes(spec)
+        assert all(f.passed for f in findings)

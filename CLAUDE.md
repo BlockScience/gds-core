@@ -159,7 +159,7 @@ Block roles (`BoundaryAction`, `Policy`, `Mechanism`, `ControlAction`) subclass 
 Both use the pluggable pattern: `Callable[[T], list[Finding]]`.
 
 - **Generic checks (G-001..G-006)** operate on `SystemIR` — structural topology only
-- **Semantic checks (SC-001..SC-009)** operate on `GDSSpec` — domain properties (completeness, determinism, reachability, type safety, parameter references, canonical wellformedness, admissibility references, transition read consistency)
+- **Semantic checks (SC-001..SC-011)** operate on `GDSSpec` — domain properties (completeness, determinism, reachability, type safety, parameter references, canonical wellformedness, admissibility references, transition read consistency, control action routing, control action observes validation)
 - **Domain checks** operate on domain models (e.g., `StockFlowModel`, `ControlModel`) — pre-compilation structural validation
 
 ### Branching Workflow

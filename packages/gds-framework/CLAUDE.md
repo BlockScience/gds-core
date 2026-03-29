@@ -72,6 +72,8 @@ from gds import (
     check_canonical_wellformedness,          # (spec) -> list[Finding]  SC-006/SC-007
     check_admissibility_references,          # (spec) -> list[Finding]  SC-008
     check_transition_reads,                  # (spec) -> list[Finding]  SC-009
+    check_control_action_routing,            # (spec) -> list[Finding]  SC-010
+    check_control_action_observes,           # (spec) -> list[Finding]  SC-011
 
     # Custom checks
     gds_check, get_custom_checks, all_checks,  # decorator + registries
@@ -157,11 +159,13 @@ Mechanism(name=..., interface=interface(forward_in=["Command"]),
           updates=[("entity_name", "variable_name")])
 # Constraint: backward_in and backward_out must be empty
 
-ControlAction(name=..., interface=interface(forward_in=["State"], forward_out=["Control"]))
+ControlAction(name=..., interface=interface(forward_in=["State"], forward_out=["Control"]),
+              observes=[("Entity", "variable")])  # which state vars the output map reads
 # No extra constraints
 
 # All roles support: params_used: list[str], constraints: list[str]
 # BoundaryAction, Policy, ControlAction also support: options: list[str]
+# ControlAction also supports: observes: list[tuple[str, str]] (entity, variable pairs)
 ```
 
 ## Minimal Complete Example
@@ -251,8 +255,10 @@ report = gds.verify(system_ir)  # runs G-001..G-006
 
 # Semantic checks on GDSSpec (domain properties)
 from gds import check_completeness, check_type_safety
-# SC-001..SC-007: completeness, determinism, reachability, type safety,
-#                 parameter references, canonical wellformedness
+# SC-001..SC-011: completeness, determinism, reachability, type safety,
+#                 parameter references, canonical wellformedness,
+#                 admissibility, transition reads, control action routing,
+#                 control action observes
 
 # Custom checks via decorator
 @gds.gds_check("CUSTOM-001", gds.Severity.WARNING)

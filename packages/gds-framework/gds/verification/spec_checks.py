@@ -10,7 +10,7 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import TYPE_CHECKING
 
-from gds.blocks.roles import BoundaryAction, HasParams, Mechanism
+from gds.blocks.roles import BoundaryAction, ControlAction, HasParams, Mechanism, Policy
 from gds.canonical import project_canonical
 from gds.verification.findings import Finding, Severity
 
@@ -418,6 +418,147 @@ def check_transition_reads(spec: GDSSpec) -> list[Finding]:
                 message=(
                     f"All {len(spec.transition_signatures)} transition "
                     f"signature(s) are consistent"
+                ),
+                passed=True,
+            )
+        )
+
+    return findings
+
+
+def check_control_action_routing(spec: GDSSpec) -> list[Finding]:
+    """ControlAction output must not wire to Policy or BoundaryAction.
+
+    SC-010: In the forward wiring topology declared in SpecWiring,
+    a ControlAction's output should flow toward Mechanisms (state
+    updates), not backward toward Policies or BoundaryActions.
+    Feedback routing is allowed but occurs at the composition layer
+    (.feedback()/.loop()), not in SpecWiring.
+    """
+    findings: list[Finding] = []
+
+    control_names: set[str] = set()
+    policy_or_boundary_names: set[str] = set()
+    for bname, block in spec.blocks.items():
+        if isinstance(block, ControlAction):
+            control_names.add(bname)
+        elif isinstance(block, (Policy, BoundaryAction)):
+            policy_or_boundary_names.add(bname)
+
+    if not control_names:
+        findings.append(
+            Finding(
+                check_id="SC-010",
+                severity=Severity.INFO,
+                message="No ControlAction blocks — SC-010 not applicable",
+                passed=True,
+            )
+        )
+        return findings
+
+    violations: list[str] = []
+    for wiring in spec.wirings.values():
+        for wire in wiring.wires:
+            if wire.source in control_names and wire.target in policy_or_boundary_names:
+                target_role = type(spec.blocks[wire.target]).__name__
+                violations.append(
+                    f"'{wire.source}' -> '{wire.target}' ({target_role})"
+                )
+
+    if violations:
+        findings.append(
+            Finding(
+                check_id="SC-010",
+                severity=Severity.WARNING,
+                message=(
+                    f"ControlAction output wired to Policy/BoundaryAction "
+                    f"in forward path: {'; '.join(violations)}. "
+                    f"Output map C should feed Mechanisms, not decision "
+                    f"logic. Use .feedback() for observation feedback."
+                ),
+                source_elements=[v.split("'")[1] for v in violations],
+                passed=False,
+            )
+        )
+    else:
+        findings.append(
+            Finding(
+                check_id="SC-010",
+                severity=Severity.INFO,
+                message=(
+                    "ControlAction routing valid — no forward-path "
+                    "wires to Policy or BoundaryAction"
+                ),
+                passed=True,
+            )
+        )
+
+    return findings
+
+
+def check_control_action_observes(spec: GDSSpec) -> list[Finding]:
+    """ControlAction.observes must reference valid entity variables.
+
+    SC-011: Each (entity, variable) pair in ControlAction.observes
+    must reference a registered entity with that variable. Parallel
+    to SC-009 (TransitionSignature.reads) for Mechanism read deps.
+    """
+    findings: list[Finding] = []
+
+    control_blocks = [
+        (name, block)
+        for name, block in spec.blocks.items()
+        if isinstance(block, ControlAction)
+    ]
+
+    if not control_blocks:
+        findings.append(
+            Finding(
+                check_id="SC-011",
+                severity=Severity.INFO,
+                message="No ControlAction blocks — SC-011 not applicable",
+                passed=True,
+            )
+        )
+        return findings
+
+    issues: list[str] = []
+    bad_names: set[str] = set()
+
+    for bname, block in control_blocks:
+        for entity_name, var_name in block.observes:
+            if entity_name not in spec.entities:
+                issues.append(
+                    f"ControlAction '{bname}' observes unknown "
+                    f"entity '{entity_name}'"
+                )
+                bad_names.add(bname)
+            elif var_name not in spec.entities[entity_name].variables:
+                issues.append(
+                    f"ControlAction '{bname}' observes unknown "
+                    f"variable '{entity_name}.{var_name}'"
+                )
+                bad_names.add(bname)
+
+    if issues:
+        findings.append(
+            Finding(
+                check_id="SC-011",
+                severity=Severity.ERROR,
+                message=f"ControlAction observes issues: {issues}",
+                source_elements=sorted(bad_names),
+                passed=False,
+            )
+        )
+    else:
+        n_obs = sum(len(b.observes) for _, b in control_blocks)
+        findings.append(
+            Finding(
+                check_id="SC-011",
+                severity=Severity.INFO,
+                message=(
+                    f"All {len(control_blocks)} ControlAction block(s) "
+                    f"with {n_obs} observes reference(s) are valid"
                 ),
                 passed=True,
             )
