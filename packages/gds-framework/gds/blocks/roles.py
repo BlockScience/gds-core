@@ -76,13 +76,21 @@ class BoundaryAction(AtomicBlock):
 
 
 class ControlAction(AtomicBlock):
-    """Endogenous control — reads state, emits control signals.
+    """Output map — observes state, emits observable signals.
 
-    These are internal feedback loops: the system observing itself
-    and generating signals that influence downstream policy/mechanism blocks.
+    Represents the output equation y = C(x, d) in the canonical form.
+    ControlAction blocks read state variables and produce the system's
+    observable output. At every >> composition boundary, one system's
+    ControlAction output is isomorphic to the next system's
+    BoundaryAction input (controller-plant duality).
+
+    ``observes`` lists (entity_name, variable_name) pairs specifying
+    which state variables this output map reads, paralleling
+    Mechanism.updates for writes.
     """
 
     kind: str = "control"
+    observes: list[tuple[str, str]] = Field(default_factory=list)
     options: list[str] = Field(default_factory=list)
     params_used: list[str] = Field(default_factory=list)
     constraints: list[str] = Field(default_factory=list)

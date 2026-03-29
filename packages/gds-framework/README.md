@@ -53,6 +53,7 @@ plant = ControlAction(
         forward_out=["Temperature"],
         backward_out=["Energy Cost"],
     ),
+    observes=[("Room", "temperature")],
 )
 
 # Compose with operators — types checked at construction time

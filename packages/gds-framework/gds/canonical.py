@@ -3,13 +3,15 @@
 The canonical projection extracts the mathematical GDS decomposition
 from a GDSSpec:
 
-    h_θ : X → X  where θ ∈ Θ
+    h_θ : X → X  where θ ∈ Θ,  y = C_θ(x, d)
 
     X = state space (product of entity variables)
     U = input space (BoundaryAction outputs)
     D = decision space (Policy outputs)
-    g = policy mapping: X x U → D
-    f = state transition: X x D → X
+    Y = output space (ControlAction outputs)
+    g = policy mapping: X × U → D
+    f = state transition: X × D → X
+    C = output map: X × D → Y (ControlAction blocks)
     Θ = parameter space (ParameterSchema)
 
 This is a **pure function** of GDSSpec — always derivable, never authoritative.
@@ -50,6 +52,13 @@ class CanonicalGDS(BaseModel):
     # Decision space D: (block_name, port_name) from Policy forward_out
     decision_ports: tuple[tuple[str, str], ...] = ()
 
+    # Output space Y: (block_name, port_name) from ControlAction forward_out
+    output_ports: tuple[tuple[str, str], ...] = ()
+
+    # Output map C: (control_block_name, ((entity, var), ...))
+    # Records which state variables each ControlAction observes
+    output_map: tuple[tuple[str, tuple[tuple[str, str], ...]], ...] = ()
+
     # Structural decomposition: block names by role
     boundary_blocks: tuple[str, ...] = ()
     control_blocks: tuple[str, ...] = ()
@@ -74,6 +83,7 @@ class CanonicalGDS(BaseModel):
         """Render as mathematical formula string."""
         has_f = len(self.mechanism_blocks) > 0
         has_g = len(self.policy_blocks) > 0
+        has_c = len(self.control_blocks) > 0
 
         if has_f and has_g:
             decomp = "f ∘ g"
@@ -86,8 +96,14 @@ class CanonicalGDS(BaseModel):
 
         if self.has_parameters:
             decomp_theta = decomp.replace("f", "f_θ").replace("g", "g_θ")
-            return f"h_θ : X → X  (h = {decomp_theta}, θ ∈ Θ)"
-        return f"h : X → X  (h = {decomp})"
+            base = f"h_θ : X → X  (h = {decomp_theta}, θ ∈ Θ)"
+        else:
+            base = f"h : X → X  (h = {decomp})"
+
+        if has_c:
+            base += ",  y = C_θ(x, d)" if self.has_parameters else ",  y = C(x, d)"
+
+        return base
 
 
 def project_canonical(spec: GDSSpec) -> CanonicalGDS:
@@ -134,7 +150,22 @@ def project_canonical(spec: GDSSpec) -> CanonicalGDS:
         for p in block.interface.forward_out:
             decision_ports.append((bname, p.name))
 
-    # 6. Mechanism update targets
+    # 6. Output space Y: ControlAction forward_out ports
+    output_ports: list[tuple[str, str]] = []
+    for bname in control_blocks:
+        block = spec.blocks[bname]
+        for p in block.interface.forward_out:
+            output_ports.append((bname, p.name))
+
+    # 7. Output map C: ControlAction observed state variables
+    output_map: list[tuple[str, tuple[tuple[str, str], ...]]] = []
+    for bname in control_blocks:
+        block = spec.blocks[bname]
+        if isinstance(block, ControlAction):
+            observes = tuple(tuple(pair) for pair in block.observes)
+            output_map.append((bname, observes))  # type: ignore[arg-type]
+
+    # 8. Mechanism update targets
     update_map: list[tuple[str, tuple[tuple[str, str], ...]]] = []
     for bname in mechanism_blocks:
         block = spec.blocks[bname]
@@ -142,13 +173,13 @@ def project_canonical(spec: GDSSpec) -> CanonicalGDS:
             updates = tuple(tuple(pair) for pair in block.updates)
             update_map.append((bname, updates))  # type: ignore[arg-type]
 
-    # 7. Admissibility dependencies
+    # 9. Admissibility dependencies
     admissibility_map: list[tuple[str, tuple[tuple[str, str], ...]]] = []
     for ac_name, ac in spec.admissibility_constraints.items():
         deps = tuple(tuple(pair) for pair in ac.depends_on)
         admissibility_map.append((ac_name, deps))  # type: ignore[arg-type]
 
-    # 8. Transition read map
+    # 10. Transition read map
     read_map: list[tuple[str, tuple[tuple[str, str], ...]]] = []
     for mname, ts in spec.transition_signatures.items():
         reads = tuple(tuple(pair) for pair in ts.reads)
@@ -159,6 +190,8 @@ def project_canonical(spec: GDSSpec) -> CanonicalGDS:
         parameter_schema=parameter_schema,
         input_ports=tuple(input_ports),
         decision_ports=tuple(decision_ports),
+        output_ports=tuple(output_ports),
+        output_map=tuple(output_map),
         boundary_blocks=tuple(boundary_blocks),
         control_blocks=tuple(control_blocks),
         policy_blocks=tuple(policy_blocks),

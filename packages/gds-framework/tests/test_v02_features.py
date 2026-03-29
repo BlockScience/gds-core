@@ -264,6 +264,8 @@ class TestCanonicalGDS:
         assert c.control_blocks == ()
         assert c.input_ports == ()
         assert c.decision_ports == ()
+        assert c.output_ports == ()
+        assert c.output_map == ()
         assert c.update_map == ()
 
     def test_frozen(self):
@@ -311,6 +313,37 @@ class TestCanonicalGDS:
             policy_blocks=("p1",),
         )
         assert c.formula() == "h_θ : X → X  (h = g_θ, θ ∈ Θ)"
+
+    def test_formula_with_control_blocks(self):
+        """With control blocks, formula includes y = C(x, d)."""
+        c = CanonicalGDS(
+            policy_blocks=("p1",),
+            mechanism_blocks=("m1",),
+            control_blocks=("c1",),
+        )
+        assert "f ∘ g" in c.formula()
+        assert "y = C(x, d)" in c.formula()
+
+    def test_formula_with_control_blocks_and_params(self, float_type):
+        """Parameterized formula with control: includes C_θ(x, d)."""
+        schema = ParameterSchema().add(ParameterDef(name="a", typedef=float_type))
+        c = CanonicalGDS(
+            parameter_schema=schema,
+            policy_blocks=("p1",),
+            mechanism_blocks=("m1",),
+            control_blocks=("c1",),
+        )
+        assert "C_θ(x, d)" in c.formula()
+        assert "f_θ ∘ g_θ" in c.formula()
+
+    def test_formula_without_control_blocks_unchanged(self):
+        """Backward compat: formula without control blocks has no C."""
+        c = CanonicalGDS(
+            policy_blocks=("p1",),
+            mechanism_blocks=("m1",),
+        )
+        assert c.formula() == "h : X → X  (h = f ∘ g)"
+        assert "C" not in c.formula()
 
     def test_has_parameters(self, float_type):
         c_empty = CanonicalGDS()
@@ -385,6 +418,100 @@ class TestProjectCanonical:
         spec.register_block(ca)
         canonical = project_canonical(spec)
         assert "governance" in canonical.control_blocks
+
+    def test_control_action_output_ports(self):
+        """ControlAction forward_out appears in output_ports."""
+        spec = GDSSpec(name="Test")
+        ca = ControlAction(
+            name="observe",
+            interface=Interface(
+                forward_in=(port("state signal"),),
+                forward_out=(port("observation"),),
+            ),
+        )
+        spec.register_block(ca)
+        canonical = project_canonical(spec)
+        assert ("observe", "observation") in canonical.output_ports
+        assert "observe" in canonical.control_blocks
+
+    def test_control_action_output_map(self, float_type):
+        """ControlAction.observes recorded in output_map as (entity, var) pairs."""
+        spec = GDSSpec(name="Test")
+        entity = Entity(
+            name="Plant",
+            variables={"temp": StateVariable(name="temp", typedef=float_type)},
+        )
+        spec.register_entity(entity)
+        ca = ControlAction(
+            name="sensor",
+            interface=Interface(
+                forward_in=(port("state signal"),),
+                forward_out=(port("observation"),),
+            ),
+            observes=[("Plant", "temp")],
+        )
+        spec.register_block(ca)
+        canonical = project_canonical(spec)
+        assert len(canonical.output_map) == 1
+        name, observes = canonical.output_map[0]
+        assert name == "sensor"
+        assert ("Plant", "temp") in observes
+
+    def test_controller_plant_duality_at_composition_boundary(self):
+        """Correspondence proof: ControlAction output ports are isomorphic
+        to the next system's BoundaryAction input ports at a >> boundary.
+
+        Left system emits via ControlAction forward_out.
+        Right system receives via BoundaryAction forward_out (which
+        becomes forward_in of downstream blocks via >>).
+        The port token sets must overlap for >> to auto-wire.
+        """
+        # Left system: ControlAction emits "Temperature"
+        ca = ControlAction(
+            name="Plant",
+            interface=Interface(
+                forward_in=(port("Command"),),
+                forward_out=(port("Temperature"),),
+            ),
+        )
+        # Right system: BoundaryAction emits "Temperature" (same tokens)
+        ba = BoundaryAction(
+            name="Sensor",
+            interface=Interface(
+                forward_out=(port("Temperature"),),
+            ),
+        )
+        # Extract port token sets
+        ca_out_tokens = {p.name for p in ca.interface.forward_out}
+        ba_out_tokens = {p.name for p in ba.interface.forward_out}
+        # The duality: CA output == BA output at the boundary
+        assert ca_out_tokens == ba_out_tokens
+
+        # Verify both project correctly in their respective canonicals
+        spec_left = GDSSpec(name="Left")
+        spec_left.register_block(ca)
+        canon_left = project_canonical(spec_left)
+        assert ("Plant", "Temperature") in canon_left.output_ports
+
+        spec_right = GDSSpec(name="Right")
+        spec_right.register_block(ba)
+        canon_right = project_canonical(spec_right)
+        assert ("Sensor", "Temperature") in canon_right.input_ports
+
+    def test_no_control_action_empty_output(self):
+        """Systems without ControlAction have empty output_ports/output_map."""
+        spec = GDSSpec(name="Test")
+        p = Policy(
+            name="decide",
+            interface=Interface(
+                forward_in=(port("state"),),
+                forward_out=(port("action"),),
+            ),
+        )
+        spec.register_block(p)
+        canonical = project_canonical(spec)
+        assert canonical.output_ports == ()
+        assert canonical.output_map == ()
 
     def test_mechanism_update_map(self, float_type):
         spec = GDSSpec(name="Test")
