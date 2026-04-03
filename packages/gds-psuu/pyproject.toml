@@ -35,6 +35,7 @@ dependencies = [
 [project.optional-dependencies]
 pandas = ["pandas>=2.0"]
 bayesian = ["optuna>=4.0"]
+validation = ["gds-framework>=0.2.3"]
 
 [project.urls]
 Homepage = "https://github.com/BlockScience/gds-core"
