@@ -379,6 +379,7 @@ nav:
       - Axelrod Tournament: case-studies/axelrod.md
   - Design & Research:
       - Layer 0 Milestone: guides/architecture-milestone-layer0.md
+      - Disturbance Formalization: framework/design/disturbance-formalization.md
       - DSL Roadmap: guides/dsl-roadmap.md
       - Research Boundaries: research/research-boundaries.md
       - Paper Implementation Gap: research/paper-implementation-gap.md
