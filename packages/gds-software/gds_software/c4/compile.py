@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING
 from gds.blocks.composition import Wiring
 from gds.blocks.roles import BoundaryAction, Mechanism, Policy
 from gds.compiler.compile import compile_system
+from gds.execution import ExecutionContract
 from gds.ir.models import FlowDirection, SystemIR
 from gds.spaces import Space
 from gds.spec import GDSSpec, SpecWiring, Wire
@@ -303,6 +304,9 @@ def compile_c4(model: C4Model) -> GDSSpec:
             description=f"Auto-generated wiring for C4 model {model.name!r}",
         )
     )
+
+    # C4 diagrams are atemporal — architectural structure
+    spec.execution_contract = ExecutionContract(time_domain="atemporal")
 
     return spec
 

@@ -7,7 +7,7 @@ All downstream GDS tooling works immediately — canonical projection,
 semantic checks, SpecQuery, serialization, gds-viz.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 # ── Common ─────────────────────────────────────────────────
 from gds_business.common.errors import BizCompilationError, BizError, BizValidationError

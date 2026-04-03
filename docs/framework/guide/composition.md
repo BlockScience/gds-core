@@ -10,8 +10,8 @@ These operators are domain-neutral — they work identically whether you're comp
 |---|---|---|---|---|
 | **Stack** | `a >> b` | `StackComposition` | Token overlap (auto) or explicit wiring | Sequential data flow |
 | **Parallel** | `a \| b` | `ParallelComposition` | None | Independent side-by-side blocks |
-| **Feedback** | `a.feedback(wiring)` | `FeedbackLoop` | Wiring should be CONTRAVARIANT (not enforced) | Backward signals within a timestep |
-| **Temporal Loop** | `a.loop(wiring)` | `TemporalLoop` | Wiring must be COVARIANT | Forward signals across timesteps |
+| **Feedback** | `a.feedback(wiring)` | `FeedbackLoop` | Wiring should be CONTRAVARIANT (not enforced) | Backward signals within an evaluation |
+| **Temporal Loop** | `a.loop(wiring)` | `TemporalLoop` | Wiring must be COVARIANT | Forward signals across temporal boundaries |
 
 All four operators return a new `Block`, so they can be chained and nested freely. The result is always a tree of composition nodes with `AtomicBlock` leaves.
 
@@ -254,7 +254,7 @@ stock_tier = parallel_tier([update_s, update_i, update_r])
 
 ## Feedback Loop (`.feedback()`)
 
-Feedback wraps a block (or composition) with backward signals that flow within a single timestep. This models intra-step feedback — information that propagates backward through the system before the timestep completes.
+Feedback wraps a block (or composition) with backward signals that flow within a single evaluation. This models intra-evaluation feedback -- information that propagates backward through the system before the current evaluation completes.
 
 ```python
 from gds import Wiring
@@ -283,7 +283,7 @@ graph LR
 
 ### Contravariant Direction
 
-Feedback wirings carry signals **backward** — from outputs to inputs within the same timestep. The wiring direction should be `FlowDirection.CONTRAVARIANT` to reflect this backward flow.
+Feedback wirings carry signals **backward** -- from outputs to inputs within the same evaluation. The wiring direction should be `FlowDirection.CONTRAVARIANT` to reflect this backward flow.
 
 !!! note "Not enforced at construction"
     Unlike `TemporalLoop` which **rejects** non-COVARIANT wirings at construction time, `FeedbackLoop` does not validate the direction. Using CONTRAVARIANT is a convention that correctly reflects the semantics, but passing COVARIANT will not raise an error.
@@ -314,7 +314,7 @@ assert fb.interface == inner.interface  # True
 
 ## Temporal Loop (`.loop()`)
 
-Temporal loops connect a block's outputs to its inputs across timesteps. This is how state persists — the output of timestep `t` becomes the input of timestep `t+1`.
+Temporal loops connect a block's outputs to its inputs across temporal boundaries. This is how state persists -- the output of one evaluation becomes the input of the subsequent application.
 
 ```python
 system = pipeline.loop(
@@ -335,11 +335,11 @@ system = pipeline.loop(
 
 ```mermaid
 graph LR
-    subgraph "Timestep t"
+    subgraph "Evaluation k"
         O["Observe"] -->|"Signal"| D["Decide"]
         D -->|"Action"| U["Update Prey"]
     end
-    U -.->|"Population (t → t+1)"| O
+    U -.->|"Population (recurrence)"| O
 
     style U fill:#bbf,stroke:#333
 ```
@@ -368,7 +368,7 @@ GDSTypeError: TemporalLoop 'A >> B [loop]': temporal wiring
 B.Command → A.Temperature must be COVARIANT (got contravariant)
 ```
 
-The rationale: temporal loops carry state forward in time. Backward-in-time information flow is not physically meaningful for state evolution. Use `.feedback()` instead for within-timestep backward signals.
+The rationale: temporal loops carry state forward across recurrence boundaries. Backward information flow is not structurally meaningful for state evolution. Use `.feedback()` instead for within-evaluation backward signals.
 
 ### Exit Condition
 
@@ -416,8 +416,8 @@ w = Wiring(
 |---|---|---|
 | Ports share tokens | `a >> b` | No — auto-wired |
 | Ports use different vocabularies | `StackComposition(wiring=[...])` | Yes |
-| Backward feedback within timestep | `.feedback(wiring)` | Yes — always explicit |
-| State carried across timesteps | `.loop(wiring)` | Yes — always explicit |
+| Backward feedback within evaluation | `.feedback(wiring)` | Yes — always explicit |
+| State carried across temporal boundaries | `.loop(wiring)` | Yes — always explicit |
 
 Auto-wiring only applies to `>>` (stack composition). All other operators require explicit `Wiring` objects.
 

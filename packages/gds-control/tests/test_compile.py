@@ -159,3 +159,12 @@ class TestMIMOCompilation:
         temporal = [w for w in ir.wirings if w.is_temporal]
         # x1 Dynamics → y1, x2 Dynamics → y2
         assert len(temporal) == 2
+
+
+class TestExecutionContract:
+    def test_contract_emitted(self, siso_spec):
+        """compile_model() emits a discrete ExecutionContract."""
+        assert siso_spec.execution_contract is not None
+        assert siso_spec.execution_contract.time_domain == "discrete"
+        assert siso_spec.execution_contract.synchrony == "synchronous"
+        assert siso_spec.execution_contract.update_ordering == "Moore"

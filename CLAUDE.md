@@ -114,7 +114,7 @@ Five domain DSLs (stockflow, control, games, software, business) compile to GDS.
    - `compile_to_system(model)` → `SystemIR` (builds composition tree, delegates to `gds.compiler.compile.compile_system`)
 4. **Verification** — domain-specific checks on the model, plus optional delegation to G-001..G-006 via SystemIR
 
-All DSLs map to the same GDS roles: exogenous inputs → `BoundaryAction`, decision/observation logic → `Policy`, state updates → `Mechanism` + `Entity`. `ControlAction` is unused across all DSLs. Canonical `h = f ∘ g` holds cleanly for all three domains.
+All DSLs map to the same GDS roles: exogenous inputs → `BoundaryAction`, decision/observation logic → `Policy`, state updates → `Mechanism` + `Entity`. `ControlAction` is unused by DSL compilers (all non-state-updating blocks resolve to Policy). It is available for hand-built models as the output map y = C(x, d). See docs/framework/design/controller-plant-duality.md. Canonical `h = f ∘ g` holds cleanly for all three domains.
 
 The composition tree follows a convergent tiered pattern:
 ```
@@ -149,8 +149,8 @@ Only 5 concrete Block types exist — domain packages subclass `AtomicBlock` onl
 - `AtomicBlock` — leaf node
 - `StackComposition` (`>>`) — sequential, validates token overlap
 - `ParallelComposition` (`|`) — independent, no validation
-- `FeedbackLoop` (`.feedback()`) — backward within timestep, CONTRAVARIANT
-- `TemporalLoop` (`.loop()`) — forward across timesteps, COVARIANT only
+- `FeedbackLoop` (`.feedback()`) — backward within evaluation, CONTRAVARIANT
+- `TemporalLoop` (`.loop()`) — forward across temporal boundaries, COVARIANT only
 
 Block roles (`BoundaryAction`, `Policy`, `Mechanism`, `ControlAction`) subclass `AtomicBlock` and enforce constraints at construction via `@model_validator`.
 

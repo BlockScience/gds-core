@@ -15,7 +15,7 @@ All three compile to `GDSSpec` / `SystemIR` and produce clean canonical decompos
 ### Validated Architectural Claims
 
 - **Canonical `h = f ∘ g` is correctly minimal.** Three independent domains have not required extensions.
-- **`ControlAction` is unnecessary.** All non-state-updating blocks across all DSLs map to `Policy`. The role system (Boundary, Policy, Mechanism) covers all three domains.
+- **No DSL compiler generates `ControlAction` blocks.** All non-state-updating blocks across all DSLs map to `Policy`. The `ControlAction` role serves as the output map `y = C(x, d)` for explicit inter-system composition at `>>` boundaries. See [Controller-Plant Duality](../framework/design/controller-plant-duality.md).
 - **A convergent composition pattern has emerged:**
   ```
   (peripheral observers | exogenous inputs)

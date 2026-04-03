@@ -53,7 +53,7 @@ spec.register_wiring(
 
 ## Entities & State
 
-Entities define the state space X — what persists across timesteps.
+Entities define the state space X -- what persists across temporal boundaries.
 
 ```python
 from gds import entity, state_var, typedef
@@ -69,7 +69,7 @@ room = entity("Room",
 
 ## Spaces
 
-Spaces define typed communication channels — transient signals within a timestep.
+Spaces define typed communication channels -- transient signals within an evaluation.
 
 ```python
 from gds import space

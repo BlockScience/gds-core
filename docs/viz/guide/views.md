@@ -26,8 +26,8 @@ mermaid = system_to_mermaid(system)
 | Arrow | Meaning |
 |-------|---------|
 | Solid `-->` | Covariant forward flow |
-| Thick `==>` | Contravariant feedback (within-timestep) |
-| Dashed `-.->` | Temporal loop (cross-timestep) |
+| Thick `==>` | Contravariant feedback (within-evaluation) |
+| Dashed `-.->` | Temporal loop (cross-boundary) |
 
 ### Rendered Output
 

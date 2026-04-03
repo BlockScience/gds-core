@@ -16,6 +16,7 @@ from typing import TYPE_CHECKING
 from gds.blocks.composition import Wiring
 from gds.blocks.roles import BoundaryAction, Mechanism, Policy
 from gds.compiler.compile import compile_system
+from gds.execution import ExecutionContract
 from gds.ir.models import FlowDirection, SystemIR
 from gds.spaces import Space
 from gds.spec import GDSSpec, SpecWiring, Wire
@@ -338,6 +339,9 @@ def compile_dfd(model: DFDModel) -> GDSSpec:
             description=f"Auto-generated wiring for DFD {model.name!r}",
         )
     )
+
+    # DFDs are atemporal — structural data flow diagrams
+    spec.execution_contract = ExecutionContract(time_domain="atemporal")
 
     return spec
 

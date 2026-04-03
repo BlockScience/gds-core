@@ -1,6 +1,6 @@
 # Thermostat PID
 
-**Adds feedback** — backward information flow within a single timestep.
+**Adds feedback** -- backward information flow within a single evaluation.
 
 ## GDS Decomposition
 

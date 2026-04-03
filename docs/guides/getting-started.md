@@ -117,7 +117,7 @@ Extend the minimal model with **observation and control**:
 
 - A **Sensor** (Policy) reads the room temperature
 - A **Controller** (Policy) decides the heat command using a `setpoint` parameter
-- A **TemporalLoop** (`.loop()`) feeds updated temperature back to the sensor across timesteps
+- A **TemporalLoop** (`.loop()`) feeds updated temperature back to the sensor across temporal boundaries
 
 New operators: `|` (parallel composition) and `.loop()` (temporal feedback).
 
@@ -197,7 +197,7 @@ flowchart TD
     Update_Temperature -.Temperature Reading..-> Sensor
 ```
 
-Note the dashed arrow from Update Temperature back to Sensor -- this is the temporal loop (`.loop()`), indicating cross-timestep feedback.
+Note the dashed arrow from Update Temperature back to Sensor -- this is the temporal loop (`.loop()`), indicating structural recurrence across temporal boundaries.
 
 ---
 

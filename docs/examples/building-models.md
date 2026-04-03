@@ -29,7 +29,7 @@ Count = typedef("Count", int,
 
 ### 2. Define Entities (state space X)
 
-What persists across timesteps.
+What persists across temporal boundaries.
 
 ```python
 from gds import entity, state_var
@@ -40,7 +40,7 @@ agent = entity("Agent",
 
 ### 3. Define Spaces (communication channels)
 
-Transient signals within a timestep — NOT state.
+Transient signals within an evaluation -- NOT state.
 
 ```python
 from gds import space
@@ -104,7 +104,7 @@ def build_system():
 | State vs Signal | State persists (Entity). Signals are transient (Space). |
 | Parameter vs Input | Parameters fixed per run (Θ). Inputs vary per step (BoundaryAction). |
 | Which operator | Linear → `>>`. Independent → `\|`. Backward → `.feedback()`. Iteration → `.loop()`. |
-| ControlAction vs Policy | Policy = decision logic (g). ControlAction = admissibility constraint (d). |
+| ControlAction vs Policy | Policy = decision logic g(x, z) → d. ControlAction = output observable y = C(x, d). |
 
 ## Role Constraints
 

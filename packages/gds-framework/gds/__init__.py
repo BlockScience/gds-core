@@ -6,7 +6,7 @@ cybernetics (Ghani, Hedges et al.) into a single, dependency-light
 Python framework.
 """
 
-__version__ = "0.2.3"
+__version__ = "0.3.0"
 
 # ── Composition algebra ─────────────────────────────────────
 from gds.blocks.base import AtomicBlock, Block
@@ -43,6 +43,9 @@ from gds.compiler.compile import (
 
 # ── Structural annotations ────────────────────────────────
 from gds.constraints import AdmissibleInputConstraint, StateMetric, TransitionSignature
+
+# ── Execution contract ─────────────────────────────────────
+from gds.execution import ExecutionContract
 
 # ── Convenience helpers ────────────────────────────────────
 from gds.helpers import (
@@ -89,6 +92,7 @@ from gds.types.tokens import tokenize, tokens_overlap, tokens_subset
 # ── Type system ─────────────────────────────────────────────
 from gds.types.typedef import (
     AgentID,
+    ConstraintKind,
     NonNegativeFloat,
     PositiveInt,
     Probability,
@@ -104,7 +108,10 @@ from gds.verification.spec_checks import (
     check_admissibility_references,
     check_canonical_wellformedness,
     check_completeness,
+    check_controlaction_pathway,
     check_determinism,
+    check_disturbance_routing,
+    check_execution_contract_compatibility,
     check_parameter_references,
     check_reachability,
     check_transition_reads,
@@ -122,8 +129,10 @@ __all__ = [
     "BoundaryAction",
     "CanonicalGDS",
     "CompositionType",
+    "ConstraintKind",
     "ControlAction",
     "Entity",
+    "ExecutionContract",
     "FeedbackLoop",
     "Finding",
     "FlowDirection",
@@ -172,7 +181,10 @@ __all__ = [
     "check_admissibility_references",
     "check_canonical_wellformedness",
     "check_completeness",
+    "check_controlaction_pathway",
     "check_determinism",
+    "check_disturbance_routing",
+    "check_execution_contract_compatibility",
     "check_parameter_references",
     "check_reachability",
     "check_transition_reads",

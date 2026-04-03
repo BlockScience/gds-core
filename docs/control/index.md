@@ -69,7 +69,7 @@ The compiler builds a tiered composition tree:
 - **Across tiers:** sequential composition (`>>`) -- sensors feed controllers, controllers feed state dynamics
 - **Temporal recurrence:** `.loop()` -- state outputs at timestep *t* feed back to sensors at timestep *t+1*
 
-**Design decision:** All non-state-updating blocks use `Policy`. `ControlAction` is deliberately not used -- it sits outside the canonical *g* partition, which would break the clean `(A, B, C, D) <-> (X, U, g, f)` mapping.
+**Design decision:** All non-state-updating blocks use `Policy`. gds-control deliberately maps everything to the `(A, B, C, D) -> (X, Z, g, f)` state-space decomposition, where sensors and controllers both contribute to the input map `g`. The `ControlAction` role (output map `y = C(x, d)`) is orthogonal to this mapping -- it models inter-system output, not internal control flow. See [Controller-Plant Duality](../framework/design/controller-plant-duality.md).
 
 ## Canonical Form
 

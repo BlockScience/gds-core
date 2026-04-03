@@ -1,6 +1,6 @@
 # Verification Check Catalog
 
-GDS runs 13 verification checks across two registries to validate both structural
+GDS runs 15 verification checks across two registries to validate both structural
 topology and domain semantics. This page is the complete reference for every check.
 
 ## Overview
@@ -13,7 +13,14 @@ There are two independent check registries:
 | Registry | Checks | Operates on | What it validates |
 |---|---|---|---|
 | **Generic** | G-001 through G-006 | `SystemIR` | Structural topology — port matching, acyclicity, dangling references |
-| **Semantic** | SC-001 through SC-007 | `GDSSpec` | Domain properties — completeness, determinism, type safety, canonical form |
+| **Semantic** | SC-001 through SC-009 | `GDSSpec` | Domain properties — completeness, determinism, type safety, canonical form, admissibility, transitions |
+
+### Formal Specifications
+
+Each of the 15 checks has a formal property statement, invariant connection to the
+canonical form `h = f . g`, failure semantics, and soundness conditions. See
+[Verification Check Specifications](../design/check-specifications.md) for the
+complete formal treatment.
 
 Generic checks run on the compiled IR (after `compile_system()`). Semantic checks
 run on the specification (the `GDSSpec` registry). Both produce `Finding` objects
@@ -51,6 +58,8 @@ from gds.verification.spec_checks import (
     check_parameter_references,
     check_type_safety,
     check_canonical_wellformedness,
+    check_admissibility_references,
+    check_transition_reads,
 )
 
 spec = build_spec()
@@ -61,6 +70,8 @@ findings += check_determinism(spec)
 findings += check_parameter_references(spec)
 findings += check_type_safety(spec)
 findings += check_canonical_wellformedness(spec)
+findings += check_admissibility_references(spec)
+findings += check_transition_reads(spec)
 
 for f in findings:
     if not f.passed:
@@ -124,7 +135,7 @@ system = SystemIR(
 
 !!! note
     For generic checks (G-001..G-006), passing findings retain `severity=ERROR` — the severity
-    indicates what *would* be reported if the check failed. For semantic checks (SC-001..SC-007),
+    indicates what *would* be reported if the check failed. For semantic checks (SC-001..SC-009),
     passing findings use `severity=INFO`. Use the `passed` field to distinguish pass from fail.
 
 ---
@@ -313,13 +324,13 @@ system = SystemIR(
 
 **What it checks:** The covariant (forward) flow graph must be a directed acyclic
 graph (DAG). A cycle in the covariant graph means an algebraic loop within a
-single timestep — Block A depends on Block B which depends on Block A, with no
-temporal delay to break the cycle.
+single evaluation -- Block A depends on Block B which depends on Block A, with no
+recurrence boundary to break the cycle.
 
 **Severity:** ERROR
 
 **Excludes:** Temporal wirings (`is_temporal=True`) and contravariant wirings.
-These are legitimate backward or cross-timestep connections that do not create
+These are legitimate backward or cross-boundary connections that do not create
 algebraic loops.
 
 **Detection method:** DFS-based cycle detection on the adjacency graph of
@@ -360,7 +371,7 @@ system = SystemIR(
 
 ---
 
-## Semantic Checks (SC-001 through SC-007)
+## Semantic Checks (SC-001 through SC-009)
 
 These checks operate on `GDSSpec` — the specification-level registry. They
 validate domain properties that require knowledge of entities, roles, parameters,
@@ -619,6 +630,70 @@ findings = check_canonical_wellformedness(spec)
 
 ---
 
+### SC-008: Admissibility References
+
+**What it checks:** Every registered `AdmissibleInputConstraint` must reference an
+existing `BoundaryAction` and valid (entity, variable) pairs. This validates that
+admissibility constraints — which restrict exogenous inputs based on state — are
+structurally well-formed.
+
+**Severity:** ERROR
+
+**Note:** If no admissibility constraints are registered, SC-008 emits a passing
+INFO finding.
+
+```python
+from gds.verification.spec_checks import check_admissibility_references
+
+findings = check_admissibility_references(spec)
+```
+
+**Example finding (failure):**
+
+```
+[error] SC-008: Admissibility constraint issues: ["'my_constraint': block 'Ghost' not registered"]
+```
+
+**Example finding (pass):**
+
+```
+[info] SC-008: All 2 admissibility constraint(s) are well-formed
+```
+
+---
+
+### SC-009: Transition Reads
+
+**What it checks:** Every registered `TransitionSignature` must reference an
+existing `Mechanism`, valid (entity, variable) read pairs, and valid
+`depends_on_blocks`. This validates that transition metadata — which describes
+read dependencies of state transitions — is structurally consistent.
+
+**Severity:** ERROR
+
+**Note:** If no transition signatures are registered, SC-009 emits a passing
+INFO finding.
+
+```python
+from gds.verification.spec_checks import check_transition_reads
+
+findings = check_transition_reads(spec)
+```
+
+**Example finding (failure):**
+
+```
+[error] SC-009: Transition signature issues: ["'UpdateTank': reads unknown entity 'Ghost'"]
+```
+
+**Example finding (pass):**
+
+```
+[info] SC-009: All 3 transition signature(s) are consistent
+```
+
+---
+
 ## Understanding the Output
 
 ### Finding
@@ -846,3 +921,19 @@ Some findings are expected in valid models:
 | SC-005 | Parameter references | `GDSSpec` | ERROR | Block `params_used` match registered parameter names |
 | SC-006 | Canonical wellformedness (f) | `GDSSpec` | WARNING | At least one mechanism exists (f is non-empty) |
 | SC-007 | Canonical wellformedness (X) | `GDSSpec` | WARNING | At least one state variable exists (X is non-empty) |
+| SC-008 | Admissibility references | `GDSSpec` | ERROR | Admissibility constraints reference valid blocks and variables |
+| SC-009 | Transition reads | `GDSSpec` | ERROR | Transition signatures reference valid mechanisms and variables |
+
+---
+
+## Assurance Scope
+
+A `verify()` pass checks structural and semantic well-formedness. It proves
+that the wiring graph is a valid mathematical object and that the specification
+is internally consistent. It does **not** prove behavioral properties like
+safety, stability, conservation, or liveness -- those require simulation,
+formal proof, or domain expert review.
+
+For a complete treatment of what verification does and does not prove, the
+residual obligations by domain, and a one-page verification passport template,
+see [Assurance Claims and Residual Gaps](../design/assurance-claims.md).

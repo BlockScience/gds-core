@@ -147,3 +147,11 @@ class TestCompileDFDToSystem:
         )
         ir = compile_dfd_to_system(model)
         assert len(ir.blocks) == 2
+
+
+class TestExecutionContract:
+    def test_contract_emitted(self, auth_model):
+        """compile_dfd() emits an atemporal ExecutionContract."""
+        spec = compile_dfd(auth_model)
+        assert spec.execution_contract is not None
+        assert spec.execution_contract.time_domain == "atemporal"

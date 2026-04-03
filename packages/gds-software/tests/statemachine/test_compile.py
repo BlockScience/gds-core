@@ -140,3 +140,11 @@ class TestCompileSMToSystem:
         )
         ir = compile_sm_to_system(model)
         assert len(ir.blocks) == 7  # 1 event + 2 transitions + 4 states
+
+
+class TestExecutionContract:
+    def test_contract_emitted(self, door_model):
+        """compile_sm() emits a discrete ExecutionContract."""
+        spec = compile_sm(door_model)
+        assert spec.execution_contract is not None
+        assert spec.execution_contract.time_domain == "discrete"

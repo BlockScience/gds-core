@@ -67,6 +67,26 @@ def _typedef_to_rdf(g: Graph, ns: Namespace, t: TypeDef) -> URIRef:
     )
     if t.units:
         g.add((uri, GDS_CORE["units"], Literal(t.units)))
+    if t.constraint_kind:
+        g.add((uri, GDS_CORE["constraintKind"], Literal(t.constraint_kind)))
+    if t.constraint_bounds is not None:
+        g.add(
+            (
+                uri,
+                GDS_CORE["constraintLow"],
+                Literal(t.constraint_bounds[0], datatype=XSD.double),
+            )
+        )
+        g.add(
+            (
+                uri,
+                GDS_CORE["constraintHigh"],
+                Literal(t.constraint_bounds[1], datatype=XSD.double),
+            )
+        )
+    if t.constraint_values is not None:
+        for v in t.constraint_values:
+            g.add((uri, GDS_CORE["constraintValue"], Literal(str(v))))
     return uri
 
 

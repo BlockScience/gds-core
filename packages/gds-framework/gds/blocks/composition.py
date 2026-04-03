@@ -4,8 +4,8 @@ These operators combine blocks into larger composite systems:
 
 - **Stack** (``>>``) — chains blocks so one's output feeds another's input.
 - **Parallel** (``|``) — runs blocks side-by-side with no shared wires.
-- **Feedback** — connects backward_out to backward_in within a single timestep.
-- **Temporal Loop** — connects forward_out to forward_in across timesteps.
+- **Feedback** — connects backward_out to backward_in within a single evaluation.
+- **Temporal Loop** — connects forward_out to forward_in across temporal boundaries.
 """
 
 from __future__ import annotations
@@ -103,7 +103,7 @@ class ParallelComposition(Block):
 
 
 class FeedbackLoop(Block):
-    """Backward feedback within a single timestep (backward_out -> backward_in)."""
+    """Backward feedback within a single evaluation (backward_out -> backward_in)."""
 
     inner: Block
     feedback_wiring: list[Wiring]
@@ -118,7 +118,7 @@ class FeedbackLoop(Block):
 
 
 class TemporalLoop(Block):
-    """Forward temporal iteration across timesteps (forward_out -> forward_in).
+    """Structural recurrence across temporal boundaries (forward_out -> forward_in).
 
     All temporal wiring must be covariant direction.
     """

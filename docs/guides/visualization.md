@@ -28,8 +28,8 @@ The compiled block graph from `SystemIR`. Shows composition topology with role-b
 **Arrow conventions:**
 
 - Solid arrow `-->` = covariant forward flow
-- Dashed arrow `-.->` = temporal loop (cross-timestep)
-- Thick arrow `==>` = feedback (within-timestep, contravariant)
+- Dashed arrow `-.->` = temporal loop (cross-boundary)
+- Thick arrow `==>` = feedback (within-evaluation, contravariant)
 
 **API:** `system_to_mermaid(system)`
 

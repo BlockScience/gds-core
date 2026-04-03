@@ -58,6 +58,86 @@ def _add_property_shape(
 # ── Structural Shapes ────────────────────────────────────────────────
 
 
+def _add_constraint_shapes(g: Graph, data_graph: Graph) -> None:
+    """Add SHACL property shapes for TypeDef nodes with constraintKind.
+
+    Reads TypeDef individuals from *data_graph*, and for each one that
+    carries a ``constraintKind`` literal, generates a SHACL NodeShape with
+    the appropriate numeric restriction (``sh:minInclusive``,
+    ``sh:maxInclusive``, ``sh:minExclusive``, or ``sh:in``).
+
+    The shapes are written into *g* (the shapes graph).
+    """
+    from rdflib import BNode
+    from rdflib.collection import Collection
+
+    _kind_map = {
+        "non_negative": lambda _g, prop, _low, _high, _vals: [
+            (_g.add((prop, SH.minInclusive, Literal(0, datatype=XSD.double))),)
+        ],
+        "positive": lambda _g, prop, _low, _high, _vals: [
+            (_g.add((prop, SH.minExclusive, Literal(0, datatype=XSD.double))),)
+        ],
+        "probability": lambda _g, prop, _low, _high, _vals: [
+            _g.add((prop, SH.minInclusive, Literal(0.0, datatype=XSD.double))),
+            _g.add((prop, SH.maxInclusive, Literal(1.0, datatype=XSD.double))),
+        ],
+        "bounded": lambda _g, prop, low, high, _vals: [
+            _g.add((prop, SH.minInclusive, Literal(low, datatype=XSD.double)))
+            if low is not None
+            else None,
+            _g.add((prop, SH.maxInclusive, Literal(high, datatype=XSD.double)))
+            if high is not None
+            else None,
+        ],
+    }
+
+    for td_uri in data_graph.subjects(RDF.type, GDS_CORE["TypeDef"]):
+        kind_vals = list(data_graph.objects(td_uri, GDS_CORE["constraintKind"]))
+        if not kind_vals:
+            continue
+        kind = str(kind_vals[0])
+
+        # Resolve name for a deterministic shape URI
+        name_vals = list(data_graph.objects(td_uri, GDS_CORE["name"]))
+        td_name = str(name_vals[0]) if name_vals else "unknown"
+        safe_name = td_name.replace(" ", "_")
+
+        shape_uri = GDS_SHAPE[f"TypeDefConstraint_{safe_name}Shape"]
+        g.add((shape_uri, RDF.type, SH.NodeShape))
+        g.add((shape_uri, SH.targetNode, td_uri))
+        g.add(
+            (
+                shape_uri,
+                SH.message,
+                Literal(f"TypeDef '{td_name}' constraint ({kind}) value restriction"),
+            )
+        )
+
+        if kind == "enum":
+            # sh:in requires an RDF list
+            cv_vals = [
+                str(v) for v in data_graph.objects(td_uri, GDS_CORE["constraintValue"])
+            ]
+            if cv_vals:
+                prop = BNode()
+                g.add((shape_uri, SH.property, prop))
+                g.add((prop, SH.path, GDS_CORE["constraintValue"]))
+                list_head = BNode()
+                Collection(g, list_head, [Literal(v) for v in sorted(cv_vals)])
+                g.add((prop, SH["in"], list_head))
+        elif kind in _kind_map:
+            low_vals = list(data_graph.objects(td_uri, GDS_CORE["constraintLow"]))
+            high_vals = list(data_graph.objects(td_uri, GDS_CORE["constraintHigh"]))
+            low = float(low_vals[0].toPython()) if low_vals else None
+            high = float(high_vals[0].toPython()) if high_vals else None
+
+            prop = BNode()
+            g.add((shape_uri, SH.property, prop))
+            g.add((prop, SH.path, GDS_CORE["constraintKind"]))
+            _kind_map[kind](g, prop, low, high, None)
+
+
 def build_structural_shapes() -> Graph:
     """Build SHACL shapes for GDS structural constraints.
 
@@ -407,6 +487,22 @@ def build_semantic_shapes() -> Graph:
         message="SC-009: Transition signature must reference a Mechanism",
     )
 
+    return g
+
+
+# ── Constraint Shapes ──────────────────────────────────────────────
+
+
+def build_constraint_shapes(data_graph: Graph) -> Graph:
+    """Build SHACL shapes for TypeDef constraint_kind metadata.
+
+    Reads TypeDef individuals from *data_graph* and generates
+    SHACL NodeShapes with numeric/enum restrictions for each
+    TypeDef that carries a ``constraintKind`` literal.
+    """
+    g = Graph()
+    _bind(g)
+    _add_constraint_shapes(g, data_graph)
     return g
 
 

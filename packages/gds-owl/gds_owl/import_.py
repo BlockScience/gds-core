@@ -4,13 +4,15 @@ Reconstructs GDSSpec, SystemIR, CanonicalGDS, and VerificationReport
 from RDF graphs produced by the export functions.
 
 Known lossy fields:
-- TypeDef.constraint: Python callable, not serializable. Imported as None.
+- TypeDef.constraint: Python callable, not serializable *unless*
+  ``constraint_kind`` is set — recognised patterns are reconstructed.
 - TypeDef.python_type: Mapped from string via _PYTHON_TYPE_MAP for builtins.
 """
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from collections.abc import Callable  # noqa: TC003
+from typing import TYPE_CHECKING, Any
 
 from rdflib import RDF, XSD, Graph, Literal, URIRef
 
@@ -67,6 +69,40 @@ def _subjects_of_type(g: Graph, rdf_type: URIRef) -> list[URIRef]:
 # ── TypeDef ──────────────────────────────────────────────────────────
 
 
+def _float_or_none(g: Graph, subject: URIRef, predicate: URIRef) -> float | None:
+    """Get a single float literal value, or None."""
+    vals = list(g.objects(subject, predicate))
+    if vals:
+        v = vals[0]
+        if isinstance(v, Literal):
+            try:
+                return float(v.toPython())
+            except (TypeError, ValueError):
+                return None
+    return None
+
+
+def _reconstruct_constraint(
+    kind: str,
+    bounds: tuple[float, float] | None,
+    values: tuple[str, ...] | None,
+) -> Callable[[Any], bool] | None:
+    """Rebuild a Python callable constraint from a named constraint kind."""
+    if kind == "non_negative":
+        return lambda x: x >= 0
+    elif kind == "positive":
+        return lambda x: x > 0
+    elif kind == "probability":
+        return lambda x: 0.0 <= x <= 1.0
+    elif kind == "bounded" and bounds:
+        lo, hi = bounds
+        return lambda x, _lo=lo, _hi=hi: _lo <= x <= _hi
+    elif kind == "enum" and values:
+        allowed = set(values)
+        return lambda x, _s=allowed: x in _s
+    return None
+
+
 def _import_typedef(g: Graph, uri: URIRef) -> dict:
     """Extract TypeDef fields from an RDF node."""
     name = _str(g, uri, GDS_CORE["name"])
@@ -74,12 +110,35 @@ def _import_typedef(g: Graph, uri: URIRef) -> dict:
     python_type = _PYTHON_TYPE_MAP.get(py_type_str, str)
     description = _str(g, uri, GDS_CORE["description"])
     units = _str(g, uri, GDS_CORE["units"]) or None
+
+    constraint_kind = _str(g, uri, GDS_CORE["constraintKind"]) or None
+    constraint_bounds: tuple[float, float] | None = None
+    constraint_values: tuple[str, ...] | None = None
+    constraint = None
+
+    if constraint_kind:
+        low = _float_or_none(g, uri, GDS_CORE["constraintLow"])
+        high = _float_or_none(g, uri, GDS_CORE["constraintHigh"])
+        if low is not None and high is not None:
+            constraint_bounds = (low, high)
+
+        raw_values = [str(v) for v in g.objects(uri, GDS_CORE["constraintValue"])]
+        if raw_values:
+            constraint_values = tuple(sorted(raw_values))
+
+        constraint = _reconstruct_constraint(
+            constraint_kind, constraint_bounds, constraint_values
+        )
+
     return {
         "name": name,
         "python_type": python_type,
         "description": description,
         "units": units,
-        "constraint": None,  # not serializable
+        "constraint": constraint,
+        "constraint_kind": constraint_kind,
+        "constraint_bounds": constraint_bounds,
+        "constraint_values": constraint_values,
     }
 
 

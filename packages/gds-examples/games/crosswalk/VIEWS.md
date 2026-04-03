@@ -78,7 +78,7 @@ flowchart LR
 Blocks grouped by GDS role — all 4 roles present:
 - **BoundaryAction**: Observe Traffic (exogenous input)
 - **Policy**: Pedestrian Decision (observation -> action)
-- **ControlAction**: Safety Check (admissibility constraint)
+- **ControlAction**: Safety Check (output observable)
 - **Mechanism**: Traffic Transition (Markov state update)
 
 ```mermaid
