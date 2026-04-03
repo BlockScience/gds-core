@@ -378,6 +378,7 @@ nav:
       - case-studies/index.md
       - Axelrod Tournament: case-studies/axelrod.md
   - Design & Research:
+      - Assurance Claims: framework/design/assurance-claims.md
       - Check Specifications: framework/design/check-specifications.md
       - Layer 0 Milestone: guides/architecture-milestone-layer0.md
       - Controller-Plant Duality: framework/design/controller-plant-duality.md
