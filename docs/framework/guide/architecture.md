@@ -18,6 +18,26 @@ Domain judgment enters at Layer 1: when a modeler decides "this is a Mechanism, 
 
 This separation means Layer 0 specifications stay verifiable without knowing anything about the domain — they can be composed and checked formally. Layer 1 adds the meaning that makes a specification useful for a particular problem.
 
+## Temporal Stack
+
+The core algebra is temporally agnostic. The flag `is_temporal=True` on a wiring asserts structural recurrence -- nothing about discrete steps, continuous flow, or events. Time models are DSL-layer declarations.
+
+```
+Layer 0 — gds-framework (core)
+  is_temporal=True encodes structural recurrence only.
+  h = f . g is a single atemporal map application.
+
+Layer 1 — DSL (ExecutionContract)
+  The DSL declares what "temporal boundary" means:
+    discrete | continuous | event | atemporal
+
+Layer 2 — Simulation (SolverInterface / runner)
+  A solver instantiates the time model concretely.
+  Specification and verification are valid without a solver.
+```
+
+See the full treatment in the [Temporal Agnosticism](../design/temporal-agnosticism.md) design document.
+
 ## Foundation + Domain Packages
 
 ```
