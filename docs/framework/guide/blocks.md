@@ -18,7 +18,7 @@ Block roles subclass `AtomicBlock` and add interface constraints:
 |---|:---:|:---:|:---:|:---:|---|
 | **BoundaryAction** | MUST be `()` | any | any | any | Exogenous observation |
 | **Policy** | any | any | any | any | Decision logic |
-| **ControlAction** | any | any | any | any | Admissibility constraint |
+| **ControlAction** | any | any | any | any | Output observable y = C(x, d) |
 | **Mechanism** | any | any | MUST be `()` | MUST be `()` | State update |
 
 Violating the MUST constraints raises `GDSCompositionError` immediately at construction time.
@@ -56,7 +56,7 @@ controller = Policy(
 
 ### ControlAction
 
-Admissibility constraints — limits what actions are allowed.
+Output observable — the system's observable output `y = C(x, d)` for composition with other systems. From the plant (inside) perspective, this is what the system emits. From the controller (outside) perspective at a `>>` boundary, it becomes a control action on the next system.
 
 ```python
 from gds import ControlAction, interface
