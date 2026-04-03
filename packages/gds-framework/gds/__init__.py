@@ -44,6 +44,9 @@ from gds.compiler.compile import (
 # ── Structural annotations ────────────────────────────────
 from gds.constraints import AdmissibleInputConstraint, StateMetric, TransitionSignature
 
+# ── Execution contract ─────────────────────────────────────
+from gds.execution import ExecutionContract
+
 # ── Convenience helpers ────────────────────────────────────
 from gds.helpers import (
     all_checks,
@@ -107,6 +110,7 @@ from gds.verification.spec_checks import (
     check_completeness,
     check_controlaction_pathway,
     check_determinism,
+    check_execution_contract_compatibility,
     check_parameter_references,
     check_reachability,
     check_transition_reads,
@@ -127,6 +131,7 @@ __all__ = [
     "ConstraintKind",
     "ControlAction",
     "Entity",
+    "ExecutionContract",
     "FeedbackLoop",
     "Finding",
     "FlowDirection",
@@ -177,6 +182,7 @@ __all__ = [
     "check_completeness",
     "check_controlaction_pathway",
     "check_determinism",
+    "check_execution_contract_compatibility",
     "check_parameter_references",
     "check_reachability",
     "check_transition_reads",
