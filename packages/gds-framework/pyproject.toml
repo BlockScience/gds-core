@@ -56,6 +56,9 @@ packages = ["gds"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "--import-mode=importlib --cov=gds --cov-report=term-missing --no-header -q"
+markers = [
+    "requirement(id): links test to a formal requirement from check-specifications.md",
+]
 
 [tool.coverage.run]
 source = ["gds"]
