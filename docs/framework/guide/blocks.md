@@ -7,8 +7,8 @@ The composition algebra is **sealed** — only 5 concrete Block types exist:
 - `AtomicBlock` — leaf node (domain packages subclass this)
 - `StackComposition` (`>>`) — sequential, validates token overlap
 - `ParallelComposition` (`|`) — independent, no type validation
-- `FeedbackLoop` (`.feedback()`) — backward within timestep
-- `TemporalLoop` (`.loop()`) — forward across timesteps, enforces COVARIANT only
+- `FeedbackLoop` (`.feedback()`) — backward within evaluation
+- `TemporalLoop` (`.loop()`) — forward across temporal boundaries, enforces COVARIANT only
 
 ## GDS Roles
 
@@ -118,7 +118,7 @@ system = pipeline.feedback([
 ])
 ```
 
-Within-timestep backward flow. Requires CONTRAVARIANT direction.
+Within-evaluation backward flow. Requires CONTRAVARIANT direction.
 
 ### Temporal Loop (`.loop()`)
 
@@ -132,7 +132,7 @@ system = pipeline.loop([
 ])
 ```
 
-Cross-timestep forward flow. COVARIANT is mandatory — CONTRAVARIANT raises `GDSTypeError`.
+Cross-boundary forward flow. COVARIANT is mandatory -- CONTRAVARIANT raises `GDSTypeError`.
 
 ## Tagged Mixin
 

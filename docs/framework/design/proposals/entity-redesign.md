@@ -169,7 +169,7 @@ Entity = (name, X, U, Y, Θ, θ, P, annotations)
 ```
 
 Where:
-- **X** = state space — persistent across timesteps
+- **X** = state space — persistent across temporal boundaries
 - **U** = input space — signals the entity receives
 - **Y** = output space — signals the entity emits
 - **Θ** = parameter space — configuration dimensions, fixed per trajectory
@@ -782,7 +782,7 @@ u_i = boundary_i(y_j, y_k, ..., e)
 
 Entity i's input (u_i) is assembled from the outbound signals (y_j, y_k, ...) of other entities plus any truly exogenous input (e) from outside the system. The BoundaryAction captures this assembly.
 
-The coupling topology is a directed graph: an edge from entity j to entity i means j's ControlAction output feeds i's BoundaryAction input. This graph is derivable from the composition algebra — `>>` creates sequential coupling, `|` creates independent entities, `.feedback()` creates bidirectional coupling within a timestep, `.loop()` creates temporal coupling across timesteps.
+The coupling topology is a directed graph: an edge from entity j to entity i means j's ControlAction output feeds i's BoundaryAction input. This graph is derivable from the composition algebra — `>>` creates sequential coupling, `|` creates independent entities, `.feedback()` creates bidirectional coupling within an evaluation, `.loop()` creates temporal coupling across temporal boundaries.
 
 ### The Global Dynamical System
 

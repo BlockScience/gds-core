@@ -82,7 +82,7 @@ system = SystemIR(
 
 ### G-006: Covariant Cycles
 
-Three blocks form a cycle via non-temporal covariant wirings -- an algebraic loop that cannot be resolved within a single timestep.
+Three blocks form a cycle via non-temporal covariant wirings -- an algebraic loop that cannot be resolved within a single evaluation.
 
 ```python
 system = SystemIR(

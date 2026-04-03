@@ -51,8 +51,8 @@ print(f"{report.checks_passed}/{report.checks_total} checks passed")
 |---|---|---|---|
 | `>>` | Sequential | Forward | Pipeline stages |
 | `\|` | Parallel | Independent | Concurrent updates |
-| `.feedback()` | Feedback | Backward (within timestep) | Cost signals, constraints |
-| `.loop()` | Temporal | Forward (across timesteps) | Iteration, convergence |
+| `.feedback()` | Feedback | Backward (within evaluation) | Cost signals, constraints |
+| `.loop()` | Temporal | Forward (across temporal boundaries) | Recurrence, convergence |
 
 ## Next Steps
 

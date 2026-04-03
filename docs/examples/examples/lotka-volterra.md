@@ -1,6 +1,6 @@
 # Lotka-Volterra
 
-**Adds temporal loops** — forward iteration across timesteps.
+**Adds temporal loops** -- structural recurrence across temporal boundaries.
 
 ## GDS Decomposition
 
@@ -31,11 +31,11 @@ flowchart TD
 
 ## What You'll Learn
 
-- `.loop()` composition for cross-timestep temporal feedback
+- `.loop()` composition for cross-boundary temporal recurrence
 - **COVARIANT** flow direction — mandatory for `.loop()` (CONTRAVARIANT raises GDSTypeError)
 - Mechanism with `forward_out` — emitting signals after state update
 - `exit_condition` parameter for loop termination
-- Contrast with `.feedback()`: within-timestep vs across-timestep
+- Contrast with `.feedback()`: within-evaluation vs across-boundary
 
 !!! note "Key distinction"
     Temporal wirings must be **COVARIANT** — `.loop()` enforces this at construction time.

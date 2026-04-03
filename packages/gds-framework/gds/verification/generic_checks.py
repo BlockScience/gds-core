@@ -281,7 +281,7 @@ def check_g005_sequential_type_compatibility(system: SystemIR) -> list[Finding]:
 
 
 def check_g006_covariant_acyclicity(system: SystemIR) -> list[Finding]:
-    """G-006: Covariant flow graph must be a DAG (no cycles within a timestep).
+    """G-006: Covariant flow graph must be a DAG (no cycles within an evaluation).
 
     Temporal wirings and contravariant wirings are excluded.
     """
