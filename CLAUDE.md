@@ -149,8 +149,8 @@ Only 5 concrete Block types exist — domain packages subclass `AtomicBlock` onl
 - `AtomicBlock` — leaf node
 - `StackComposition` (`>>`) — sequential, validates token overlap
 - `ParallelComposition` (`|`) — independent, no validation
-- `FeedbackLoop` (`.feedback()`) — backward within timestep, CONTRAVARIANT
-- `TemporalLoop` (`.loop()`) — forward across timesteps, COVARIANT only
+- `FeedbackLoop` (`.feedback()`) — backward within evaluation, CONTRAVARIANT
+- `TemporalLoop` (`.loop()`) — forward across temporal boundaries, COVARIANT only
 
 Block roles (`BoundaryAction`, `Policy`, `Mechanism`, `ControlAction`) subclass `AtomicBlock` and enforce constraints at construction via `@model_validator`.
 

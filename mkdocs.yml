@@ -383,6 +383,7 @@ nav:
       - DSL Roadmap: guides/dsl-roadmap.md
       - Research Boundaries: research/research-boundaries.md
       - Paper Implementation Gap: research/paper-implementation-gap.md
+      - Temporal Agnosticism: framework/design/temporal-agnosticism.md
       - View Stratification: guides/view-stratification.md
       - Ecosystem: framework/ecosystem.md
       - Semantic Web Integration: research/semantic-web-summary.md

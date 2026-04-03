@@ -60,7 +60,7 @@ class Block(Tagged, ABC):
         )
 
     def feedback(self, wiring: list[Wiring]) -> FeedbackLoop:
-        """Wrap with backward feedback within a single timestep."""
+        """Wrap with backward feedback within a single evaluation."""
         from gds.blocks.composition import FeedbackLoop
 
         return FeedbackLoop(
@@ -70,7 +70,7 @@ class Block(Tagged, ABC):
         )
 
     def loop(self, wiring: list[Wiring], exit_condition: str = "") -> TemporalLoop:
-        """Wrap with forward temporal iteration across timesteps."""
+        """Wrap with structural recurrence across temporal boundaries."""
         from gds.blocks.composition import TemporalLoop
 
         return TemporalLoop(

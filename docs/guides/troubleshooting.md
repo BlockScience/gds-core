@@ -166,15 +166,15 @@ WiringIR(source="Ghost", target="B", label="signal", ...)
 
 ### G-006: Covariant Acyclicity
 
-**What it checks:** The covariant (non-temporal, non-contravariant) flow graph must be a DAG -- no cycles within a single timestep.
+**What it checks:** The covariant (non-temporal, non-contravariant) flow graph must be a DAG -- no cycles within a single evaluation.
 
-**When it fails:** Three or more blocks form a cycle via covariant wirings, creating an algebraic loop that cannot be resolved within one timestep.
+**When it fails:** Three or more blocks form a cycle via covariant wirings, creating an algebraic loop that cannot be resolved within one evaluation.
 
 ```
 A -> B -> C -> A  # cycle detected!
 ```
 
-**Fix:** Break the cycle by using `.loop()` (temporal, across timesteps) for one of the edges instead of `>>` (sequential, within timestep).
+**Fix:** Break the cycle by using `.loop()` (temporal, across temporal boundaries) for one of the edges instead of `>>` (sequential, within evaluation).
 
 ---
 
@@ -267,8 +267,8 @@ These are not interchangeable:
 
 | Operator | Direction | Timing | Purpose |
 |----------|-----------|--------|---------|
-| `.feedback()` | CONTRAVARIANT | Within timestep | Backward utility/reward signals |
-| `.loop()` | COVARIANT | Across timesteps | State feedback to observers |
+| `.feedback()` | CONTRAVARIANT | Within evaluation | Backward utility/reward signals |
+| `.loop()` | COVARIANT | Across temporal boundaries | State feedback to observers |
 
 Using `.feedback()` for temporal state feedback will cause G-003 failures.
 

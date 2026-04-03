@@ -53,8 +53,8 @@ monoidal categories out of the box once the algebra is instantiated.
 
 ### 1c. Traced Monoidal Structure
 
-Prove the Joyal-Street-Verity axioms for `fb` (contravariant, within-timestep)
-and `loop` (covariant, across-timestep):
+Prove the Joyal-Street-Verity axioms for `fb` (contravariant, within-evaluation)
+and `loop` (covariant, across-boundary):
 
 | Axiom | Statement |
 |---|---|
@@ -67,8 +67,8 @@ and `loop` (covariant, across-timestep):
 **Approach:** Coq with Interaction Trees library. The two feedback operators
 have different variance, so they require separate trace instances:
 
-- `fb`: contravariant trace (backward ports looped within timestep)
-- `loop`: covariant trace (forward ports carried across timesteps)
+- `fb`: contravariant trace (backward ports looped within evaluation)
+- `loop`: covariant trace (forward ports carried across temporal boundaries)
 
 Hasegawa's correspondence (Conway fixed-point <-> categorical trace) validates
 that `fb` computes within-timestep fixed points soundly.

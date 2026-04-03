@@ -4,7 +4,7 @@ In GDS terms, the full state space X is the product of all entity states:
     X = Entity_1.state x Entity_2.state x ... x Entity_n.state
 
 Entities correspond to actors, resources, registries — anything that
-persists across timesteps and has mutable state.
+persists across temporal boundaries and has mutable state.
 """
 
 from __future__ import annotations
@@ -41,7 +41,7 @@ class Entity(Tagged):
 
     In GDS terms, the full state space X is the product of all entity
     state spaces. Entities correspond to actors, resources, registries —
-    anything that persists across timesteps.
+    anything that persists across temporal boundaries.
     """
 
     name: str

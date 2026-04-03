@@ -299,7 +299,7 @@ inputs = boundary_a | boundary_b
 
 ### `block.feedback(wiring)` -- Feedback loop
 
-Backward feedback within a single timestep. Wiring connects `backward_out` to `backward_in`.
+Backward feedback within a single evaluation. Wiring connects `backward_out` to `backward_in`.
 
 ```python
 from gds import Wiring
@@ -318,7 +318,7 @@ system = (policy >> mechanism).feedback([
 
 ### `block.loop(wiring, exit_condition="")` -- Temporal loop
 
-Forward iteration across timesteps. All temporal wiring must be `COVARIANT`.
+Structural recurrence across temporal boundaries. All temporal wiring must be `COVARIANT`.
 
 ```python
 system = (boundary >> policy >> mechanism).loop(
