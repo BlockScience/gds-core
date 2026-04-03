@@ -382,6 +382,7 @@ nav:
       - Check Specifications: framework/design/check-specifications.md
       - Layer 0 Milestone: guides/architecture-milestone-layer0.md
       - Controller-Plant Duality: framework/design/controller-plant-duality.md
+      - Disturbance Formalization: framework/design/disturbance-formalization.md
       - DSL Roadmap: guides/dsl-roadmap.md
       - Research Boundaries: research/research-boundaries.md
       - Paper Implementation Gap: research/paper-implementation-gap.md

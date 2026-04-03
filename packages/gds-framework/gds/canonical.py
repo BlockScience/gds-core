@@ -6,13 +6,20 @@ from a GDSSpec:
     h_θ : X → X  where θ ∈ Θ
 
     X = state space (product of entity variables)
-    Z = exogenous signal space (BoundaryAction outputs)
+    U_c = controlled input space (non-disturbance BoundaryAction outputs)
+    W = disturbance space (BoundaryAction outputs tagged role="disturbance")
     D = decision space (Policy outputs)
     Y = output space (ControlAction outputs)
-    g = policy mapping: X x Z → D
-    f = state transition: X x D → X
+    g = policy mapping: X x U_c → D
+    f = state transition: X x D → X  (or X x D x W → X when W ≠ ∅)
     C = output map: X x D → Y
     Θ = parameter space (ParameterSchema)
+
+The U_c / W partition splits exogenous inputs into two categories:
+- U_c (controlled): signals that pass through the decision layer g
+- W (disturbance): signals that bypass g and enter f directly
+
+When W = ∅, the system reduces to the standard form f : X x D → X.
 
 Notation mapping (codebase vs paper):
     Paper (Zargham & Shorish 2022) uses u ∈ U_x for the selected action
@@ -20,8 +27,11 @@ Notation mapping (codebase vs paper):
     decision space D and exogenous signal space Z (external factors):
         Paper's u (action)  ↔  codebase's d (decision, Policy output)
         Paper's U_x         ↔  codebase's D (decision space)
-        Paper's g(x)        ↔  codebase's g(x, z)
-        Bosch lectures' z   ↔  codebase's z (exogenous signals)
+        Paper's g(x)        ↔  codebase's g(x, u_c)
+        Bosch lectures' z   ↔  codebase's u_c (controlled inputs)
+    The disturbance space W is a GDS extension not present in the
+    original paper — it models exogenous noise or environmental
+    perturbations that the controller cannot observe or act upon.
 
 This is a **pure function** of GDSSpec — always derivable, never authoritative.
 GDSSpec remains ground truth.
@@ -55,8 +65,11 @@ class CanonicalGDS(BaseModel):
     # Parameter space Θ
     parameter_schema: ParameterSchema = Field(default_factory=ParameterSchema)
 
-    # Exogenous signal space Z: (block_name, port_name) from BoundaryAction forward_out
+    # Controlled input space U_c: BoundaryAction forward_out
     input_ports: tuple[tuple[str, str], ...] = ()
+
+    # Disturbance space W: disturbance-tagged BoundaryAction forward_out
+    disturbance_ports: tuple[tuple[str, str], ...] = ()
 
     # Decision space D: (block_name, port_name) from Policy forward_out
     decision_ports: tuple[tuple[str, str], ...] = ()
@@ -84,6 +97,11 @@ class CanonicalGDS(BaseModel):
         """True if the system has any parameters."""
         return len(self.parameter_schema) > 0
 
+    @property
+    def has_disturbances(self) -> bool:
+        """True if the system has disturbance-tagged inputs."""
+        return len(self.disturbance_ports) > 0
+
     def formula(self) -> str:
         """Render as mathematical formula string."""
         has_f = len(self.mechanism_blocks) > 0
@@ -107,6 +125,9 @@ class CanonicalGDS(BaseModel):
 
         if has_c:
             result += ", y = C(x, d)"
+
+        if self.has_disturbances:
+            result += "; f : X x D x W → X"
 
         return result
 
@@ -141,12 +162,15 @@ def project_canonical(spec: GDSSpec) -> CanonicalGDS:
         elif isinstance(block, Mechanism):
             mechanism_blocks.append(bname)
 
-    # 4. Exogenous signal space Z: BoundaryAction forward_out ports
+    # 4. U_c / W partition: BoundaryAction forward_out ports
     input_ports: list[tuple[str, str]] = []
+    disturbance_ports: list[tuple[str, str]] = []
     for bname in boundary_blocks:
         block = spec.blocks[bname]
+        is_disturbance = getattr(block, "tags", {}).get("role") == "disturbance"
+        target = disturbance_ports if is_disturbance else input_ports
         for p in block.interface.forward_out:
-            input_ports.append((bname, p.name))
+            target.append((bname, p.name))
 
     # 5. Decision space D: Policy forward_out ports
     decision_ports: list[tuple[str, str]] = []
@@ -186,6 +210,7 @@ def project_canonical(spec: GDSSpec) -> CanonicalGDS:
         state_variables=tuple(state_variables),
         parameter_schema=parameter_schema,
         input_ports=tuple(input_ports),
+        disturbance_ports=tuple(disturbance_ports),
         decision_ports=tuple(decision_ports),
         output_ports=tuple(output_ports),
         boundary_blocks=tuple(boundary_blocks),
