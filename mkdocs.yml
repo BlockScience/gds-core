@@ -132,8 +132,28 @@ plugins:
         Case Studies:
           - {case-studies/index.md: "Real-world projects built on the GDS ecosystem"}
           - {case-studies/axelrod.md: "Axelrod tournament — one model, many views with gds-games, gds-sim, gds-psuu, gds-viz"}
+        Design & Research:
+          - {framework/design/assurance-claims.md: "Verification passport and assurance claims"}
+          - {framework/design/check-specifications.md: "Formal property statements for all verification checks"}
+          - {framework/design/controller-plant-duality.md: "ControlAction as output map y = C(x, d)"}
+          - {framework/design/disturbance-formalization.md: "Disturbance inputs — U_c/W partition"}
+          - {framework/design/temporal-agnosticism.md: "Temporal agnosticism invariant and three-layer stack"}
+          - {framework/design/execution-semantics.md: "ExecutionContract and DSL time model declaration"}
+          - {framework/design/traceability-matrix.md: "Requirement-to-test traceability matrix"}
+          - {framework/design/gds-deepdive.md: "GDS theory deep dive — formalism, MSML, BDP-lib synthesis"}
+          - {framework/design/v0.2-design.md: "v0.2 architecture — parameter typing, canonical projection, tags"}
+          - research/research-boundaries.md
+          - research/paper-implementation-gap.md
+          - research/semantic-web-summary.md
+          - research/formal-representability.md
+          - research/representation-gap.md
+          - research/verification-plan.md
+          - research/verification/*.md
+          - research/journal.md
         Ecosystem:
           - {framework/ecosystem.md: "All packages, their imports, and dependency relationships"}
+        Changelog:
+          - {changelog.md: "Release history — breaking changes, new capabilities, version bumps"}
 
 markdown_extensions:
   - admonition
@@ -378,22 +398,31 @@ nav:
       - case-studies/index.md
       - Axelrod Tournament: case-studies/axelrod.md
   - Design & Research:
-      - Assurance Claims: framework/design/assurance-claims.md
-      - Check Specifications: framework/design/check-specifications.md
-      - Layer 0 Milestone: guides/architecture-milestone-layer0.md
-      - Controller-Plant Duality: framework/design/controller-plant-duality.md
-      - Disturbance Formalization: framework/design/disturbance-formalization.md
-      - DSL Roadmap: guides/dsl-roadmap.md
-      - Research Boundaries: research/research-boundaries.md
-      - Paper Implementation Gap: research/paper-implementation-gap.md
-      - Temporal Agnosticism: framework/design/temporal-agnosticism.md
-      - Execution Semantics: framework/design/execution-semantics.md
-      - View Stratification: guides/view-stratification.md
-      - Ecosystem: framework/ecosystem.md
-      - Semantic Web Integration: research/semantic-web-summary.md
-      - Traceability Matrix: framework/design/traceability-matrix.md
-      - Formal Verification:
-          - Verification Plan: research/verification-plan.md
-          - R3 Non-Representability: research/verification/r3-undecidability.md
-          - R1/R2 Decidability: research/verification/representability-proof.md
+      - Design Documents:
+          - Assurance Claims: framework/design/assurance-claims.md
+          - Check Specifications: framework/design/check-specifications.md
+          - Controller-Plant Duality: framework/design/controller-plant-duality.md
+          - Disturbance Formalization: framework/design/disturbance-formalization.md
+          - Temporal Agnosticism: framework/design/temporal-agnosticism.md
+          - Execution Semantics: framework/design/execution-semantics.md
+          - Traceability Matrix: framework/design/traceability-matrix.md
+          - GDS Deep Dive: framework/design/gds-deepdive.md
+          - v0.2 Architecture: framework/design/v0.2-design.md
+          - Entity Redesign Proposal: framework/design/proposals/entity-redesign.md
+      - Research:
+          - Research Boundaries: research/research-boundaries.md
+          - Paper Implementation Gap: research/paper-implementation-gap.md
+          - Representation Gap: research/representation-gap.md
+          - Semantic Web Integration: research/semantic-web-summary.md
+          - Formal Representability: research/formal-representability.md
+          - Formal Verification:
+              - Verification Plan: research/verification-plan.md
+              - R3 Non-Representability: research/verification/r3-undecidability.md
+              - R1/R2 Decidability: research/verification/representability-proof.md
           - Research Journal: research/journal.md
+      - Roadmaps & Milestones:
+          - Layer 0 Milestone: guides/architecture-milestone-layer0.md
+          - DSL Roadmap: guides/dsl-roadmap.md
+          - View Stratification: guides/view-stratification.md
+      - Ecosystem: framework/ecosystem.md
+  - Changelog: changelog.md
