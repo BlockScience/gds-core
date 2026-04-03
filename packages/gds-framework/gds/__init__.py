@@ -89,6 +89,7 @@ from gds.types.tokens import tokenize, tokens_overlap, tokens_subset
 # ── Type system ─────────────────────────────────────────────
 from gds.types.typedef import (
     AgentID,
+    ConstraintKind,
     NonNegativeFloat,
     PositiveInt,
     Probability,
@@ -123,6 +124,7 @@ __all__ = [
     "BoundaryAction",
     "CanonicalGDS",
     "CompositionType",
+    "ConstraintKind",
     "ControlAction",
     "Entity",
     "FeedbackLoop",
