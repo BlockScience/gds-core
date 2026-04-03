@@ -4,16 +4,22 @@ import pytest
 
 from gds.blocks.roles import BoundaryAction, ControlAction, Mechanism, Policy
 from gds.canonical import project_canonical
+from gds.constraints import AdmissibleInputConstraint, TransitionSignature
+from gds.parameters import ParameterDef
 from gds.spec import GDSSpec, SpecWiring, Wire
 from gds.state import Entity, StateVariable
 from gds.types.interface import Interface, port
 from gds.types.typedef import TypeDef
 from gds.verification.findings import Severity
 from gds.verification.spec_checks import (
+    check_admissibility_references,
+    check_canonical_wellformedness,
     check_completeness,
     check_controlaction_pathway,
     check_determinism,
+    check_parameter_references,
     check_reachability,
+    check_transition_reads,
     check_type_safety,
 )
 
@@ -36,6 +42,7 @@ def entity_with_var(pop_type):
 # ── SC-001: Completeness ────────────────────────────────────
 
 
+@pytest.mark.requirement("SC-001")
 class TestCompleteness:
     def test_orphan_variable_detected(self, entity_with_var):
         spec = GDSSpec(name="Test")
@@ -68,6 +75,7 @@ class TestCompleteness:
 # ── SC-002: Determinism ──────────────────────────────────────
 
 
+@pytest.mark.requirement("SC-002")
 class TestDeterminism:
     def test_write_conflict_detected(self, entity_with_var):
         spec = GDSSpec(name="Test")
@@ -115,6 +123,7 @@ class TestDeterminism:
 # ── SC-003: Reachability ─────────────────────────────────────
 
 
+@pytest.mark.requirement("SC-003")
 class TestReachability:
     def test_reachable(self):
         spec = GDSSpec(name="Test")
@@ -171,6 +180,7 @@ class TestReachability:
 # ── SC-004: Type safety ──────────────────────────────────────
 
 
+@pytest.mark.requirement("SC-004")
 class TestTypeSafety:
     def test_valid_space_reference(self):
         t = TypeDef(name="Prob", python_type=float)
@@ -231,7 +241,7 @@ class TestTypeSafety:
         assert len(passed) >= 1
 
 
-# ── SC-010: ControlAction pathway ──────────────────────────
+# ── SC-010: ControlAction pathway ───���─────────────────��────
 
 
 class TestControlActionPathway:
@@ -397,3 +407,180 @@ class TestCanonicalOutputPorts:
         spec.register_block(m)
         formula = project_canonical(spec).formula()
         assert "C(x, d)" not in formula
+
+
+# -- SC-005: Parameter References ------------------------------------
+
+
+@pytest.mark.requirement("SC-005")
+class TestParameterReferences:
+    def test_unresolved_param_detected(self):
+        """Block uses a parameter not registered in the spec."""
+        spec = GDSSpec(name="Test")
+        m = Mechanism(
+            name="Mech",
+            interface=Interface(forward_in=(port("X"),)),
+            updates=[("E", "v")],
+            params_used=["alpha"],
+        )
+        spec.register_block(m)
+        findings = check_parameter_references(spec)
+        failed = [f for f in findings if not f.passed]
+        assert len(failed) >= 1
+        assert failed[0].check_id == "SC-005"
+        assert failed[0].severity == Severity.ERROR
+
+    def test_resolved_params_pass(self):
+        """All params_used entries resolve to registered parameters."""
+        rate_type = TypeDef(name="Rate", python_type=float)
+        spec = GDSSpec(name="Test")
+        spec.register_type(rate_type)
+        spec.register_parameter(ParameterDef(name="alpha", typedef=rate_type))
+        m = Mechanism(
+            name="Mech",
+            interface=Interface(forward_in=(port("X"),)),
+            updates=[("E", "v")],
+            params_used=["alpha"],
+        )
+        spec.register_block(m)
+        findings = check_parameter_references(spec)
+        failed = [f for f in findings if not f.passed]
+        assert len(failed) == 0
+
+    def test_no_params_passes(self):
+        """Spec with no parameter usage passes trivially."""
+        spec = GDSSpec(name="Empty")
+        findings = check_parameter_references(spec)
+        passed = [f for f in findings if f.passed]
+        assert len(passed) >= 1
+
+
+# -- SC-006/SC-007: Canonical Wellformedness --------------------------
+
+
+@pytest.mark.requirement("SC-006")
+@pytest.mark.requirement("SC-007")
+class TestCanonicalWellformedness:
+    def test_no_mechanisms_warns(self):
+        """Spec with no mechanisms should warn that f is empty (SC-006)."""
+        spec = GDSSpec(name="Test")
+        # Add a policy but no mechanism
+        p = Policy(name="P")
+        spec.register_block(p)
+        findings = check_canonical_wellformedness(spec)
+        sc006 = [f for f in findings if f.check_id == "SC-006"]
+        assert len(sc006) == 1
+        assert not sc006[0].passed
+        assert sc006[0].severity == Severity.WARNING
+
+    def test_no_entities_warns(self):
+        """Spec with no entities should warn that X is empty (SC-007)."""
+        spec = GDSSpec(name="Test")
+        m = Mechanism(name="M", updates=[])
+        spec.register_block(m)
+        findings = check_canonical_wellformedness(spec)
+        sc007 = [f for f in findings if f.check_id == "SC-007"]
+        assert len(sc007) == 1
+        assert not sc007[0].passed
+        assert sc007[0].severity == Severity.WARNING
+
+    def test_wellformed_passes(self, entity_with_var):
+        """Spec with both mechanisms and entities passes both checks."""
+        spec = GDSSpec(name="Test")
+        spec.register_entity(entity_with_var)
+        m = Mechanism(name="M", updates=[("Prey", "population")])
+        spec.register_block(m)
+        findings = check_canonical_wellformedness(spec)
+        sc006 = [f for f in findings if f.check_id == "SC-006"]
+        sc007 = [f for f in findings if f.check_id == "SC-007"]
+        assert all(f.passed for f in sc006)
+        assert all(f.passed for f in sc007)
+
+
+# -- SC-008: Admissibility References ---------------------------------
+
+
+@pytest.mark.requirement("SC-008")
+class TestAdmissibilityReferences:
+    def test_nonexistent_boundary_detected(self):
+        """Constraint referencing a missing BoundaryAction raises ERROR."""
+        spec = GDSSpec(name="Test")
+        ac = AdmissibleInputConstraint(
+            name="limit",
+            boundary_block="Ghost",
+            depends_on=[],
+        )
+        spec.register_admissibility(ac)
+        findings = check_admissibility_references(spec)
+        failed = [f for f in findings if not f.passed]
+        assert len(failed) >= 1
+        assert failed[0].check_id == "SC-008"
+        assert failed[0].severity == Severity.ERROR
+
+    def test_valid_constraint_passes(self, entity_with_var):
+        """Constraint referencing a registered BoundaryAction passes."""
+        spec = GDSSpec(name="Test")
+        spec.register_entity(entity_with_var)
+        ba = BoundaryAction(
+            name="Sensor",
+            interface=Interface(forward_out=(port("Signal"),)),
+        )
+        spec.register_block(ba)
+        ac = AdmissibleInputConstraint(
+            name="limit",
+            boundary_block="Sensor",
+            depends_on=[("Prey", "population")],
+        )
+        spec.register_admissibility(ac)
+        findings = check_admissibility_references(spec)
+        failed = [f for f in findings if not f.passed]
+        assert len(failed) == 0
+
+    def test_no_constraints_passes(self):
+        """Spec with no admissibility constraints passes trivially."""
+        spec = GDSSpec(name="Empty")
+        findings = check_admissibility_references(spec)
+        passed = [f for f in findings if f.passed]
+        assert len(passed) >= 1
+
+
+# -- SC-009: Transition Reads ------------------------------------------
+
+
+@pytest.mark.requirement("SC-009")
+class TestTransitionReads:
+    def test_nonexistent_mechanism_detected(self):
+        """Signature referencing a missing Mechanism raises ERROR."""
+        spec = GDSSpec(name="Test")
+        ts = TransitionSignature(
+            mechanism="Ghost",
+            reads=[],
+        )
+        spec.register_transition_signature(ts)
+        findings = check_transition_reads(spec)
+        failed = [f for f in findings if not f.passed]
+        assert len(failed) >= 1
+        assert failed[0].check_id == "SC-009"
+        assert failed[0].severity == Severity.ERROR
+
+    def test_valid_signature_passes(self, entity_with_var):
+        """Signature referencing a registered Mechanism passes."""
+        spec = GDSSpec(name="Test")
+        spec.register_entity(entity_with_var)
+        m = Mechanism(name="Update", updates=[("Prey", "population")])
+        spec.register_block(m)
+        ts = TransitionSignature(
+            mechanism="Update",
+            reads=[("Prey", "population")],
+        )
+        spec.register_transition_signature(ts)
+        findings = check_transition_reads(spec)
+        failed = [f for f in findings if not f.passed]
+        assert len(failed) == 0
+
+    def test_no_signatures_passes(self):
+        """Spec with no transition signatures passes trivially."""
+        spec = GDSSpec(name="Empty")
+        findings = check_transition_reads(spec)
+        passed = [f for f in findings if f.passed]
+        assert len(passed) >= 1
