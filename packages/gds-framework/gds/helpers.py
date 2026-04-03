@@ -29,6 +29,9 @@ def typedef(
     constraint: Callable[[Any], bool] | None = None,
     description: str = "",
     units: str | None = None,
+    constraint_kind: str | None = None,
+    constraint_bounds: tuple[float, float] | None = None,
+    constraint_values: tuple[Any, ...] | None = None,
 ) -> TypeDef:
     """Create a TypeDef with positional name + type, keyword-only rest.
 
@@ -39,6 +42,11 @@ def typedef(
             (e.g. ``lambda x: x >= 0``).
         description: Human-readable description.
         units: Optional unit label (e.g. ``"celsius"``).
+        constraint_kind: Named constraint pattern for lossless OWL/SHACL
+            round-tripping.  One of ``"non_negative"``, ``"positive"``,
+            ``"probability"``, ``"bounded"``, ``"enum"``, or ``None``.
+        constraint_bounds: ``(low, high)`` bounds for ``"bounded"`` kind.
+        constraint_values: Allowed values for ``"enum"`` kind.
 
     Returns:
         A frozen ``TypeDef`` instance.
@@ -49,6 +57,9 @@ def typedef(
         constraint=constraint,
         description=description,
         units=units,
+        constraint_kind=constraint_kind,
+        constraint_bounds=constraint_bounds,
+        constraint_values=constraint_values,
     )
 
 

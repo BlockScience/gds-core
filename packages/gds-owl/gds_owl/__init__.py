@@ -33,6 +33,7 @@ from gds_owl.serialize import (
 )
 from gds_owl.shacl import (
     build_all_shapes,
+    build_constraint_shapes,
     build_generic_shapes,
     build_semantic_shapes,
     build_structural_shapes,
@@ -48,6 +49,7 @@ __all__ = [
     "PREFIXES",
     "TEMPLATES",
     "build_all_shapes",
+    "build_constraint_shapes",
     "build_core_ontology",
     "build_generic_shapes",
     "build_semantic_shapes",

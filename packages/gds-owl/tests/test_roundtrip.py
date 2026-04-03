@@ -84,11 +84,93 @@ class TestSpecRoundTrip:
                 thermostat_spec.wirings[name].wires
             )
 
-    def test_constraint_is_lossy(self, thermostat_spec: GDSSpec) -> None:
-        """TypeDef.constraint is not serializable; imported as None."""
+    def test_constraint_without_kind_stays_lossy(
+        self, thermostat_spec: GDSSpec
+    ) -> None:
+        """TypeDef.constraint without constraint_kind stays lossy."""
+        from gds.types.typedef import TypeDef
+
+        # Register a type that has a constraint but no constraint_kind
+        custom = TypeDef(
+            name="CustomConstrained",
+            python_type=float,
+            constraint=lambda x: x != 42,
+        )
+        thermostat_spec.register_type(custom)
         spec2 = self._round_trip(thermostat_spec)
-        for td in spec2.types.values():
-            assert td.constraint is None
+        rt_custom = spec2.types["CustomConstrained"]
+        assert rt_custom.constraint is None
+        assert rt_custom.constraint_kind is None
+
+    def test_constraint_kind_round_trips(self, thermostat_spec: GDSSpec) -> None:
+        """Probability with constraint_kind='probability' survives round-trip."""
+        from gds.types.typedef import Probability
+
+        thermostat_spec.register_type(Probability)
+        spec2 = self._round_trip(thermostat_spec)
+        rt_prob = spec2.types["Probability"]
+        assert rt_prob.constraint_kind == "probability"
+        assert rt_prob.constraint is not None
+        assert rt_prob.check_value(0.5) is True
+        assert rt_prob.check_value(1.5) is False
+
+    def test_non_negative_round_trips(self, thermostat_spec: GDSSpec) -> None:
+        """NonNegativeFloat with constraint_kind='non_negative' survives."""
+        from gds.types.typedef import NonNegativeFloat
+
+        thermostat_spec.register_type(NonNegativeFloat)
+        spec2 = self._round_trip(thermostat_spec)
+        rt_nnf = spec2.types["NonNegativeFloat"]
+        assert rt_nnf.constraint_kind == "non_negative"
+        assert rt_nnf.constraint is not None
+        assert rt_nnf.check_value(0.0) is True
+        assert rt_nnf.check_value(-1.0) is False
+
+    def test_bounded_round_trips(self) -> None:
+        """A bounded TypeDef round-trips with reconstructed constraint."""
+        from gds.types.typedef import TypeDef
+
+        bounded = TypeDef(
+            name="Score",
+            python_type=float,
+            constraint=lambda x: 0.0 <= x <= 100.0,
+            constraint_kind="bounded",
+            constraint_bounds=(0.0, 100.0),
+        )
+        spec = GDSSpec(name="bounded_test")
+        spec.register_type(bounded)
+
+        spec2 = self._round_trip(spec)
+        rt = spec2.types["Score"]
+        assert rt.constraint_kind == "bounded"
+        assert rt.constraint_bounds == (0.0, 100.0)
+        assert rt.constraint is not None
+        assert rt.check_value(50.0) is True
+        assert rt.check_value(101.0) is False
+        assert rt.check_value(-1.0) is False
+
+    def test_enum_round_trips(self) -> None:
+        """An enum TypeDef round-trips with reconstructed constraint."""
+        from gds.types.typedef import TypeDef
+
+        color = TypeDef(
+            name="Color",
+            python_type=str,
+            constraint=lambda x: x in {"red", "green", "blue"},
+            constraint_kind="enum",
+            constraint_values=("red", "green", "blue"),
+        )
+        spec = GDSSpec(name="enum_test")
+        spec.register_type(color)
+
+        spec2 = self._round_trip(spec)
+        rt = spec2.types["Color"]
+        assert rt.constraint_kind == "enum"
+        assert rt.constraint_values is not None
+        assert set(rt.constraint_values) == {"red", "green", "blue"}
+        assert rt.constraint is not None
+        assert rt.check_value("red") is True
+        assert rt.check_value("yellow") is False
 
     def test_admissibility_constraints_survive(self, thermostat_spec: GDSSpec) -> None:
         from gds.constraints import AdmissibleInputConstraint
