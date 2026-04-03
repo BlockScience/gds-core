@@ -10,7 +10,7 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import TYPE_CHECKING
 
-from gds.blocks.roles import BoundaryAction, HasParams, Mechanism
+from gds.blocks.roles import BoundaryAction, ControlAction, HasParams, Mechanism, Policy
 from gds.canonical import project_canonical
 from gds.verification.findings import Finding, Severity
 
@@ -419,6 +419,67 @@ def check_transition_reads(spec: GDSSpec) -> list[Finding]:
                     f"All {len(spec.transition_signatures)} transition "
                     f"signature(s) are consistent"
                 ),
+                passed=True,
+            )
+        )
+
+    return findings
+
+
+def check_controlaction_pathway(spec: GDSSpec) -> list[Finding]:
+    """SC-010: ControlAction outputs must not feed the g pathway.
+
+    The output map y = C(x, d) produces observable output Y. Its signals
+    must not be routed back into Policy or BoundaryAction blocks, which
+    form the input map g. Doing so would conflate the output map C with
+    the policy map g, breaking the canonical separation h = f . g.
+
+    ControlAction outputs MAY feed Mechanism blocks (state dynamics can
+    depend on observations) or exit the system boundary.
+    """
+    findings: list[Finding] = []
+
+    # Identify ControlAction blocks
+    ca_blocks: set[str] = set()
+    for bname, block in spec.blocks.items():
+        if isinstance(block, ControlAction):
+            ca_blocks.add(bname)
+
+    if not ca_blocks:
+        return findings
+
+    # Identify g-pathway blocks (Policy + BoundaryAction)
+    g_blocks: set[str] = set()
+    for bname, block in spec.blocks.items():
+        if isinstance(block, (Policy, BoundaryAction)):
+            g_blocks.add(bname)
+
+    # Check wiring: no wire from CA output to g-pathway input
+    for wiring in spec.wirings.values():
+        for wire in wiring.wires:
+            if wire.source in ca_blocks and wire.target in g_blocks:
+                findings.append(
+                    Finding(
+                        check_id="SC-010",
+                        severity=Severity.WARNING,
+                        message=(
+                            f"ControlAction block {wire.source!r} output is wired to "
+                            f"g-pathway block {wire.target!r}. ControlAction outputs "
+                            f"(output map C) should not feed Policy or BoundaryAction "
+                            f"blocks (input map g)."
+                        ),
+                        source_elements=[wire.source, wire.target],
+                        passed=False,
+                    )
+                )
+
+    if not findings:
+        findings.append(
+            Finding(
+                check_id="SC-010",
+                severity=Severity.INFO,
+                message="ControlAction outputs are not routed to the g pathway.",
+                source_elements=list(ca_blocks),
                 passed=True,
             )
         )
