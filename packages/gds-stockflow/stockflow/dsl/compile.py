@@ -15,6 +15,7 @@ from typing import TYPE_CHECKING
 from gds.blocks.composition import StackComposition, Wiring
 from gds.blocks.roles import BoundaryAction, Mechanism, Policy
 from gds.compiler.compile import compile_system
+from gds.execution import ExecutionContract
 from gds.ir.models import FlowDirection, SystemIR
 from gds.parameters import ParameterDef
 from gds.spaces import Space
@@ -407,6 +408,9 @@ def compile_model(model: StockFlowModel) -> GDSSpec:
                 depends_on_blocks=connected_flows,
             )
         )
+
+    # 8. Declare execution contract — stock-flow is discrete/synchronous/Moore
+    spec.execution_contract = ExecutionContract(time_domain="discrete")
 
     return spec
 

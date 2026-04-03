@@ -172,3 +172,11 @@ class TestVSMModelCompileMethods:
         m = _manufacturing_line()
         ir = m.compile_system()
         assert isinstance(ir, SystemIR)
+
+
+class TestExecutionContract:
+    def test_contract_emitted(self):
+        """compile_vsm() emits an atemporal ExecutionContract."""
+        spec = compile_vsm(_manufacturing_line())
+        assert spec.execution_contract is not None
+        assert spec.execution_contract.time_domain == "atemporal"
