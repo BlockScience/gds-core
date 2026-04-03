@@ -5,6 +5,7 @@ import pytest
 from gds.blocks.roles import BoundaryAction, ControlAction, Mechanism, Policy
 from gds.canonical import project_canonical
 from gds.constraints import AdmissibleInputConstraint, TransitionSignature
+from gds.execution import ExecutionContract
 from gds.parameters import ParameterDef
 from gds.spec import GDSSpec, SpecWiring, Wire
 from gds.state import Entity, StateVariable
@@ -17,6 +18,7 @@ from gds.verification.spec_checks import (
     check_completeness,
     check_controlaction_pathway,
     check_determinism,
+    check_execution_contract_compatibility,
     check_parameter_references,
     check_reachability,
     check_transition_reads,
@@ -584,3 +586,38 @@ class TestTransitionReads:
         findings = check_transition_reads(spec)
         passed = [f for f in findings if f.passed]
         assert len(passed) >= 1
+
+
+# -- SC-011: ExecutionContract Compatibility ----------------------------
+
+
+@pytest.mark.requirement("SC-011")
+class TestExecutionContractCompatibility:
+    def test_no_contract_info(self):
+        """Spec with no ExecutionContract produces INFO finding."""
+        spec = GDSSpec(name="NoContract")
+        findings = check_execution_contract_compatibility(spec)
+        assert len(findings) == 1
+        assert findings[0].check_id == "SC-011"
+        assert findings[0].passed
+        assert findings[0].severity == Severity.INFO
+        assert "no executioncontract" in findings[0].message.lower()
+
+    def test_discrete_contract_info(self):
+        """Spec with valid discrete contract produces INFO with details."""
+        spec = GDSSpec(name="Discrete")
+        spec.execution_contract = ExecutionContract(time_domain="discrete")
+        findings = check_execution_contract_compatibility(spec)
+        assert len(findings) == 1
+        assert findings[0].check_id == "SC-011"
+        assert findings[0].passed
+        assert "discrete" in findings[0].message
+
+    def test_atemporal_contract_info(self):
+        """Spec with atemporal contract produces INFO."""
+        spec = GDSSpec(name="Atemporal")
+        spec.execution_contract = ExecutionContract(time_domain="atemporal")
+        findings = check_execution_contract_compatibility(spec)
+        assert len(findings) == 1
+        assert findings[0].passed
+        assert "atemporal" in findings[0].message

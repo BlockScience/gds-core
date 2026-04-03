@@ -15,6 +15,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from gds.blocks.roles import BoundaryAction, Policy
+from gds.execution import ExecutionContract
 from gds.spec import GDSSpec, SpecWiring, Wire
 from gds.types.interface import Interface, port
 
@@ -88,5 +89,8 @@ def compile_pattern_to_spec(pattern: Pattern) -> GDSSpec:
                 description=f"Auto-generated wiring for pattern {pattern.name!r}",
             )
         )
+
+    # Games are atemporal — round iteration without intrinsic time model
+    spec.execution_contract = ExecutionContract(time_domain="atemporal")
 
     return spec

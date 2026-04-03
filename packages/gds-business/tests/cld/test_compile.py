@@ -132,3 +132,11 @@ class TestCLDModelCompileMethods:
         m = _simple_model()
         ir = m.compile_system()
         assert isinstance(ir, SystemIR)
+
+
+class TestExecutionContract:
+    def test_contract_emitted(self):
+        """compile_cld() emits a discrete ExecutionContract."""
+        spec = compile_cld(_simple_model())
+        assert spec.execution_contract is not None
+        assert spec.execution_contract.time_domain == "discrete"

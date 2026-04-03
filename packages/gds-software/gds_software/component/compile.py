@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING
 
 from gds.blocks.roles import BoundaryAction, Mechanism, Policy
 from gds.compiler.compile import compile_system
+from gds.execution import ExecutionContract
 from gds.ir.models import SystemIR
 from gds.spaces import Space
 from gds.spec import GDSSpec, SpecWiring, Wire
@@ -207,6 +208,9 @@ def compile_component(model: ComponentModel) -> GDSSpec:
             description=f"Auto-generated wiring for component diagram {model.name!r}",
         )
     )
+
+    # Component diagrams are atemporal — structural architecture
+    spec.execution_contract = ExecutionContract(time_domain="atemporal")
 
     return spec
 

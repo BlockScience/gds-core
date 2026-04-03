@@ -14,6 +14,7 @@ from typing import TYPE_CHECKING
 
 from gds.blocks.roles import Policy
 from gds.compiler.compile import compile_system
+from gds.execution import ExecutionContract
 from gds.ir.models import SystemIR
 from gds.spaces import Space
 from gds.spec import GDSSpec, SpecWiring, Wire
@@ -135,6 +136,9 @@ def compile_cld(model: CausalLoopModel) -> GDSSpec:
                 description=f"Auto-generated wiring for CLD {model.name!r}",
             )
         )
+
+    # CLDs model causal feedback — discrete/synchronous/Moore
+    spec.execution_contract = ExecutionContract(time_domain="discrete")
 
     return spec
 

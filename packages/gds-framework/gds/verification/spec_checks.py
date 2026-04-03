@@ -541,3 +541,68 @@ def check_controlaction_pathway(spec: GDSSpec) -> list[Finding]:
         )
 
     return findings
+
+
+def check_execution_contract_compatibility(spec: GDSSpec) -> list[Finding]:
+    """SC-011: ExecutionContract well-formedness and compatibility.
+
+    When a GDSSpec has an execution_contract, verify it is internally
+    consistent.  This check is a placeholder for future cross-composition
+    validation (when GDSSpec gains sub-spec references).
+
+    Currently validates:
+    - If execution_contract is set with time_domain="discrete", the SystemIR
+      (if compilable) should have no algebraic loops in non-temporal wirings
+      (this is already checked by G-006, so we just note the dependency).
+    - Contract field consistency (discrete-only fields).
+    """
+    findings: list[Finding] = []
+
+    if spec.execution_contract is None:
+        findings.append(
+            Finding(
+                check_id="SC-011",
+                severity=Severity.INFO,
+                message=(
+                    "No ExecutionContract declared — spec is valid "
+                    "for structural verification only."
+                ),
+                source_elements=[spec.name],
+                passed=True,
+            )
+        )
+        return findings
+
+    contract = spec.execution_contract
+
+    # Validate contract is well-formed (redundant with __post_init__ but defensive)
+    if contract.time_domain == "discrete" and contract.update_ordering not in (
+        "Moore",
+        "Mealy",
+    ):
+        findings.append(
+            Finding(
+                check_id="SC-011",
+                severity=Severity.ERROR,
+                message=f"Invalid update_ordering: {contract.update_ordering!r}",
+                source_elements=[spec.name],
+                passed=False,
+            )
+        )
+
+    if not findings:
+        findings.append(
+            Finding(
+                check_id="SC-011",
+                severity=Severity.INFO,
+                message=(
+                    f"ExecutionContract declared: "
+                    f"{contract.time_domain}/{contract.synchrony}"
+                    f"/{contract.update_ordering}"
+                ),
+                source_elements=[spec.name],
+                passed=True,
+            )
+        )
+
+    return findings
