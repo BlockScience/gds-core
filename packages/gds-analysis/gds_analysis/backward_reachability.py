@@ -18,7 +18,6 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from gds_continuous import ODEModel, ODESimulation
     from gds_continuous.types import ODEFunction
 
 
