@@ -339,6 +339,10 @@ def _build_spec_framework(g: Graph) -> None:
     _add_datatype_property(g, "pythonType", domain="TypeDef")
     _add_datatype_property(g, "units", domain="TypeDef")
     _add_datatype_property(g, "hasConstraint", domain="TypeDef", range_="boolean")
+    _add_datatype_property(g, "constraintKind", domain="TypeDef")
+    _add_datatype_property(g, "constraintLow", domain="TypeDef", range_="double")
+    _add_datatype_property(g, "constraintHigh", domain="TypeDef", range_="double")
+    _add_datatype_property(g, "constraintValue", domain="TypeDef")
 
     # StateVariable datatype properties
     _add_datatype_property(g, "symbol", domain="StateVariable")

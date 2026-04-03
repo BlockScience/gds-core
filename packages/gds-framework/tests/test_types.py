@@ -280,3 +280,54 @@ class TestBuiltInTypes:
     )
     def test_units(self, typedef, attr, expected):
         assert getattr(typedef, attr) == expected
+
+
+# ── constraint_kind ─────────────────────────────────────────
+
+
+class TestConstraintKind:
+    def test_constraint_kind_default_is_none(self):
+        t = TypeDef(name="Plain", python_type=float)
+        assert t.constraint_kind is None
+        assert t.constraint_bounds is None
+        assert t.constraint_values is None
+
+    @pytest.mark.parametrize(
+        "typedef_obj, expected_kind",
+        [
+            (Probability, "probability"),
+            (NonNegativeFloat, "non_negative"),
+            (PositiveInt, "positive"),
+            (TokenAmount, "non_negative"),
+            (Timestamp, "non_negative"),
+            (AgentID, None),
+        ],
+    )
+    def test_builtin_constraint_kinds(self, typedef_obj, expected_kind):
+        assert typedef_obj.constraint_kind == expected_kind
+
+    def test_bounded_kind_with_bounds(self):
+        t = TypeDef(
+            name="Score",
+            python_type=float,
+            constraint=lambda x: 0 <= x <= 100,
+            constraint_kind="bounded",
+            constraint_bounds=(0.0, 100.0),
+        )
+        assert t.constraint_kind == "bounded"
+        assert t.constraint_bounds == (0.0, 100.0)
+        assert t.check_value(50.0) is True
+        assert t.check_value(101.0) is False
+
+    def test_enum_kind_with_values(self):
+        t = TypeDef(
+            name="Color",
+            python_type=str,
+            constraint=lambda x: x in {"red", "green", "blue"},
+            constraint_kind="enum",
+            constraint_values=("red", "green", "blue"),
+        )
+        assert t.constraint_kind == "enum"
+        assert t.constraint_values == ("red", "green", "blue")
+        assert t.check_value("red") is True
+        assert t.check_value("yellow") is False
