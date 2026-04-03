@@ -923,3 +923,17 @@ Some findings are expected in valid models:
 | SC-007 | Canonical wellformedness (X) | `GDSSpec` | WARNING | At least one state variable exists (X is non-empty) |
 | SC-008 | Admissibility references | `GDSSpec` | ERROR | Admissibility constraints reference valid blocks and variables |
 | SC-009 | Transition reads | `GDSSpec` | ERROR | Transition signatures reference valid mechanisms and variables |
+
+---
+
+## Assurance Scope
+
+A `verify()` pass checks structural and semantic well-formedness. It proves
+that the wiring graph is a valid mathematical object and that the specification
+is internally consistent. It does **not** prove behavioral properties like
+safety, stability, conservation, or liveness -- those require simulation,
+formal proof, or domain expert review.
+
+For a complete treatment of what verification does and does not prove, the
+residual obligations by domain, and a one-page verification passport template,
+see [Assurance Claims and Residual Gaps](../design/assurance-claims.md).
