@@ -426,7 +426,7 @@ class Policy(Block):
     named options for A/B testing or scenario analysis.
 
     In GDS terms: policies implement the decision mapping
-    within the admissibility constraint.
+    d = g(x, z) within the canonical form h = f ∘ g.
     """
 
     kind = "policy"

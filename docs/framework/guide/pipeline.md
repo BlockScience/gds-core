@@ -396,10 +396,10 @@ The canonical projection classifies every registered block by its role:
 
 | Role | Maps to | Canonical component |
 |------|---------|---------------------|
-| `BoundaryAction` | Input space U | Exogenous inputs |
-| `Policy` | Decision space D | g: X x U --> D |
+| `BoundaryAction` | Exogenous signal space Z | Exogenous inputs |
+| `Policy` | Decision space D | g: X x Z --> D |
 | `Mechanism` | State transition | f: X x D --> X |
-| `ControlAction` | (unused) | -- |
+| `ControlAction` | Output space Y | Output observable y = C(x, d) |
 
 `project_canonical()` operates on `GDSSpec`, not `SystemIR`, because it needs role information and entity definitions. It is deterministic, stateless, and never mutates the spec. The `CanonicalGDS` result is frozen (immutable).
 
