@@ -10,7 +10,13 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import TYPE_CHECKING
 
-from gds.blocks.roles import BoundaryAction, ControlAction, HasParams, Mechanism, Policy
+from gds.blocks.roles import (
+    BoundaryAction,
+    ControlAction,
+    HasParams,
+    Mechanism,
+    Policy,
+)
 from gds.canonical import project_canonical
 from gds.verification.findings import Finding, Severity
 
@@ -601,6 +607,66 @@ def check_execution_contract_compatibility(spec: GDSSpec) -> list[Finding]:
                     f"/{contract.update_ordering}"
                 ),
                 source_elements=[spec.name],
+                passed=True,
+            )
+        )
+
+    return findings
+
+
+def check_disturbance_routing(spec: GDSSpec) -> list[Finding]:
+    """DST-001: Disturbance-tagged BoundaryAction must not wire to Policy.
+
+    A disturbance is an exogenous input that bypasses the decision layer.
+    It must route directly to Mechanism blocks, never to Policy blocks.
+    This enforces the invariant: no component of W appears in the domain of g.
+    """
+    findings: list[Finding] = []
+
+    disturbance_blocks: set[str] = set()
+    for bname, block in spec.blocks.items():
+        if (
+            isinstance(block, BoundaryAction)
+            and getattr(block, "tags", {}).get("role") == "disturbance"
+        ):
+            disturbance_blocks.add(bname)
+
+    if not disturbance_blocks:
+        return findings
+
+    policy_blocks: set[str] = set()
+    for bname, block in spec.blocks.items():
+        if isinstance(block, Policy):
+            policy_blocks.add(bname)
+
+    for wiring in spec.wirings.values():
+        for wire in wiring.wires:
+            if wire.source in disturbance_blocks and wire.target in policy_blocks:
+                findings.append(
+                    Finding(
+                        check_id="DST-001",
+                        severity=Severity.ERROR,
+                        message=(
+                            f"Disturbance-tagged BoundaryAction {wire.source!r} "
+                            f"is wired to Policy block {wire.target!r}. "
+                            f"Disturbances must bypass the decision layer "
+                            f"and route directly to Mechanism blocks."
+                        ),
+                        source_elements=[wire.source, wire.target],
+                        passed=False,
+                    )
+                )
+
+    if not findings:
+        findings.append(
+            Finding(
+                check_id="DST-001",
+                severity=Severity.INFO,
+                message=(
+                    f"Disturbance routing valid: {len(disturbance_blocks)} "
+                    f"disturbance input(s) bypass decision layer."
+                ),
+                source_elements=list(disturbance_blocks),
                 passed=True,
             )
         )
