@@ -163,3 +163,11 @@ class TestSCNModelCompileMethods:
         m = _beer_game()
         ir = m.compile_system()
         assert isinstance(ir, SystemIR)
+
+
+class TestExecutionContract:
+    def test_contract_emitted(self):
+        """compile_scn() emits a discrete ExecutionContract."""
+        spec = compile_scn(_beer_game())
+        assert spec.execution_contract is not None
+        assert spec.execution_contract.time_domain == "discrete"

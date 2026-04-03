@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING
 
 from gds.blocks.roles import Mechanism
 from gds.compiler.compile import compile_system
+from gds.execution import ExecutionContract
 from gds.ir.models import SystemIR
 from gds.spaces import Space
 from gds.spec import GDSSpec, SpecWiring, Wire
@@ -178,6 +179,9 @@ def compile_erd(model: ERDModel) -> GDSSpec:
             description=f"Auto-generated wiring for ERD {model.name!r}",
         )
     )
+
+    # ERDs are atemporal — entity relationship structure
+    spec.execution_contract = ExecutionContract(time_domain="atemporal")
 
     return spec
 

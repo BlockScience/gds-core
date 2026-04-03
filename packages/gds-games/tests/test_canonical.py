@@ -608,3 +608,14 @@ class TestFeedbackCrossBuilt:
         assert set(dsl_can.policy_blocks) == set(hand_can.policy_blocks)
         assert dsl_can.mechanism_blocks == hand_can.mechanism_blocks == ()
         assert dsl_can.control_blocks == hand_can.control_blocks == ()
+
+
+class TestExecutionContract:
+    """Games compile_pattern_to_spec() emits atemporal ExecutionContract."""
+
+    def test_contract_emitted(self) -> None:
+        game = CovariantFunction(name="F", x="In", y="Out")
+        pattern = Pattern(name="Simple", game=game)
+        spec = compile_pattern_to_spec(pattern)
+        assert spec.execution_contract is not None
+        assert spec.execution_contract.time_domain == "atemporal"

@@ -21,6 +21,7 @@ from gds.constraints import (  # noqa: TC001
     StateMetric,
     TransitionSignature,
 )
+from gds.execution import ExecutionContract  # noqa: TC001
 from gds.parameters import ParameterDef, ParameterSchema
 from gds.spaces import Space
 from gds.state import Entity
@@ -72,6 +73,7 @@ class GDSSpec(Tagged):
     )
     transition_signatures: dict[str, TransitionSignature] = Field(default_factory=dict)
     state_metrics: dict[str, StateMetric] = Field(default_factory=dict)
+    execution_contract: ExecutionContract | None = None
 
     # ── Registration ────────────────────────────────────────
 
