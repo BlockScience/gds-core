@@ -31,7 +31,7 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "gds-framework>=0.2.3",
+    "gds-framework>=0.3.0",
     "pydantic>=2.10",
 ]
 

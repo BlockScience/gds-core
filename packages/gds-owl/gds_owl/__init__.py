@@ -1,6 +1,6 @@
 """gds-owl — OWL/Turtle, SHACL, and SPARQL for gds-framework specifications."""
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 from gds_owl._namespace import (
     GDS,
