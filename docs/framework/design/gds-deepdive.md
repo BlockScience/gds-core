@@ -507,7 +507,7 @@ class Entity:
         X = Entity_1.state × Entity_2.state × ... × Entity_n.state
 
     Entities correspond to actors, resources, registries —
-    anything that persists across timesteps and has mutable state.
+    anything that persists across temporal boundaries and has mutable state.
     """
 
     def __init__(

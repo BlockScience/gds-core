@@ -313,13 +313,13 @@ system = SystemIR(
 
 **What it checks:** The covariant (forward) flow graph must be a directed acyclic
 graph (DAG). A cycle in the covariant graph means an algebraic loop within a
-single timestep — Block A depends on Block B which depends on Block A, with no
-temporal delay to break the cycle.
+single evaluation -- Block A depends on Block B which depends on Block A, with no
+recurrence boundary to break the cycle.
 
 **Severity:** ERROR
 
 **Excludes:** Temporal wirings (`is_temporal=True`) and contravariant wirings.
-These are legitimate backward or cross-timestep connections that do not create
+These are legitimate backward or cross-boundary connections that do not create
 algebraic loops.
 
 **Detection method:** DFS-based cycle detection on the adjacency graph of

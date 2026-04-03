@@ -12,7 +12,7 @@ GDS terminology mapped to framework concepts.
 | **Input Map** (g) | Maps state and exogenous signals to a decision: g(x, z) → d | `Policy` blocks (endogenous decision logic) |
 | **State Update Map** (f) | Takes current state and decision, produces the next state: f(x, d) → x⁺ | `Mechanism` blocks — the only blocks that write to state |
 | **State Transition Map** (h) | The composed pipeline h = f\|_x ∘ g — one full step of the system | The wiring produced by `>>` composition |
-| **Trajectory** (x₀, x₁, ...) | A sequence of states produced by repeatedly applying h | Temporal iteration via `.loop()` |
+| **Trajectory** | A sequence of states under repeated application of h | Structural recurrence via `.loop()` |
 | **Reachability** | Can the system reach state y from state x through some sequence of inputs? | `check_reachability()` in the verification engine |
 | **Controllability** | Can the system be steered to a target state from any nearby initial condition? | Formal property checked at the spec level |
 | **Configuration Space** | The subset of X where every point is reachable from some initial condition | Characterized by transitive closure over the wiring graph |

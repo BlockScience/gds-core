@@ -16,7 +16,7 @@ Work through the **example models** in order. Each introduces one new concept wh
 |:-:|---------|-------------------|
 | 1 | [SIR Epidemic](../examples/examples/sir-epidemic.md) | Fundamentals — types, entities, spaces, blocks, composition |
 | 2 | [Thermostat PID](../examples/examples/thermostat.md) | Feedback and backward flow |
-| 3 | [Lotka-Volterra](../examples/examples/lotka-volterra.md) | Temporal loops and cross-timestep iteration |
+| 3 | [Lotka-Volterra](../examples/examples/lotka-volterra.md) | Temporal loops and structural recurrence |
 | 4 | [Prisoner's Dilemma](../examples/examples/prisoners-dilemma.md) | Nested composition and multi-entity state |
 | 5 | [Insurance Contract](../examples/examples/insurance.md) | Complete 4-role taxonomy |
 | 6 | [Crosswalk Problem](../examples/examples/crosswalk.md) | Mechanism design and governance parameters |
