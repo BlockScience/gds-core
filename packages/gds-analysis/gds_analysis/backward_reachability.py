@@ -17,9 +17,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
-from gds_continuous import ODEModel, ODESimulation
-
 if TYPE_CHECKING:
+    from gds_continuous import ODEModel, ODESimulation
     from gds_continuous.types import ODEFunction
 
 
@@ -109,6 +108,14 @@ def backward_reachable_set(
     -------
     BackwardReachableSet with trajectories and metadata.
     """
+    try:
+        from gds_continuous import ODEModel, ODESimulation
+    except ImportError as exc:
+        raise ImportError(
+            "backward_reachable_set requires gds-continuous. "
+            "Install it with: pip install gds-analysis[continuous]"
+        ) from exc
+
     params = params or {}
 
     def backward_rhs(t: float, y: list[float], p: dict[str, Any]) -> list[float]:
