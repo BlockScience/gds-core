@@ -1,5 +1,7 @@
 """Tests for generic verification checks (G-001 through G-006)."""
 
+import pytest
+
 from gds.ir.models import BlockIR, FlowDirection, InputIR, SystemIR, WiringIR
 from gds.verification.engine import verify
 from gds.verification.findings import VerificationReport
@@ -15,6 +17,7 @@ from gds.verification.generic_checks import (
 # ── G-001: Domain/codomain matching ─────────────────────────
 
 
+@pytest.mark.requirement("G-001")
 class TestG001:
     def test_matching_wiring_passes(self, sample_system_ir):
         findings = check_g001_domain_codomain_matching(sample_system_ir)
@@ -65,6 +68,7 @@ class TestG001:
 # ── G-002: Signature completeness ────────────────────────────
 
 
+@pytest.mark.requirement("G-002")
 class TestG002:
     def test_complete_block_passes(self, sample_system_ir):
         findings = check_g002_signature_completeness(sample_system_ir)
@@ -137,6 +141,7 @@ class TestG002:
 # ── G-003: Direction consistency ─────────────────────────────
 
 
+@pytest.mark.requirement("G-003")
 class TestG003:
     def test_covariant_wiring_no_findings(self, sample_system_ir):
         """Covariant wirings are handled by G-001 — G-003 skips them."""
@@ -228,6 +233,7 @@ class TestG003:
 # ── G-004: Dangling wirings ──────────────────────────────────
 
 
+@pytest.mark.requirement("G-004")
 class TestG004:
     def test_valid_passes(self, sample_system_ir):
         findings = check_g004_dangling_wirings(sample_system_ir)
@@ -291,6 +297,7 @@ class TestG004:
 # ── G-005: Sequential type compatibility ─────────────────────
 
 
+@pytest.mark.requirement("G-005")
 class TestG005:
     def test_compatible_passes(self, sample_system_ir):
         findings = check_g005_sequential_type_compatibility(sample_system_ir)
@@ -343,6 +350,7 @@ class TestG005:
 # ── G-006: Covariant acyclicity ──────────────────────────────
 
 
+@pytest.mark.requirement("G-006")
 class TestG006:
     def test_dag_passes(self, sample_system_ir):
         findings = check_g006_covariant_acyclicity(sample_system_ir)

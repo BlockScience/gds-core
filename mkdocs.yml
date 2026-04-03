@@ -388,6 +388,7 @@ nav:
       - View Stratification: guides/view-stratification.md
       - Ecosystem: framework/ecosystem.md
       - Semantic Web Integration: research/semantic-web-summary.md
+      - Traceability Matrix: framework/design/traceability-matrix.md
       - Formal Verification:
           - Verification Plan: research/verification-plan.md
           - R3 Non-Representability: research/verification/r3-undecidability.md
