@@ -87,6 +87,60 @@ class TestAllShapes:
         assert len(g) >= max(len(structural), len(generic), len(semantic))
 
 
+class TestConstraintShapes:
+    def test_constraint_shapes_for_probability(self, thermostat_spec: GDSSpec) -> None:
+        """SHACL constraint shapes are generated for TypeDefs with constraint_kind."""
+        from gds.types.typedef import Probability
+        from gds_owl.shacl import GDS_SHAPE, build_constraint_shapes
+
+        thermostat_spec.register_type(Probability)
+        data = spec_to_graph(thermostat_spec)
+        shapes = build_constraint_shapes(data)
+
+        # Should have a shape for Probability
+        prob_shape = GDS_SHAPE["TypeDefConstraint_ProbabilityShape"]
+        assert (prob_shape, RDF.type, SH.NodeShape) in shapes
+
+    def test_no_constraint_shapes_without_kind(self) -> None:
+        """TypeDefs without constraint_kind produce no constraint shapes."""
+        from gds.types.typedef import TypeDef
+        from gds_owl.shacl import build_constraint_shapes
+
+        plain = TypeDef(name="Plain", python_type=float, constraint=lambda x: x > 0)
+        spec = GDSSpec(name="plain_test")
+        spec.register_type(plain)
+        data = spec_to_graph(spec)
+        shapes = build_constraint_shapes(data)
+
+        # Should have no node shapes (only prefix bindings)
+        node_shapes = list(shapes.subjects(RDF.type, SH.NodeShape))
+        assert len(node_shapes) == 0
+
+    def test_bounded_constraint_shape(self) -> None:
+        """Bounded constraint_kind produces minInclusive/maxInclusive shapes."""
+        from gds.types.typedef import TypeDef
+        from gds_owl.shacl import GDS_SHAPE, build_constraint_shapes
+
+        bounded = TypeDef(
+            name="Score",
+            python_type=float,
+            constraint=lambda x: 0 <= x <= 100,
+            constraint_kind="bounded",
+            constraint_bounds=(0.0, 100.0),
+        )
+        spec = GDSSpec(name="bounded_test")
+        spec.register_type(bounded)
+        data = spec_to_graph(spec)
+        shapes = build_constraint_shapes(data)
+
+        score_shape = GDS_SHAPE["TypeDefConstraint_ScoreShape"]
+        assert (score_shape, RDF.type, SH.NodeShape) in shapes
+
+        # Verify the shape has property constraints
+        props = list(shapes.objects(score_shape, SH.property))
+        assert len(props) >= 1
+
+
 @pytest.mark.skipif(not HAS_PYSHACL, reason="pyshacl not installed")
 class TestValidation:
     def test_valid_spec_conforms(self, thermostat_spec: GDSSpec) -> None:
