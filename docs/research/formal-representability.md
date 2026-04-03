@@ -155,8 +155,8 @@ The components are:
 - **Morphisms** are Blocks: typed components with bidirectional interfaces
 - **>>** (sequential): first ; second with token-overlap validation
 - **|** (parallel): left tensor right, no shared wires
-- **fb** (feedback): contravariant backward flow within timestep
-- **loop** (temporal): covariant forward flow across timesteps
+- **fb** (feedback): contravariant backward flow within evaluation
+- **loop** (temporal): covariant forward flow across temporal boundaries
 
 **Definition 1.2 (Token System).** Port names carry structural type
 information via tokenization:

@@ -131,7 +131,7 @@ Each domain package is a thin layer. The heavy lifting — composition, compilat
 <details>
 <summary><strong>Example: what lives where</strong></summary>
 
-Consider modeling a **Lotka-Volterra predator-prey system** as a GDS. The state space is (prey_population, predator_population). Each timestep: the environment is observed, growth/predation rates are computed, populations are updated.
+Consider modeling a **Lotka-Volterra predator-prey system** as a GDS. The state space is (prey_population, predator_population). Each evaluation: the environment is observed, growth/predation rates are computed, populations are updated.
 
 **gds-framework provides** (domain-neutral):
 - `TypeDef(name="Population", python_type=int, constraint=lambda x: x >= 0)` — constrained types

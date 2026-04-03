@@ -25,7 +25,7 @@ These paths are independent. You can compile without a `GDSSpec`, and you can ru
 
 ## Step 1: Define Your Domain
 
-Every GDS model starts with domain definitions: what types of data exist, what communication channels carry them, and what stateful entities persist across timesteps.
+Every GDS model starts with domain definitions: what types of data exist, what communication channels carry them, and what stateful entities persist across temporal boundaries.
 
 ```python
 from gds import typedef, space, entity, state_var
@@ -35,11 +35,11 @@ Temperature = typedef("Temperature", float, units="K")
 Command = typedef("Command", float)
 Energy = typedef("Energy", float, constraint=lambda x: x >= 0)
 
-# Spaces -- typed communication channels (transient within a timestep)
+# Spaces -- typed communication channels (transient within an evaluation)
 sensor_space = space("SensorSpace", measured_temp=Temperature)
 command_space = space("CommandSpace", heater_command=Command)
 
-# Entities -- stateful objects that persist across timesteps (the state space X)
+# Entities -- stateful objects that persist across temporal boundaries (the state space X)
 room = entity("Room",
     temperature=state_var(Temperature, symbol="T"),
     energy_consumed=state_var(Energy, symbol="E"),
@@ -122,8 +122,8 @@ Compose blocks into a tree using four operators:
 |----------|--------|---------|
 | Sequential | `a >> b` | Output of `a` feeds input of `b` |
 | Parallel | `a \| b` | Side-by-side, no shared wires |
-| Feedback | `a.feedback(wiring)` | Backward flow within a timestep |
-| Temporal | `a.loop(wiring)` | Forward flow across timesteps |
+| Feedback | `a.feedback(wiring)` | Backward flow within an evaluation |
+| Temporal | `a.loop(wiring)` | Forward flow across temporal boundaries |
 
 ```python
 # Build the composition tree
@@ -248,7 +248,7 @@ The six generic checks:
 | G-003 | Direction consistency | No COVARIANT+feedback or CONTRAVARIANT+temporal contradictions; contravariant port-slot matching |
 | G-004 | Dangling wirings | All wiring endpoints reference blocks or inputs that exist in the system |
 | G-005 | Sequential type compatibility | Stack wiring labels are token-subsets of BOTH source output AND target input |
-| G-006 | Covariant acyclicity | The covariant (within-timestep) flow graph is a DAG |
+| G-006 | Covariant acyclicity | The covariant (within-evaluation) flow graph is a DAG |
 
 You can also run a subset of checks:
 

@@ -44,8 +44,8 @@ class CompositionType(StrEnum):
 
     - SEQUENTIAL — output of one feeds input of next (stack).
     - PARALLEL — blocks run side-by-side with no shared wires.
-    - FEEDBACK — backward_out→backward_in connections within a timestep.
-    - TEMPORAL — forward_out→forward_in connections across timesteps.
+    - FEEDBACK — backward_out→backward_in connections within an evaluation.
+    - TEMPORAL — forward_out→forward_in connections across temporal boundaries.
     """
 
     SEQUENTIAL = "sequential"
@@ -84,7 +84,7 @@ class WiringIR(BaseModel):
     wiring_type: str = ""
     direction: FlowDirection
     is_feedback: bool = False
-    is_temporal: bool = False
+    is_temporal: bool = False  # Structural recurrence marker — no time model implied
     category: str = "dataflow"
 
 

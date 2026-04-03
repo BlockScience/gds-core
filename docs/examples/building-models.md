@@ -29,7 +29,7 @@ Count = typedef("Count", int,
 
 ### 2. Define Entities (state space X)
 
-What persists across timesteps.
+What persists across temporal boundaries.
 
 ```python
 from gds import entity, state_var
@@ -40,7 +40,7 @@ agent = entity("Agent",
 
 ### 3. Define Spaces (communication channels)
 
-Transient signals within a timestep — NOT state.
+Transient signals within an evaluation -- NOT state.
 
 ```python
 from gds import space
