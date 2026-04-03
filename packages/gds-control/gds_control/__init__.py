@@ -6,7 +6,7 @@ All downstream GDS tooling works immediately — canonical projection,
 semantic checks, SpecQuery, serialization, gds-viz.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 # ── DSL declarations ────────────────────────────────────────
 from gds_control.dsl.elements import Controller, Input, Sensor, State
