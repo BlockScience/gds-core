@@ -204,3 +204,13 @@ class TestCompileToSystem:
         ir = population_model.compile_system()
         assert ir.name == "Population"
         assert len(ir.blocks) == 6
+
+
+class TestExecutionContract:
+    def test_contract_emitted(self, population_model):
+        """compile_model() emits a discrete ExecutionContract."""
+        spec = compile_model(population_model)
+        assert spec.execution_contract is not None
+        assert spec.execution_contract.time_domain == "discrete"
+        assert spec.execution_contract.synchrony == "synchronous"
+        assert spec.execution_contract.update_ordering == "Moore"

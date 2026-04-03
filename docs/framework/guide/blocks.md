@@ -7,8 +7,8 @@ The composition algebra is **sealed** — only 5 concrete Block types exist:
 - `AtomicBlock` — leaf node (domain packages subclass this)
 - `StackComposition` (`>>`) — sequential, validates token overlap
 - `ParallelComposition` (`|`) — independent, no type validation
-- `FeedbackLoop` (`.feedback()`) — backward within timestep
-- `TemporalLoop` (`.loop()`) — forward across timesteps, enforces COVARIANT only
+- `FeedbackLoop` (`.feedback()`) — backward within evaluation
+- `TemporalLoop` (`.loop()`) — forward across temporal boundaries, enforces COVARIANT only
 
 ## GDS Roles
 
@@ -18,7 +18,7 @@ Block roles subclass `AtomicBlock` and add interface constraints:
 |---|:---:|:---:|:---:|:---:|---|
 | **BoundaryAction** | MUST be `()` | any | any | any | Exogenous observation |
 | **Policy** | any | any | any | any | Decision logic |
-| **ControlAction** | any | any | any | any | Admissibility constraint |
+| **ControlAction** | any | any | any | any | Output observable y = C(x, d) |
 | **Mechanism** | any | any | MUST be `()` | MUST be `()` | State update |
 
 Violating the MUST constraints raises `GDSCompositionError` immediately at construction time.
@@ -56,7 +56,7 @@ controller = Policy(
 
 ### ControlAction
 
-Admissibility constraints — limits what actions are allowed.
+Output observable — the system's observable output `y = C(x, d)` for composition with other systems. From the plant (inside) perspective, this is what the system emits. From the controller (outside) perspective at a `>>` boundary, it becomes a control action on the next system.
 
 ```python
 from gds import ControlAction, interface
@@ -118,7 +118,7 @@ system = pipeline.feedback([
 ])
 ```
 
-Within-timestep backward flow. Requires CONTRAVARIANT direction.
+Within-evaluation backward flow. Requires CONTRAVARIANT direction.
 
 ### Temporal Loop (`.loop()`)
 
@@ -132,7 +132,7 @@ system = pipeline.loop([
 ])
 ```
 
-Cross-timestep forward flow. COVARIANT is mandatory — CONTRAVARIANT raises `GDSTypeError`.
+Cross-boundary forward flow. COVARIANT is mandatory -- CONTRAVARIANT raises `GDSTypeError`.
 
 ## Tagged Mixin
 

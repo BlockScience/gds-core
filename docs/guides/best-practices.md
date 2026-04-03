@@ -168,14 +168,14 @@ Two loop operators serve different purposes:
 
 | Operator | Direction | Timing | Use Case |
 |----------|-----------|--------|----------|
-| `.feedback()` | CONTRAVARIANT | Within timestep | Backward utility/reward signals |
-| `.loop()` | COVARIANT | Across timesteps | State fed back to observers |
+| `.feedback()` | CONTRAVARIANT | Within evaluation | Backward utility/reward signals |
+| `.loop()` | COVARIANT | Across temporal boundaries | State fed back to observers |
 
 ```python
 from gds.blocks.composition import Wiring
 from gds.ir.models import FlowDirection
 
-# Temporal loop: state at time t feeds into observer at time t+1
+# Temporal loop: state from evaluation k feeds into observer at evaluation k+1
 system_with_loop = forward_pipeline.loop(
     [
         Wiring(
@@ -188,7 +188,7 @@ system_with_loop = forward_pipeline.loop(
     ],
 )
 
-# Feedback loop: backward signal within a single timestep
+# Feedback loop: backward signal within a single evaluation
 # Used in game theory for utility/payoff channels
 system_with_feedback = game_pipeline.feedback(
     [
@@ -204,7 +204,7 @@ system_with_feedback = game_pipeline.feedback(
 ```
 
 !!! warning
-    `.feedback()` is **contravariant** -- it flows backward. `.loop()` is **covariant** -- it flows forward across time. Mixing these up will cause G-003 direction consistency failures.
+    `.feedback()` is **contravariant** -- it flows backward. `.loop()` is **covariant** -- it flows forward across temporal boundaries. Mixing these up will cause G-003 direction consistency failures.
 
 ### Parallel Composition for Independent Subsystems
 
@@ -293,7 +293,7 @@ The `>>` operator builds a DAG. Cycles in covariant flow are caught by G-006:
 # Bad: creates a cycle in the covariant flow graph
 a >> b >> c >> a  # G-006 will flag this
 
-# Good: use .loop() for cross-timestep feedback
+# Good: use .loop() for cross-boundary recurrence
 forward = a >> b >> c
 system = forward.loop([...])  # temporal loop, not a cycle
 ```
@@ -489,7 +489,7 @@ query.param_to_blocks()
 | Use the three-tier pattern: boundary >> policy >> mechanism | Create circular sequential compositions |
 | Name ports for clear token overlap | Use generic names like "Signal" everywhere |
 | Start with auto-wiring, fall back to explicit | Use explicit wiring when auto-wiring works |
-| Use `.loop()` for cross-timestep state feedback | Use `.feedback()` for temporal state (it is contravariant) |
+| Use `.loop()` for cross-boundary state recurrence | Use `.feedback()` for temporal state (it is contravariant) |
 | Use Policy for all decision/observation logic | Use ControlAction (unused across all DSLs) |
 | Run verification even on passing models | Skip verification -- subtle issues hide in structure |
 | Separate state mutation (Mechanism) from decisions (Policy) | Put state-updating logic in Policy blocks |

@@ -18,6 +18,7 @@ from typing import TYPE_CHECKING
 from gds.blocks.composition import Wiring
 from gds.blocks.roles import BoundaryAction, Mechanism, Policy
 from gds.compiler.compile import compile_system
+from gds.execution import ExecutionContract
 from gds.ir.models import FlowDirection, SystemIR
 from gds.spaces import Space
 from gds.spec import GDSSpec, SpecWiring, Wire
@@ -310,6 +311,9 @@ def compile_sm(model: StateMachineModel) -> GDSSpec:
             description=f"Auto-generated wiring for state machine {model.name!r}",
         )
     )
+
+    # State machines are discrete/synchronous/Moore
+    spec.execution_contract = ExecutionContract(time_domain="discrete")
 
     return spec
 

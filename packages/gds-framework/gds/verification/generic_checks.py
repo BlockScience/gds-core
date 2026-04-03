@@ -11,8 +11,17 @@ from gds.verification.findings import Finding, Severity
 
 
 def check_g001_domain_codomain_matching(system: SystemIR) -> list[Finding]:
-    """G-001: For every covariant block-to-block wiring, verify the label
-    is consistent with source forward_out or target forward_in.
+    """G-001: Domain/Codomain Matching.
+
+    For every covariant block-to-block wiring, verify the label is consistent
+    with source forward_out or target forward_in. Contravariant wirings are
+    skipped (handled by G-003).
+
+    Property: For every wiring w where w.direction = COVARIANT and both
+    endpoints are blocks: tokens(w.label) is a subset of
+    tokens(source.forward_out) OR tokens(target.forward_in).
+
+    See: docs/framework/design/check-specifications.md
     """
     findings = []
     block_sigs = {b.name: b.signature for b in system.blocks}
@@ -63,12 +72,18 @@ def check_g001_domain_codomain_matching(system: SystemIR) -> list[Finding]:
 
 
 def check_g002_signature_completeness(system: SystemIR) -> list[Finding]:
-    """G-002: Every block must have at least one non-empty input slot
-    and at least one non-empty output slot.
+    """G-002: Signature Completeness.
 
-    BoundaryAction blocks (block_type == "boundary") are exempt from the
-    input requirement — they have no inputs by design, since they model
-    exogenous signals entering the system from outside.
+    Every block must have at least one non-empty input slot and at least one
+    non-empty output slot. BoundaryAction blocks (block_type == "boundary") are
+    exempt from the input requirement -- they have no inputs by design, since
+    they model exogenous signals entering the system from outside.
+
+    Property: For every block b: has_output(b) is True, and (if b is not
+    a BoundaryAction) has_input(b) is True, where has_input/has_output check
+    that at least one of the forward/backward slots is non-empty.
+
+    See: docs/framework/design/check-specifications.md
     """
     findings = []
     for block in system.blocks:
@@ -105,19 +120,27 @@ def check_g002_signature_completeness(system: SystemIR) -> list[Finding]:
 
 
 def check_g003_direction_consistency(system: SystemIR) -> list[Finding]:
-    """G-003: Validate direction flag consistency and contravariant port-slot matching.
+    """G-003: Direction Consistency.
+
+    Validate direction flag consistency and contravariant port-slot matching.
 
     Two validations:
 
-    A) Flag consistency — ``direction``, ``is_feedback``, ``is_temporal`` must
+    A) Flag consistency -- ``direction``, ``is_feedback``, ``is_temporal`` must
        not contradict:
-       - COVARIANT + is_feedback → ERROR (feedback implies contravariant)
-       - CONTRAVARIANT + is_temporal → ERROR (temporal implies covariant)
+       - COVARIANT + is_feedback -> ERROR (feedback implies contravariant)
+       - CONTRAVARIANT + is_temporal -> ERROR (temporal implies covariant)
 
-    B) Contravariant port-slot matching — for CONTRAVARIANT wirings, the label
+    B) Contravariant port-slot matching -- for CONTRAVARIANT wirings, the label
        must be a token-subset of the source's backward_out (signature[3]) or
        the target's backward_in (signature[2]). G-001 already covers the
        covariant side.
+
+    Property: (A) NOT (COVARIANT AND is_feedback) and NOT (CONTRAVARIANT AND
+    is_temporal). (B) For contravariant wirings: tokens(label) is a subset of
+    tokens(source.backward_out) OR tokens(target.backward_in).
+
+    See: docs/framework/design/check-specifications.md
     """
     findings = []
     block_sigs = {b.name: b.signature for b in system.blocks}
@@ -204,7 +227,16 @@ def check_g003_direction_consistency(system: SystemIR) -> list[Finding]:
 
 
 def check_g004_dangling_wirings(system: SystemIR) -> list[Finding]:
-    """G-004: Flag wirings whose source or target is not in the system."""
+    """G-004: Dangling Wirings.
+
+    Flag wirings whose source or target is not in the system's block or input
+    set. A dangling reference indicates a typo or missing block.
+
+    Property: For every wiring w: w.source in N and w.target in N, where
+    N = {b.name for b in blocks} union {i.name for i in inputs}.
+
+    See: docs/framework/design/check-specifications.md
+    """
     findings = []
     known_names = {b.name for b in system.blocks}
     for inp in system.inputs:
@@ -238,8 +270,17 @@ def check_g004_dangling_wirings(system: SystemIR) -> list[Finding]:
 
 
 def check_g005_sequential_type_compatibility(system: SystemIR) -> list[Finding]:
-    """G-005: In stack composition, wiring label must be subset of
-    BOTH source forward_out AND target forward_in.
+    """G-005: Sequential Type Compatibility.
+
+    In stack (sequential) composition, the wiring label must be a token-subset
+    of BOTH the source's forward_out AND the target's forward_in. This is
+    stricter than G-001, which only requires matching one side.
+
+    Property: For every covariant, non-temporal wiring w between blocks:
+    tokens(w.label) is a subset of tokens(source.forward_out) AND
+    tokens(w.label) is a subset of tokens(target.forward_in).
+
+    See: docs/framework/design/check-specifications.md
     """
     findings = []
     block_sigs = {b.name: b.signature for b in system.blocks}
@@ -281,9 +322,17 @@ def check_g005_sequential_type_compatibility(system: SystemIR) -> list[Finding]:
 
 
 def check_g006_covariant_acyclicity(system: SystemIR) -> list[Finding]:
-    """G-006: Covariant flow graph must be a DAG (no cycles within a timestep).
+    """G-006: Covariant Acyclicity.
 
-    Temporal wirings and contravariant wirings are excluded.
+    The covariant (forward) flow graph must be a directed acyclic graph (DAG).
+    Temporal wirings and contravariant wirings are excluded because they do not
+    create within-evaluation algebraic dependencies.
+
+    Property: Let G_cov = (V, E_cov) where V = {b.name for b in blocks} and
+    E_cov = {(w.source, w.target) for w in wirings if w.direction = COVARIANT
+    and not w.is_temporal}. G_cov is acyclic.
+
+    See: docs/framework/design/check-specifications.md
     """
     block_names = {b.name for b in system.blocks}
     adj: dict[str, list[str]] = {name: [] for name in block_names}

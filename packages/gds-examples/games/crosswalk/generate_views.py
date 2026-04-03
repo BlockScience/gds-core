@@ -70,7 +70,7 @@ def generate_views() -> str:
         "Blocks grouped by GDS role — all 4 roles present:\n"
         "- **BoundaryAction**: Observe Traffic (exogenous input)\n"
         "- **Policy**: Pedestrian Decision (observation -> action)\n"
-        "- **ControlAction**: Safety Check (admissibility constraint)\n"
+        "- **ControlAction**: Safety Check (output observable)\n"
         "- **Mechanism**: Traffic Transition (Markov state update)\n"
     )
     sections.append(f"```mermaid\n{spec_to_mermaid(spec)}\n```\n")

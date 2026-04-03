@@ -12,13 +12,13 @@ The foundation. Learn TypeDef, Entity, Space, BoundaryAction, Policy, Mechanism,
 
 ### 2. [Thermostat PID](examples/thermostat.md) — Feedback
 
-Adds `.feedback()` for within-timestep backward information flow. Introduces CONTRAVARIANT flow direction and the ControlAction role.
+Adds `.feedback()` for within-evaluation backward information flow. Introduces CONTRAVARIANT flow direction and the ControlAction role.
 
 **New:** `.feedback()`, backward ports, ControlAction
 
 ### 3. [Lotka-Volterra](examples/lotka-volterra.md) — Temporal Loops
 
-Adds `.loop()` for cross-timestep iteration. Introduces COVARIANT temporal wiring and Mechanism with `forward_out`.
+Adds `.loop()` for cross-boundary recurrence. Introduces COVARIANT temporal wiring and Mechanism with `forward_out`.
 
 **New:** `.loop()`, temporal wiring, exit conditions
 

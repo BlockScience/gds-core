@@ -17,14 +17,14 @@ Six independent DSLs now compile to the same algebraic core:
 All three reduce to the same canonical form without modification:
 
 ```
-d = g(x, u)
+d = g(x, z)
 x' = f(x, d)
 ```
 
 Key structural facts:
 
 - Canonical `h = f ∘ g` has survived three domains with no extensions required.
-- No DSL uses `ControlAction` — all non-state-updating blocks map to `Policy`.
+- No DSL compiler emits `ControlAction` blocks -- all non-state-updating blocks map to `Policy`. The `ControlAction` role serves as the output map `y = C(x, d)` for explicit inter-system composition at `>>` boundaries.
 - Role partition (boundary, policy, mechanism) is complete and disjoint in every case.
 - Cross-built equivalence (DSL-compiled vs hand-built) has been verified at Spec, Canonical, and SystemIR levels for all validated DSLs.
 - OGS canonical validation confirms `f = ∅`, `X = ∅` — compositional game theory is a **degenerate dynamical system** where `h = g` (pure policy, no state transition). See [RQ3](#research-question-3-ogs-as-degenerate-dynamical-system) below.
@@ -160,7 +160,7 @@ At the IR level, all temporal wirings are identical:
 source → target (temporal, covariant)
 ```
 
-Canonical treats recurrence purely algebraically — `x' = f(x, g(x, u))` — without encoding evaluation scheduling, delay, or sampling semantics.
+Canonical treats recurrence purely algebraically — `x' = f(x, g(x, z))` — without encoding evaluation scheduling, delay, or sampling semantics.
 
 This is correct structurally. But it is incomplete for execution.
 
@@ -172,7 +172,7 @@ This is correct structurally. But it is incomplete for execution.
 
 All current DSLs assume synchronous discrete-time execution (Moore-style):
 
-1. Compute `d = g(x[t], u[t])`
+1. Compute `d = g(x[t], z[t])`
 2. Compute `x[t+1] = f(x[t], d)`
 3. All observation and control occur within one step
 
@@ -208,7 +208,7 @@ Without explicit execution semantics, different DSLs may assume incompatible tim
 Define execution directly from canonical:
 
 ```python
-d = g(x, u)       # observation + decision
+d = g(x, z)       # observation + decision
 x_next = f(x, d)  # state update
 ```
 

@@ -5,7 +5,7 @@ enabling constraint enforcement, metric computation, and reachability
 analysis on concrete trajectories.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 from gds_analysis.adapter import spec_to_model
 from gds_analysis.backward_reachability import (

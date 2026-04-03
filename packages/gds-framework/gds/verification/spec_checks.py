@@ -10,7 +10,13 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import TYPE_CHECKING
 
-from gds.blocks.roles import BoundaryAction, HasParams, Mechanism
+from gds.blocks.roles import (
+    BoundaryAction,
+    ControlAction,
+    HasParams,
+    Mechanism,
+    Policy,
+)
 from gds.canonical import project_canonical
 from gds.verification.findings import Finding, Severity
 
@@ -19,10 +25,16 @@ if TYPE_CHECKING:
 
 
 def check_completeness(spec: GDSSpec) -> list[Finding]:
-    """Every entity variable is updated by at least one mechanism.
+    """SC-001: Completeness.
 
-    Detects orphan state variables that can never change — a likely
-    specification error.
+    Every entity variable is updated by at least one mechanism. Detects orphan
+    state variables that can never change -- a likely specification error.
+
+    Property: Let U = {(e, v) for m in Mechanisms for (e, v) in m.updates}.
+    For every entity e and variable v in e.variables: (e.name, v) in U.
+    The mechanism update map is surjective onto the state variable set.
+
+    See: docs/framework/design/check-specifications.md
     """
     findings: list[Finding] = []
 
@@ -64,10 +76,17 @@ def check_completeness(spec: GDSSpec) -> list[Finding]:
 
 
 def check_determinism(spec: GDSSpec) -> list[Finding]:
-    """Within each wiring, no two mechanisms update the same variable.
+    """SC-002: Determinism.
 
-    Detects write conflicts where multiple mechanisms try to modify
-    the same state variable within the same composition.
+    Within each wiring, no two mechanisms update the same variable. Detects
+    write conflicts where multiple mechanisms try to modify the same state
+    variable within the same composition.
+
+    Property: For every wiring w and every (entity, variable) pair (e, v):
+    |{m in w.block_names : m is Mechanism, (e, v) in m.updates}| <= 1.
+    The state transition f must be a function, not a multi-valued relation.
+
+    See: docs/framework/design/check-specifications.md
     """
     findings: list[Finding] = []
 
@@ -108,9 +127,17 @@ def check_determinism(spec: GDSSpec) -> list[Finding]:
 
 
 def check_reachability(spec: GDSSpec, from_block: str, to_block: str) -> list[Finding]:
-    """Can signals reach from one block to another through wiring?
+    """SC-003: Reachability.
 
-    Maps to GDS attainability correspondence.
+    Can signals reach from one block to another through the wiring graph?
+    Maps to the GDS attainability correspondence.
+
+    Property: There exists a directed path in the wire graph from from_block
+    to to_block, where edges are (wire.source, wire.target) across all
+    SpecWiring instances. Unlike other semantic checks, requires explicit
+    from_block and to_block arguments.
+
+    See: docs/framework/design/check-specifications.md
     """
     adj: dict[str, set[str]] = defaultdict(set)
     for wiring in spec.wirings.values():
@@ -152,10 +179,16 @@ def check_reachability(spec: GDSSpec, from_block: str, to_block: str) -> list[Fi
 
 
 def check_parameter_references(spec: GDSSpec) -> list[Finding]:
-    """All parameter references in blocks resolve to registered parameters.
+    """SC-005: Parameter References.
 
-    Validates that every ``params_used`` entry on blocks corresponds to
-    a parameter definition in the spec's ``parameter_schema``.
+    All parameter references in blocks resolve to registered parameters.
+    Validates that every ``params_used`` entry on blocks corresponds to a
+    parameter definition in the spec's ``parameter_schema``.
+
+    Property: For every block b implementing HasParams:
+    {p for p in b.params_used} is a subset of spec.parameter_schema.names().
+
+    See: docs/framework/design/check-specifications.md
     """
     findings: list[Finding] = []
 
@@ -191,10 +224,16 @@ def check_parameter_references(spec: GDSSpec) -> list[Finding]:
 
 
 def check_type_safety(spec: GDSSpec) -> list[Finding]:
-    """Wire spaces match source and target block expectations.
+    """SC-004: Type Safety.
 
-    Verifies that space references on wires correspond to registered
-    spaces and that source/target blocks are connected to compatible spaces.
+    Wire spaces match source and target block expectations. Verifies that space
+    references on wires correspond to registered spaces.
+
+    Property: For every wire in every SpecWiring: if wire.space is non-empty,
+    then wire.space is in spec.spaces. Referential integrity of space
+    declarations on wiring channels.
+
+    See: docs/framework/design/check-specifications.md
     """
     findings: list[Finding] = []
 
@@ -228,11 +267,18 @@ def check_type_safety(spec: GDSSpec) -> list[Finding]:
 
 
 def check_canonical_wellformedness(spec: GDSSpec) -> list[Finding]:
-    """Canonical projection structural validity.
+    """SC-006/SC-007: Canonical Wellformedness.
 
-    Checks:
-    - SC-006: At least one mechanism exists (f is non-empty)
-    - SC-007: State space X is non-empty (entities with variables exist)
+    Canonical projection structural validity. Two sub-checks:
+
+    - SC-006: At least one mechanism exists (f is non-empty).
+      Property: |project_canonical(spec).mechanism_blocks| >= 1.
+    - SC-007: State space X is non-empty (entities with variables exist).
+      Property: |project_canonical(spec).state_variables| >= 1.
+
+    Together these ensure the canonical form h = f . g is non-degenerate.
+
+    See: docs/framework/design/check-specifications.md
     """
     findings: list[Finding] = []
     canonical = project_canonical(spec)
@@ -284,10 +330,18 @@ def check_canonical_wellformedness(spec: GDSSpec) -> list[Finding]:
 
 
 def check_admissibility_references(spec: GDSSpec) -> list[Finding]:
-    """Admissibility constraints reference valid BoundaryActions and variables.
+    """SC-008: Admissibility References.
 
-    SC-008: Every registered AdmissibleInputConstraint references an
-    existing BoundaryAction and valid (entity, variable) pairs.
+    Every registered AdmissibleInputConstraint references an existing
+    BoundaryAction and valid (entity, variable) pairs.
+
+    Property: For every AdmissibleInputConstraint ac:
+    (1) ac.boundary_block in spec.blocks,
+    (2) spec.blocks[ac.boundary_block] is BoundaryAction,
+    (3) for all (e, v) in ac.depends_on: e in spec.entities and
+        v in spec.entities[e].variables.
+
+    See: docs/framework/design/check-specifications.md
     """
     findings: list[Finding] = []
 
@@ -352,11 +406,19 @@ def check_admissibility_references(spec: GDSSpec) -> list[Finding]:
 
 
 def check_transition_reads(spec: GDSSpec) -> list[Finding]:
-    """Transition signatures reference valid Mechanisms and variables.
+    """SC-009: Transition Reads.
 
-    SC-009: Every TransitionSignature references an existing Mechanism,
-    reads valid (entity, variable) pairs, and depends_on_blocks are
-    registered blocks.
+    Every TransitionSignature references an existing Mechanism, reads valid
+    (entity, variable) pairs, and depends_on_blocks are registered blocks.
+
+    Property: For every TransitionSignature ts:
+    (1) ts.mechanism in spec.blocks,
+    (2) spec.blocks[ts.mechanism] is Mechanism,
+    (3) for all (e, v) in ts.reads: e in spec.entities and
+        v in spec.entities[e].variables,
+    (4) for all b in ts.depends_on_blocks: b in spec.blocks.
+
+    See: docs/framework/design/check-specifications.md
     """
     findings: list[Finding] = []
 
@@ -419,6 +481,192 @@ def check_transition_reads(spec: GDSSpec) -> list[Finding]:
                     f"All {len(spec.transition_signatures)} transition "
                     f"signature(s) are consistent"
                 ),
+                passed=True,
+            )
+        )
+
+    return findings
+
+
+def check_controlaction_pathway(spec: GDSSpec) -> list[Finding]:
+    """SC-010: ControlAction outputs must not feed the g pathway.
+
+    The output map y = C(x, d) produces observable output Y. Its signals
+    must not be routed back into Policy or BoundaryAction blocks, which
+    form the input map g. Doing so would conflate the output map C with
+    the policy map g, breaking the canonical separation h = f . g.
+
+    ControlAction outputs MAY feed Mechanism blocks (state dynamics can
+    depend on observations) or exit the system boundary.
+    """
+    findings: list[Finding] = []
+
+    # Identify ControlAction blocks
+    ca_blocks: set[str] = set()
+    for bname, block in spec.blocks.items():
+        if isinstance(block, ControlAction):
+            ca_blocks.add(bname)
+
+    if not ca_blocks:
+        return findings
+
+    # Identify g-pathway blocks (Policy + BoundaryAction)
+    g_blocks: set[str] = set()
+    for bname, block in spec.blocks.items():
+        if isinstance(block, (Policy, BoundaryAction)):
+            g_blocks.add(bname)
+
+    # Check wiring: no wire from CA output to g-pathway input
+    for wiring in spec.wirings.values():
+        for wire in wiring.wires:
+            if wire.source in ca_blocks and wire.target in g_blocks:
+                findings.append(
+                    Finding(
+                        check_id="SC-010",
+                        severity=Severity.WARNING,
+                        message=(
+                            f"ControlAction block {wire.source!r} output is wired to "
+                            f"g-pathway block {wire.target!r}. ControlAction outputs "
+                            f"(output map C) should not feed Policy or BoundaryAction "
+                            f"blocks (input map g)."
+                        ),
+                        source_elements=[wire.source, wire.target],
+                        passed=False,
+                    )
+                )
+
+    if not findings:
+        findings.append(
+            Finding(
+                check_id="SC-010",
+                severity=Severity.INFO,
+                message="ControlAction outputs are not routed to the g pathway.",
+                source_elements=list(ca_blocks),
+                passed=True,
+            )
+        )
+
+    return findings
+
+
+def check_execution_contract_compatibility(spec: GDSSpec) -> list[Finding]:
+    """SC-011: ExecutionContract well-formedness and compatibility.
+
+    When a GDSSpec has an execution_contract, verify it is internally
+    consistent.  This check is a placeholder for future cross-composition
+    validation (when GDSSpec gains sub-spec references).
+
+    Currently validates:
+    - If execution_contract is set with time_domain="discrete", the SystemIR
+      (if compilable) should have no algebraic loops in non-temporal wirings
+      (this is already checked by G-006, so we just note the dependency).
+    - Contract field consistency (discrete-only fields).
+    """
+    findings: list[Finding] = []
+
+    if spec.execution_contract is None:
+        findings.append(
+            Finding(
+                check_id="SC-011",
+                severity=Severity.INFO,
+                message=(
+                    "No ExecutionContract declared — spec is valid "
+                    "for structural verification only."
+                ),
+                source_elements=[spec.name],
+                passed=True,
+            )
+        )
+        return findings
+
+    contract = spec.execution_contract
+
+    # Validate contract is well-formed (redundant with __post_init__ but defensive)
+    if contract.time_domain == "discrete" and contract.update_ordering not in (
+        "Moore",
+        "Mealy",
+    ):
+        findings.append(
+            Finding(
+                check_id="SC-011",
+                severity=Severity.ERROR,
+                message=f"Invalid update_ordering: {contract.update_ordering!r}",
+                source_elements=[spec.name],
+                passed=False,
+            )
+        )
+
+    if not findings:
+        findings.append(
+            Finding(
+                check_id="SC-011",
+                severity=Severity.INFO,
+                message=(
+                    f"ExecutionContract declared: "
+                    f"{contract.time_domain}/{contract.synchrony}"
+                    f"/{contract.update_ordering}"
+                ),
+                source_elements=[spec.name],
+                passed=True,
+            )
+        )
+
+    return findings
+
+
+def check_disturbance_routing(spec: GDSSpec) -> list[Finding]:
+    """DST-001: Disturbance-tagged BoundaryAction must not wire to Policy.
+
+    A disturbance is an exogenous input that bypasses the decision layer.
+    It must route directly to Mechanism blocks, never to Policy blocks.
+    This enforces the invariant: no component of W appears in the domain of g.
+    """
+    findings: list[Finding] = []
+
+    disturbance_blocks: set[str] = set()
+    for bname, block in spec.blocks.items():
+        if (
+            isinstance(block, BoundaryAction)
+            and getattr(block, "tags", {}).get("role") == "disturbance"
+        ):
+            disturbance_blocks.add(bname)
+
+    if not disturbance_blocks:
+        return findings
+
+    policy_blocks: set[str] = set()
+    for bname, block in spec.blocks.items():
+        if isinstance(block, Policy):
+            policy_blocks.add(bname)
+
+    for wiring in spec.wirings.values():
+        for wire in wiring.wires:
+            if wire.source in disturbance_blocks and wire.target in policy_blocks:
+                findings.append(
+                    Finding(
+                        check_id="DST-001",
+                        severity=Severity.ERROR,
+                        message=(
+                            f"Disturbance-tagged BoundaryAction {wire.source!r} "
+                            f"is wired to Policy block {wire.target!r}. "
+                            f"Disturbances must bypass the decision layer "
+                            f"and route directly to Mechanism blocks."
+                        ),
+                        source_elements=[wire.source, wire.target],
+                        passed=False,
+                    )
+                )
+
+    if not findings:
+        findings.append(
+            Finding(
+                check_id="DST-001",
+                severity=Severity.INFO,
+                message=(
+                    f"Disturbance routing valid: {len(disturbance_blocks)} "
+                    f"disturbance input(s) bypass decision layer."
+                ),
+                source_elements=list(disturbance_blocks),
                 passed=True,
             )
         )
