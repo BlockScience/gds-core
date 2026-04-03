@@ -19,10 +19,16 @@ if TYPE_CHECKING:
 
 
 def check_completeness(spec: GDSSpec) -> list[Finding]:
-    """Every entity variable is updated by at least one mechanism.
+    """SC-001: Completeness.
 
-    Detects orphan state variables that can never change — a likely
-    specification error.
+    Every entity variable is updated by at least one mechanism. Detects orphan
+    state variables that can never change -- a likely specification error.
+
+    Property: Let U = {(e, v) for m in Mechanisms for (e, v) in m.updates}.
+    For every entity e and variable v in e.variables: (e.name, v) in U.
+    The mechanism update map is surjective onto the state variable set.
+
+    See: docs/framework/design/check-specifications.md
     """
     findings: list[Finding] = []
 
@@ -64,10 +70,17 @@ def check_completeness(spec: GDSSpec) -> list[Finding]:
 
 
 def check_determinism(spec: GDSSpec) -> list[Finding]:
-    """Within each wiring, no two mechanisms update the same variable.
+    """SC-002: Determinism.
 
-    Detects write conflicts where multiple mechanisms try to modify
-    the same state variable within the same composition.
+    Within each wiring, no two mechanisms update the same variable. Detects
+    write conflicts where multiple mechanisms try to modify the same state
+    variable within the same composition.
+
+    Property: For every wiring w and every (entity, variable) pair (e, v):
+    |{m in w.block_names : m is Mechanism, (e, v) in m.updates}| <= 1.
+    The state transition f must be a function, not a multi-valued relation.
+
+    See: docs/framework/design/check-specifications.md
     """
     findings: list[Finding] = []
 
@@ -108,9 +121,17 @@ def check_determinism(spec: GDSSpec) -> list[Finding]:
 
 
 def check_reachability(spec: GDSSpec, from_block: str, to_block: str) -> list[Finding]:
-    """Can signals reach from one block to another through wiring?
+    """SC-003: Reachability.
 
-    Maps to GDS attainability correspondence.
+    Can signals reach from one block to another through the wiring graph?
+    Maps to the GDS attainability correspondence.
+
+    Property: There exists a directed path in the wire graph from from_block
+    to to_block, where edges are (wire.source, wire.target) across all
+    SpecWiring instances. Unlike other semantic checks, requires explicit
+    from_block and to_block arguments.
+
+    See: docs/framework/design/check-specifications.md
     """
     adj: dict[str, set[str]] = defaultdict(set)
     for wiring in spec.wirings.values():
@@ -152,10 +173,16 @@ def check_reachability(spec: GDSSpec, from_block: str, to_block: str) -> list[Fi
 
 
 def check_parameter_references(spec: GDSSpec) -> list[Finding]:
-    """All parameter references in blocks resolve to registered parameters.
+    """SC-005: Parameter References.
 
-    Validates that every ``params_used`` entry on blocks corresponds to
-    a parameter definition in the spec's ``parameter_schema``.
+    All parameter references in blocks resolve to registered parameters.
+    Validates that every ``params_used`` entry on blocks corresponds to a
+    parameter definition in the spec's ``parameter_schema``.
+
+    Property: For every block b implementing HasParams:
+    {p for p in b.params_used} is a subset of spec.parameter_schema.names().
+
+    See: docs/framework/design/check-specifications.md
     """
     findings: list[Finding] = []
 
@@ -191,10 +218,16 @@ def check_parameter_references(spec: GDSSpec) -> list[Finding]:
 
 
 def check_type_safety(spec: GDSSpec) -> list[Finding]:
-    """Wire spaces match source and target block expectations.
+    """SC-004: Type Safety.
 
-    Verifies that space references on wires correspond to registered
-    spaces and that source/target blocks are connected to compatible spaces.
+    Wire spaces match source and target block expectations. Verifies that space
+    references on wires correspond to registered spaces.
+
+    Property: For every wire in every SpecWiring: if wire.space is non-empty,
+    then wire.space is in spec.spaces. Referential integrity of space
+    declarations on wiring channels.
+
+    See: docs/framework/design/check-specifications.md
     """
     findings: list[Finding] = []
 
@@ -228,11 +261,18 @@ def check_type_safety(spec: GDSSpec) -> list[Finding]:
 
 
 def check_canonical_wellformedness(spec: GDSSpec) -> list[Finding]:
-    """Canonical projection structural validity.
+    """SC-006/SC-007: Canonical Wellformedness.
 
-    Checks:
-    - SC-006: At least one mechanism exists (f is non-empty)
-    - SC-007: State space X is non-empty (entities with variables exist)
+    Canonical projection structural validity. Two sub-checks:
+
+    - SC-006: At least one mechanism exists (f is non-empty).
+      Property: |project_canonical(spec).mechanism_blocks| >= 1.
+    - SC-007: State space X is non-empty (entities with variables exist).
+      Property: |project_canonical(spec).state_variables| >= 1.
+
+    Together these ensure the canonical form h = f . g is non-degenerate.
+
+    See: docs/framework/design/check-specifications.md
     """
     findings: list[Finding] = []
     canonical = project_canonical(spec)
@@ -284,10 +324,18 @@ def check_canonical_wellformedness(spec: GDSSpec) -> list[Finding]:
 
 
 def check_admissibility_references(spec: GDSSpec) -> list[Finding]:
-    """Admissibility constraints reference valid BoundaryActions and variables.
+    """SC-008: Admissibility References.
 
-    SC-008: Every registered AdmissibleInputConstraint references an
-    existing BoundaryAction and valid (entity, variable) pairs.
+    Every registered AdmissibleInputConstraint references an existing
+    BoundaryAction and valid (entity, variable) pairs.
+
+    Property: For every AdmissibleInputConstraint ac:
+    (1) ac.boundary_block in spec.blocks,
+    (2) spec.blocks[ac.boundary_block] is BoundaryAction,
+    (3) for all (e, v) in ac.depends_on: e in spec.entities and
+        v in spec.entities[e].variables.
+
+    See: docs/framework/design/check-specifications.md
     """
     findings: list[Finding] = []
 
@@ -352,11 +400,19 @@ def check_admissibility_references(spec: GDSSpec) -> list[Finding]:
 
 
 def check_transition_reads(spec: GDSSpec) -> list[Finding]:
-    """Transition signatures reference valid Mechanisms and variables.
+    """SC-009: Transition Reads.
 
-    SC-009: Every TransitionSignature references an existing Mechanism,
-    reads valid (entity, variable) pairs, and depends_on_blocks are
-    registered blocks.
+    Every TransitionSignature references an existing Mechanism, reads valid
+    (entity, variable) pairs, and depends_on_blocks are registered blocks.
+
+    Property: For every TransitionSignature ts:
+    (1) ts.mechanism in spec.blocks,
+    (2) spec.blocks[ts.mechanism] is Mechanism,
+    (3) for all (e, v) in ts.reads: e in spec.entities and
+        v in spec.entities[e].variables,
+    (4) for all b in ts.depends_on_blocks: b in spec.blocks.
+
+    See: docs/framework/design/check-specifications.md
     """
     findings: list[Finding] = []
 
