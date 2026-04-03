@@ -203,9 +203,9 @@ pi : GDSSpec -> CanonicalGDS yields:
 C = (X, U, D, Theta, g, f, h, A_deps, R_deps)
 
 X      = product_{(e,v) in E} TypeDef(e.variables[v])    state space
-U      = {(b, p) : b in B_boundary, p in b.forward_out}  input space
+Z      = {(b, p) : b in B_boundary, p in b.forward_out}  exogenous signal space
 D      = {(b, p) : b in B_policy, p in b.forward_out}    decision space
-g      : X x U -> D                                       policy mapping
+g      : X x Z -> D                                       policy mapping
 f      : X x D -> X                                       state transition
 h_theta: X -> X  where  h = f ∘ g                         composed transition
 A_deps = {(name, {(e,v)}) : ac in A}                      admissibility dependencies
@@ -774,7 +774,7 @@ tier based on what it requires:
 | State evolution over time | Dynamic temporal | gds-sim execution | Requires evaluating f repeatedly |
 | Constraint satisfaction | Dynamic behavioral | TypeDef.constraint() | General case: Rice's theorem |
 | Auto-wiring computation | Dynamic structural | tokenize() + overlap | String parsing exceeds SPARQL |
-| Actual signal propagation | Dynamic behavioral | simulation with concrete values | Requires computing g(x, u) |
+| Actual signal propagation | Dynamic behavioral | simulation with concrete values | Requires computing g(x, z) |
 | Scheduling/delay semantics | Dynamic temporal | execution model | Not stored in GDS — external |
 | Equilibrium computation | Dynamic strategic | game solvers | Computing Nash equilibria is PPAD-complete |
 

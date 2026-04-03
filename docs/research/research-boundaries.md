@@ -17,7 +17,7 @@ Six independent DSLs now compile to the same algebraic core:
 All three reduce to the same canonical form without modification:
 
 ```
-d = g(x, u)
+d = g(x, z)
 x' = f(x, d)
 ```
 
@@ -160,7 +160,7 @@ At the IR level, all temporal wirings are identical:
 source → target (temporal, covariant)
 ```
 
-Canonical treats recurrence purely algebraically — `x' = f(x, g(x, u))` — without encoding evaluation scheduling, delay, or sampling semantics.
+Canonical treats recurrence purely algebraically — `x' = f(x, g(x, z))` — without encoding evaluation scheduling, delay, or sampling semantics.
 
 This is correct structurally. But it is incomplete for execution.
 
@@ -172,7 +172,7 @@ This is correct structurally. But it is incomplete for execution.
 
 All current DSLs assume synchronous discrete-time execution (Moore-style):
 
-1. Compute `d = g(x[t], u[t])`
+1. Compute `d = g(x[t], z[t])`
 2. Compute `x[t+1] = f(x[t], d)`
 3. All observation and control occur within one step
 
@@ -208,7 +208,7 @@ Without explicit execution semantics, different DSLs may assume incompatible tim
 Define execution directly from canonical:
 
 ```python
-d = g(x, u)       # observation + decision
+d = g(x, z)       # observation + decision
 x_next = f(x, d)  # state update
 ```
 

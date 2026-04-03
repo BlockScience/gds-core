@@ -38,7 +38,7 @@ Concepts Covered:
     - Discrete state spaces with integer-valued TrafficState
     - All 4 block roles: BoundaryAction, Policy, ControlAction, Mechanism
     - Design parameters (Theta) as mechanism design levers
-    - ControlAction for admissibility constraints (safe vs unsafe crossing)
+    - ControlAction as output observable (safety check signal)
     - Markov transition matrix semantics in the mechanism
     - Reachability and controllability as verification outcomes
     - Binary exogenous randomness (luck) as BoundaryAction input
