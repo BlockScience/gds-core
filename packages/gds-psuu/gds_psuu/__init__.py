@@ -2,6 +2,7 @@
 
 __version__ = "0.2.0"
 
+from gds_psuu.checks import check_parameter_space_compatibility
 from gds_psuu.errors import PsuuError, PsuuSearchError, PsuuValidationError
 from gds_psuu.evaluation import EvaluationResult, Evaluator
 from gds_psuu.kpi import KPI, final_state_mean, final_state_std, time_average
@@ -38,6 +39,7 @@ from gds_psuu.space import (
     Integer,
     LinearConstraint,
     ParameterSpace,
+    SchemaViolation,
 )
 from gds_psuu.sweep import Sweep
 from gds_psuu.types import AggregationFn, KPIFn, KPIScores, MetricFn, ParamPoint
@@ -72,11 +74,13 @@ __all__ = [
     "PsuuSearchError",
     "PsuuValidationError",
     "RandomSearchOptimizer",
+    "SchemaViolation",
     "SensitivityResult",
     "SingleKPI",
     "Sweep",
     "SweepResults",
     "WeightedSum",
+    "check_parameter_space_compatibility",
     "final_state_mean",
     "final_state_std",
     "final_value",
