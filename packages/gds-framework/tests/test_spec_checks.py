@@ -18,6 +18,7 @@ from gds.verification.spec_checks import (
     check_completeness,
     check_controlaction_pathway,
     check_determinism,
+    check_disturbance_routing,
     check_execution_contract_compatibility,
     check_parameter_references,
     check_reachability,
@@ -621,3 +622,120 @@ class TestExecutionContractCompatibility:
         assert len(findings) == 1
         assert findings[0].passed
         assert "atemporal" in findings[0].message
+
+
+# -- DST-001: Disturbance Routing ----------------------------------------
+
+
+class TestDisturbanceRouting:
+    def test_no_disturbance_returns_empty(self):
+        """Specs without disturbance-tagged blocks produce no findings."""
+        spec = GDSSpec(name="NoDist")
+        ba = BoundaryAction(
+            name="Sensor",
+            interface=Interface(forward_out=(port("Signal"),)),
+        )
+        spec.register_block(ba)
+        findings = check_disturbance_routing(spec)
+        assert len(findings) == 0
+
+    def test_valid_routing_to_mechanism_passes(self):
+        """Disturbance wired to Mechanism passes DST-001."""
+        spec = GDSSpec(name="ValidDist")
+        dist = BoundaryAction(
+            name="Wind",
+            interface=Interface(forward_out=(port("Force"),)),
+            tags={"role": "disturbance"},
+        )
+        m = Mechanism(
+            name="Plant",
+            interface=Interface(forward_in=(port("Force"),)),
+            updates=[("Room", "temperature")],
+        )
+        spec.register_block(dist)
+        spec.register_block(m)
+        spec.register_wiring(
+            SpecWiring(
+                name="DistToMech",
+                block_names=["Wind", "Plant"],
+                wires=[Wire(source="Wind", target="Plant")],
+            )
+        )
+        findings = check_disturbance_routing(spec)
+        passed = [f for f in findings if f.passed]
+        assert len(passed) == 1
+        assert passed[0].check_id == "DST-001"
+
+    def test_routing_to_policy_fails(self):
+        """Disturbance wired to Policy produces ERROR."""
+        spec = GDSSpec(name="BadDist")
+        dist = BoundaryAction(
+            name="Wind",
+            interface=Interface(forward_out=(port("Force"),)),
+            tags={"role": "disturbance"},
+        )
+        p = Policy(
+            name="Controller",
+            interface=Interface(
+                forward_in=(port("Force"),),
+                forward_out=(port("Command"),),
+            ),
+        )
+        spec.register_block(dist)
+        spec.register_block(p)
+        spec.register_wiring(
+            SpecWiring(
+                name="DistToPolicy",
+                block_names=["Wind", "Controller"],
+                wires=[Wire(source="Wind", target="Controller")],
+            )
+        )
+        findings = check_disturbance_routing(spec)
+        failed = [f for f in findings if not f.passed]
+        assert len(failed) == 1
+        assert failed[0].check_id == "DST-001"
+        assert failed[0].severity == Severity.ERROR
+        assert "Wind" in failed[0].message
+        assert "Controller" in failed[0].message
+
+
+# -- Canonical disturbance_ports ─────────────────────────────────
+
+
+class TestCanonicalDisturbancePorts:
+    def test_disturbance_ports_partitioned(self):
+        """Disturbance-tagged BoundaryAction ports go to disturbance_ports."""
+        spec = GDSSpec(name="WithDist")
+        sensor = BoundaryAction(
+            name="Sensor",
+            interface=Interface(forward_out=(port("Temperature"),)),
+        )
+        wind = BoundaryAction(
+            name="Wind",
+            interface=Interface(forward_out=(port("Force"),)),
+            tags={"role": "disturbance"},
+        )
+        spec.register_block(sensor)
+        spec.register_block(wind)
+        canonical = project_canonical(spec)
+        assert canonical.input_ports == (("Sensor", "Temperature"),)
+        assert canonical.disturbance_ports == (("Wind", "Force"),)
+        assert canonical.has_disturbances is True
+
+    def test_no_disturbance_all_in_input_ports(self):
+        """Without disturbance tags, all BoundaryAction ports are input_ports."""
+        spec = GDSSpec(name="NoDist")
+        sensor = BoundaryAction(
+            name="Sensor",
+            interface=Interface(forward_out=(port("Temperature"),)),
+        )
+        env = BoundaryAction(
+            name="Environment",
+            interface=Interface(forward_out=(port("Humidity"),)),
+        )
+        spec.register_block(sensor)
+        spec.register_block(env)
+        canonical = project_canonical(spec)
+        assert len(canonical.input_ports) == 2
+        assert canonical.disturbance_ports == ()
+        assert canonical.has_disturbances is False
