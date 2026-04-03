@@ -112,6 +112,27 @@ graph TD
 
 **Legend:** :blue_square: Core | :yellow_square: Domain DSLs | :green_square: Simulation & Analysis | :purple_square: Tooling
 
+## For AI Agents and LLMs
+
+This documentation is available in a machine-readable format for AI coding
+assistants, agents, and LLMs:
+
+| Resource | URL | Use |
+|----------|-----|-----|
+| **llms.txt** | [/llms.txt](https://blockscience.github.io/gds-core/llms.txt) | Compact index of all documentation pages with one-line descriptions |
+| **llms-full.txt** | [/llms-full.txt](https://blockscience.github.io/gds-core/llms-full.txt) | Full concatenated documentation — feed this to an LLM for complete context on the GDS ecosystem |
+
+**If you are an AI agent** working with gds-core, fetch `llms-full.txt` to get
+a comprehensive understanding of the framework's architecture, all 14 packages,
+the composition algebra, verification engine, and domain DSLs. The file follows
+the [llms.txt](https://llmstxt.org) standard and contains every documentation
+page in this site as plain Markdown.
+
+## Changelog
+
+See the [Changelog](changelog.md) for a complete history of releases, breaking
+changes, and new capabilities across all packages.
+
 ## License
 
 Apache-2.0 — [BlockScience](https://block.science)
