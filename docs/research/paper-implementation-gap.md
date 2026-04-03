@@ -19,10 +19,10 @@
 | State Space (Def 2.1) | X | `Entity` + `StateVariable`; X = product of all entity variables | Product structure is explicit |
 | State (Def 2.2) | x in X | Dict of entity -> variable -> value | At runtime only (gds-sim) |
 | Trajectory (Def 2.3) | x_0, x_1, ... | gds-sim trajectory execution | Deferred to simulation package |
-| Input Space (Def 2.4) | U | `BoundaryAction.forward_out` ports | Structural only |
-| Input (Def 2.4) | u in U | Signal on boundary port | At runtime only |
+| Input Space (Def 2.4) | U (paper) / Z (codebase) | `BoundaryAction.forward_out` ports | Structural only. Codebase uses Z for exogenous signals to avoid conflation with the paper's u (selected action). |
+| Input (Def 2.4) | u in U (paper) / z in Z (codebase) | Signal on boundary port | At runtime only |
 | State Update Map (Def 2.6) | f : X x U_x -> X | `Mechanism` blocks with `updates` field | Structural skeleton only -- f_struct (which entity/variable) is captured, f_behav (the function) is not stored |
-| Input Map (Def 2.8) | g : X -> U_x | `Policy` blocks | Same: structural identity only |
+| Input Map (Def 2.8) | g : X -> U_x (paper) / g : X x Z -> D (codebase) | `Policy` blocks | Same: structural identity only. Codebase interposes explicit decision space D and exogenous signals Z. |
 | State Transition Map (Def 2.9) | h = f\|_x . g | `project_canonical()` computes formula | Declared composition, not executable |
 | GDS (Def 2.10) | {h, X} | `CanonicalGDS` dataclass | Faithful for structural identity |
 
@@ -79,9 +79,9 @@ h(x) = f(x, g(x))      (autonomous after g is fixed)
 
 **Software:**
 ```
-g : X x U -> D          (policy: state x exogenous input -> decisions)
+g : X x Z -> D          (policy: state x exogenous signals -> decisions)
 f : X x D -> X          (mechanism: state x decisions -> next state)
-h(x) = f(x, g(x, u))   (not autonomous -- exogenous U remains)
+h(x) = f(x, g(x, z))   (not autonomous -- exogenous Z remains)
 ```
 
 Key differences:

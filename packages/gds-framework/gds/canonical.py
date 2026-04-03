@@ -6,11 +6,20 @@ from a GDSSpec:
     h_θ : X → X  where θ ∈ Θ
 
     X = state space (product of entity variables)
-    U = input space (BoundaryAction outputs)
+    Z = exogenous signal space (BoundaryAction outputs)
     D = decision space (Policy outputs)
-    g = policy mapping: X x U → D
+    g = policy mapping: X x Z → D
     f = state transition: X x D → X
     Θ = parameter space (ParameterSchema)
+
+Notation mapping (codebase vs paper):
+    Paper (Zargham & Shorish 2022) uses u ∈ U_x for the selected action
+    and g(x) for the input map. The codebase interposes an explicit
+    decision space D and exogenous signal space Z (external factors):
+        Paper's u (action)  ↔  codebase's d (decision, Policy output)
+        Paper's U_x         ↔  codebase's D (decision space)
+        Paper's g(x)        ↔  codebase's g(x, z)
+        Bosch lectures' z   ↔  codebase's z (exogenous signals)
 
 This is a **pure function** of GDSSpec — always derivable, never authoritative.
 GDSSpec remains ground truth.
@@ -44,7 +53,7 @@ class CanonicalGDS(BaseModel):
     # Parameter space Θ
     parameter_schema: ParameterSchema = Field(default_factory=ParameterSchema)
 
-    # Input space U: (block_name, port_name) from BoundaryAction forward_out
+    # Exogenous signal space Z: (block_name, port_name) from BoundaryAction forward_out
     input_ports: tuple[tuple[str, str], ...] = ()
 
     # Decision space D: (block_name, port_name) from Policy forward_out
@@ -120,7 +129,7 @@ def project_canonical(spec: GDSSpec) -> CanonicalGDS:
         elif isinstance(block, Mechanism):
             mechanism_blocks.append(bname)
 
-    # 4. Input space U: BoundaryAction forward_out ports
+    # 4. Exogenous signal space Z: BoundaryAction forward_out ports
     input_ports: list[tuple[str, str]] = []
     for bname in boundary_blocks:
         block = spec.blocks[bname]

@@ -196,7 +196,7 @@ class TestExogenousEndogenousMixing:
         assert not set(canonical.boundary_blocks) & set(canonical.policy_blocks)
 
     def test_input_ports_from_boundary_only(self, canonical):
-        """Input space U comes exclusively from BoundaryAction forward_out."""
+        """Exogenous signal space Z comes exclusively from BoundaryAction forward_out."""
         input_blocks = {block for block, _port in canonical.input_ports}
         assert input_blocks == set(canonical.boundary_blocks)
 

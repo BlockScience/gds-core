@@ -29,13 +29,13 @@ flowchart LR
 
 ## What You'll Learn
 
-- **ControlAction** role — the 4th block role, for admissibility/control decisions
+- **ControlAction** role — the 4th block role, for output observables
 - Complete 4-role taxonomy: BoundaryAction → Policy → ControlAction → Mechanism
-- ControlAction vs Policy: Policy is core decision logic (g), ControlAction constrains the action space (d)
-- `params_used` on ControlAction — parameterized admissibility rules
+- ControlAction vs Policy: Policy is decision logic g(x, z) → d, ControlAction is the output observable y = C(x, d)
+- `params_used` on ControlAction — parameterized output computation
 
 !!! note "Key distinction"
-    Premium Calculation is **ControlAction** because it enforces admissibility constraints — it decides what's *allowed*, not what to do.
+    Premium Calculation is **ControlAction** because it computes an observable output signal — the premium rate that downstream mechanisms consume. It maps state and decisions to an output, rather than making the core risk assessment decision.
 
 ## Files
 

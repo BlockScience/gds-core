@@ -104,7 +104,7 @@ def build_system():
 | State vs Signal | State persists (Entity). Signals are transient (Space). |
 | Parameter vs Input | Parameters fixed per run (Θ). Inputs vary per step (BoundaryAction). |
 | Which operator | Linear → `>>`. Independent → `\|`. Backward → `.feedback()`. Iteration → `.loop()`. |
-| ControlAction vs Policy | Policy = decision logic (g). ControlAction = admissibility constraint (d). |
+| ControlAction vs Policy | Policy = decision logic g(x, z) → d. ControlAction = output observable y = C(x, d). |
 
 ## Role Constraints
 

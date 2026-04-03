@@ -2,10 +2,10 @@
 
 These roles decompose the transition function h into typed components:
 
-- **BoundaryAction** — exogenous input (GDS admissible inputs U)
-- **ControlAction** — endogenous control (reads state, emits signals)
-- **Policy** — decision logic (maps signals to mechanism inputs)
-- **Mechanism** — state update (the only component that writes state)
+- **BoundaryAction** — exogenous signals entering the system (z ∈ Z)
+- **ControlAction** — output observable y = C(x, d) for inter-system composition
+- **Policy** — decision logic d = g(x, z) mapping signals to mechanism inputs
+- **Mechanism** — state update x' = f(x, d), the only component that writes state
 
 Each role subclasses AtomicBlock, inheriting composition operators and
 flatten(). Role-specific validators enforce structural constraints.
@@ -50,9 +50,9 @@ class HasOptions(Protocol):
 
 
 class BoundaryAction(AtomicBlock):
-    """Exogenous input — enters the system from outside.
+    """Exogenous signal — enters the system from outside.
 
-    In GDS terms: part of the admissible input set U.
+    In GDS terms: part of the exogenous signal space Z.
     Boundary actions model external agents, oracles, user inputs,
     environmental signals — anything the system doesn't control.
 
@@ -76,10 +76,12 @@ class BoundaryAction(AtomicBlock):
 
 
 class ControlAction(AtomicBlock):
-    """Endogenous control — reads state, emits control signals.
+    """Output observable — maps state and decisions to observable output.
 
-    These are internal feedback loops: the system observing itself
-    and generating signals that influence downstream policy/mechanism blocks.
+    In GDS terms: the output map y = C(x, d). From the plant (inside)
+    perspective, this is the system's observable output. From the
+    controller (outside) perspective at a >> composition boundary,
+    this output becomes a control action on the next system.
     """
 
     kind: str = "control"
@@ -95,7 +97,7 @@ class Policy(AtomicBlock):
     scenario analysis and A/B testing.
 
     In GDS terms: policies implement the decision mapping
-    within the admissibility constraint.
+    d = g(x, z) within the canonical form h = f ∘ g.
     """
 
     kind: str = "policy"

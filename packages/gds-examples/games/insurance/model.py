@@ -1,15 +1,16 @@
-"""Insurance Contract Model — ControlAction for admissibility.
+"""Insurance Contract Model — ControlAction as output observable.
 
-Demonstrates the ControlAction role, which reads state and emits
-control signals (unlike Mechanism which writes state, and unlike
-BoundaryAction which has no forward inputs).
+Demonstrates the ControlAction role, which maps state and decisions
+to an observable output y = C(x, d) for composition with other systems
+(unlike Mechanism which writes state, and unlike BoundaryAction which
+has no forward inputs).
 
 Concepts Covered:
     - ControlAction role — the 4th and final block role
     - Complete 4-role taxonomy: BoundaryAction, Policy, ControlAction, Mechanism
     - Pure sequential pipeline (no feedback or temporal loops)
     - Mechanism with forward_out for chaining (Claim Payout → Reserve Update)
-    - params_used on ControlAction (Θ for admissibility constraints)
+    - params_used on ControlAction (Θ for output computation)
 
 Prerequisites: sir_epidemic (basic roles, >>)
 
@@ -239,7 +240,7 @@ def build_spec() -> GDSSpec:
     spec.register_block(claim_payout)
     spec.register_block(reserve_update)
 
-    # Parameters — Θ: admissibility constraints for the ControlAction
+    # Parameters — Θ: output computation parameters for the ControlAction
     spec.register_parameter("base_premium_rate", PremiumRate)
     spec.register_parameter("deductible", Currency)
     spec.register_parameter("coverage_limit", Currency)

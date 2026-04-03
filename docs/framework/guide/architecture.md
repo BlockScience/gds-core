@@ -66,7 +66,7 @@ Auto-wiring for `>>` matches `forward_out` ports to `forward_in` ports by token 
 `project_canonical(spec: GDSSpec) → CanonicalGDS` derives the formal GDS decomposition:
 
 - **X** — state space (all Entity variables)
-- **U** — input space (BoundaryAction outputs)
+- **Z** — exogenous signal space (BoundaryAction outputs)
 - **D** — decision space (Policy outputs)
 - **Θ** — parameter space (ParameterSchema)
 - **g** — policy map (BoundaryAction + Policy blocks)
