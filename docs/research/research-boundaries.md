@@ -24,7 +24,7 @@ x' = f(x, d)
 Key structural facts:
 
 - Canonical `h = f ∘ g` has survived three domains with no extensions required.
-- No DSL uses `ControlAction` — all non-state-updating blocks map to `Policy`.
+- No DSL compiler emits `ControlAction` blocks -- all non-state-updating blocks map to `Policy`. The `ControlAction` role serves as the output map `y = C(x, d)` for explicit inter-system composition at `>>` boundaries.
 - Role partition (boundary, policy, mechanism) is complete and disjoint in every case.
 - Cross-built equivalence (DSL-compiled vs hand-built) has been verified at Spec, Canonical, and SystemIR levels for all validated DSLs.
 - OGS canonical validation confirms `f = ∅`, `X = ∅` — compositional game theory is a **degenerate dynamical system** where `h = g` (pure policy, no state transition). See [RQ3](#research-question-3-ogs-as-degenerate-dynamical-system) below.

@@ -2,7 +2,8 @@
 
 import pytest
 
-from gds.blocks.roles import Mechanism, Policy
+from gds.blocks.roles import BoundaryAction, ControlAction, Mechanism, Policy
+from gds.canonical import project_canonical
 from gds.spec import GDSSpec, SpecWiring, Wire
 from gds.state import Entity, StateVariable
 from gds.types.interface import Interface, port
@@ -10,6 +11,7 @@ from gds.types.typedef import TypeDef
 from gds.verification.findings import Severity
 from gds.verification.spec_checks import (
     check_completeness,
+    check_controlaction_pathway,
     check_determinism,
     check_reachability,
     check_type_safety,
@@ -227,3 +229,171 @@ class TestTypeSafety:
         findings = check_type_safety(spec)
         passed = [f for f in findings if f.passed]
         assert len(passed) >= 1
+
+
+# ── SC-010: ControlAction pathway ──────────────────────────
+
+
+class TestControlActionPathway:
+    def test_no_controlaction_returns_empty(self):
+        """Specs without ControlAction blocks produce no findings."""
+        spec = GDSSpec(name="NoCA")
+        p = Policy(name="P")
+        m = Mechanism(name="M")
+        spec.register_block(p)
+        spec.register_block(m)
+        findings = check_controlaction_pathway(spec)
+        assert len(findings) == 0
+
+    def test_controlaction_not_wired_to_g_passes(self):
+        """ControlAction wired to Mechanism (f pathway) passes SC-010."""
+        spec = GDSSpec(name="ValidCA")
+        ca = ControlAction(
+            name="Output",
+            interface=Interface(
+                forward_in=(port("State"),),
+                forward_out=(port("Observation"),),
+            ),
+        )
+        m = Mechanism(
+            name="Plant",
+            interface=Interface(forward_in=(port("Observation"),)),
+            updates=[("Room", "temperature")],
+        )
+        spec.register_block(ca)
+        spec.register_block(m)
+        spec.register_wiring(
+            SpecWiring(
+                name="CAtoMech",
+                block_names=["Output", "Plant"],
+                wires=[Wire(source="Output", target="Plant")],
+            )
+        )
+        findings = check_controlaction_pathway(spec)
+        passed = [f for f in findings if f.passed]
+        assert len(passed) == 1
+        assert passed[0].check_id == "SC-010"
+
+    def test_controlaction_wired_to_policy_warns(self):
+        """ControlAction wired to Policy (g pathway) produces WARNING."""
+        spec = GDSSpec(name="BadCA")
+        ca = ControlAction(
+            name="Output",
+            interface=Interface(
+                forward_in=(port("State"),),
+                forward_out=(port("Signal"),),
+            ),
+        )
+        p = Policy(
+            name="Controller",
+            interface=Interface(
+                forward_in=(port("Signal"),),
+                forward_out=(port("Command"),),
+            ),
+        )
+        spec.register_block(ca)
+        spec.register_block(p)
+        spec.register_wiring(
+            SpecWiring(
+                name="CAtoPolicy",
+                block_names=["Output", "Controller"],
+                wires=[Wire(source="Output", target="Controller")],
+            )
+        )
+        findings = check_controlaction_pathway(spec)
+        failed = [f for f in findings if not f.passed]
+        assert len(failed) == 1
+        assert failed[0].check_id == "SC-010"
+        assert failed[0].severity == Severity.WARNING
+        assert "g-pathway" in failed[0].message
+
+    def test_controlaction_wired_to_boundary_warns(self):
+        """ControlAction wired to BoundaryAction (g pathway) produces WARNING."""
+        spec = GDSSpec(name="BadCA2")
+        ca = ControlAction(
+            name="Output",
+            interface=Interface(
+                forward_in=(port("State"),),
+                forward_out=(port("Signal"),),
+            ),
+        )
+        ba = BoundaryAction(
+            name="Boundary",
+            interface=Interface(forward_out=(port("Env"),)),
+        )
+        spec.register_block(ca)
+        spec.register_block(ba)
+        spec.register_wiring(
+            SpecWiring(
+                name="CAtoBoundary",
+                block_names=["Output", "Boundary"],
+                wires=[Wire(source="Output", target="Boundary")],
+            )
+        )
+        findings = check_controlaction_pathway(spec)
+        failed = [f for f in findings if not f.passed]
+        assert len(failed) == 1
+        assert failed[0].check_id == "SC-010"
+
+
+# ── Canonical output_ports extraction ──────────────────────
+
+
+class TestCanonicalOutputPorts:
+    def test_output_ports_extracted_from_controlaction(self):
+        """project_canonical extracts output_ports from ControlAction forward_out."""
+        spec = GDSSpec(name="WithCA")
+        ca = ControlAction(
+            name="Sensor Output",
+            interface=Interface(
+                forward_in=(port("State"),),
+                forward_out=(port("Temperature"), port("Humidity")),
+            ),
+        )
+        spec.register_block(ca)
+        canonical = project_canonical(spec)
+        assert canonical.output_ports == (
+            ("Sensor Output", "Temperature"),
+            ("Sensor Output", "Humidity"),
+        )
+        assert canonical.control_blocks == ("Sensor Output",)
+
+    def test_output_ports_empty_without_controlaction(self):
+        """project_canonical has empty output_ports when no ControlAction exists."""
+        spec = GDSSpec(name="NoCA")
+        p = Policy(name="P", interface=Interface(forward_out=(port("X"),)))
+        spec.register_block(p)
+        canonical = project_canonical(spec)
+        assert canonical.output_ports == ()
+
+    def test_formula_includes_output_map_when_controlaction(self):
+        """formula() includes y = C(x, d) when ControlAction blocks exist."""
+        spec = GDSSpec(name="WithCA")
+        ca = ControlAction(
+            name="Output",
+            interface=Interface(
+                forward_in=(port("State"),),
+                forward_out=(port("Y"),),
+            ),
+        )
+        p = Policy(
+            name="Controller",
+            interface=Interface(forward_in=(port("Z"),), forward_out=(port("D"),)),
+        )
+        m = Mechanism(name="Plant", updates=[("E", "x")])
+        spec.register_block(ca)
+        spec.register_block(p)
+        spec.register_block(m)
+        formula = project_canonical(spec).formula()
+        assert "y = C(x, d)" in formula
+        assert "f" in formula
+
+    def test_formula_no_output_map_without_controlaction(self):
+        """formula() omits C when no ControlAction blocks exist."""
+        spec = GDSSpec(name="NoCA")
+        p = Policy(name="P")
+        m = Mechanism(name="M", updates=[("E", "x")])
+        spec.register_block(p)
+        spec.register_block(m)
+        formula = project_canonical(spec).formula()
+        assert "C(x, d)" not in formula
