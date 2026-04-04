@@ -1,0 +1,85 @@
+[project]
+name = "gds-sysml"
+dynamic = ["version"]
+description = "SysML v2 bridge for gds-framework via OSLC RDF vocabulary"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.12"
+authors = [
+    { name = "Rohan Mehta", email = "rohan@block.science" },
+]
+keywords = [
+    "generalized-dynamical-systems",
+    "sysml",
+    "sysml-v2",
+    "oslc",
+    "rdf",
+    "model-interchange",
+    "gds-framework",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+dependencies = [
+    "gds-framework>=0.3.0",
+    "gds-owl>=0.2.0",
+    "rdflib>=7.0",
+]
+
+[project.optional-dependencies]
+syson = [
+    "httpx>=0.27",
+]
+
+[project.urls]
+Homepage = "https://github.com/BlockScience/gds-core"
+Repository = "https://github.com/BlockScience/gds-core"
+Documentation = "https://blockscience.github.io/gds-core"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "gds_sysml/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["gds_sysml"]
+
+[tool.uv.sources]
+gds-framework = { workspace = true }
+gds-owl = { workspace = true }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--import-mode=importlib --cov=gds_sysml --cov-report=term-missing --no-header -q"
+
+[tool.coverage.run]
+source = ["gds_sysml"]
+omit = ["gds_sysml/__init__.py"]
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true
+exclude_lines = [
+    "if TYPE_CHECKING:",
+    "pragma: no cover",
+]
+
+[dependency-groups]
+dev = [
+    "mypy>=1.19.1",
+    "pyright>=1.1.408",
+    "pytest>=8.0",
+    "pytest-cov>=6.0",
+    "ruff>=0.8",
+]
