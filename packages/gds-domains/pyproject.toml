@@ -59,6 +59,9 @@ path = "gds_domains/__init__.py"
 [tool.hatch.build.targets.wheel]
 packages = ["gds_domains"]
 
+[tool.hatch.build]
+include = ["gds_domains/**/*.py", "gds_domains/**/*.j2", "gds_domains/**/py.typed"]
+
 [tool.uv.sources]
 gds-framework = { workspace = true }
 
