@@ -75,7 +75,7 @@ def __getattr__(name: str) -> object:
         "NashResult",
         "PayoffMatrices",
     ):
-        from ogs import equilibrium
+        from gds_domains.games import equilibrium
 
         return getattr(equilibrium, name)
-    raise AttributeError(f"module 'ogs' has no attribute {name!r}")
+    raise AttributeError(f"module 'gds_domains.games' has no attribute {name!r}")
