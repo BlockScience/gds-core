@@ -5,6 +5,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import pytest
+from gds_psuu.evaluation import EvaluationResult
+from gds_psuu.results import SweepResults
 from gds_sim import Results
 
 from gds_psuu import (
@@ -19,8 +21,6 @@ from gds_psuu import (
     WeightedSum,
     final_state_mean,
 )
-from gds_psuu.evaluation import EvaluationResult
-from gds_psuu.results import SweepResults
 
 if TYPE_CHECKING:
     from gds_sim import Model
@@ -208,8 +208,9 @@ class TestBayesianOptimizer:
         assert len(results.evaluations) == 5
 
     def test_bayesian_bad_target_kpi(self) -> None:
-        from gds_psuu import BayesianOptimizer
         from gds_psuu.errors import PsuuSearchError
+
+        from gds_psuu import BayesianOptimizer
 
         opt = BayesianOptimizer(n_trials=5, target_kpi="nonexistent")
         space = ParameterSpace(params={"x": Continuous(min_val=0, max_val=1)})

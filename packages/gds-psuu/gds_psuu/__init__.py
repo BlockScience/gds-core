@@ -11,7 +11,7 @@ warnings.warn(
 
 __version__ = "0.99.0"
 
-from gds_analysis.psuu import (  # noqa: F401, E402
+from gds_analysis.psuu import (  # noqa: E402
     KPI,
     Aggregation,
     AggregationFn,
@@ -35,8 +35,8 @@ from gds_analysis.psuu import (  # noqa: F401, E402
     OATAnalyzer,
     Objective,
     Optimizer,
-    ParamPoint,
     ParameterSpace,
+    ParamPoint,
     PsuuError,
     PsuuSearchError,
     PsuuValidationError,

@@ -1,6 +1,5 @@
 """gds-symbolic: Symbolic math bridge for the GDS ecosystem."""
 
-
 from gds_domains.symbolic.elements import OutputEquation, StateEquation
 from gds_domains.symbolic.errors import SymbolicError
 from gds_domains.symbolic.hamiltonian import (

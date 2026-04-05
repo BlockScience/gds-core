@@ -113,10 +113,10 @@ class TestDeriveFromModel:
 
     def test_from_symbolic_model(self) -> None:
         from gds_control.dsl.elements import Input, State
-
-        from gds_symbolic import SymbolicControlModel
         from gds_symbolic.elements import StateEquation
         from gds_symbolic.hamiltonian import derive_from_model
+
+        from gds_symbolic import SymbolicControlModel
 
         model = SymbolicControlModel(
             name="LQR",
