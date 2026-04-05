@@ -9,10 +9,12 @@ body:
       description: Which package is affected?
       options:
         - gds-framework
+        - gds-domains
+        - gds-sim
+        - gds-continuous
+        - gds-analysis
+        - gds-interchange
         - gds-viz
-        - gds-games
-        - gds-stockflow
-        - gds-control
         - gds-examples
     validations:
       required: true
