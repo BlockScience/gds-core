@@ -9,10 +9,12 @@ body:
       description: Which package does this relate to?
       options:
         - gds-framework
+        - gds-domains
+        - gds-sim
+        - gds-continuous
+        - gds-analysis
+        - gds-interchange
         - gds-viz
-        - gds-games
-        - gds-stockflow
-        - gds-control
         - gds-examples
         - Other/New
     validations:
