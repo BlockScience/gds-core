@@ -28,7 +28,7 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "gds-analysis>=0.1.1",
+    "gds-analysis>=0.1.2",
 ]
 
 [project.optional-dependencies]
