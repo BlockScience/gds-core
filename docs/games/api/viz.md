@@ -1,3 +1,3 @@
-# ogs.viz
+# gds_domains.games.viz
 
-::: ogs.viz
+::: gds_domains.games.viz

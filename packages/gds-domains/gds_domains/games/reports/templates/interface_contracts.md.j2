@@ -1,0 +1,71 @@
+# {{ pattern.name }} — Interface Contracts
+
+> Auto-generated interface specification from `{{ pattern.source_canvas }}`
+
+{% for game in pattern.games %}
+## {{ game.name }}
+
+| Property | Value |
+|----------|-------|
+| **Game Type** | {{ game.game_type.value }} |
+| **Color Code** | {{ game.color_code }} |
+{% if game.gds_function %}| **GDS Function** | `{{ game.gds_function }}` |
+{% endif %}
+
+### Signature
+
+| Slot | Type | Description |
+|------|------|-------------|
+| **X** (observation) | `{{ game.signature[0] if game.signature[0] else "∅" }}` | Covariant input |
+| **Y** (choice) | `{{ game.signature[1] if game.signature[1] else "∅" }}` | Covariant output |
+| **R** (utility) | `{{ game.signature[2] if game.signature[2] else "∅" }}` | Contravariant input |
+| **S** (coutility) | `{{ game.signature[3] if game.signature[3] else "∅" }}` | Contravariant output |
+
+### Information Flows
+
+{% set incoming = flows_by_game[game.name].incoming -%}
+{% set outgoing = flows_by_game[game.name].outgoing -%}
+
+{% if incoming -%}
+**Incoming:**
+
+{% for flow in incoming -%}
+- {{ flow.label }} ← {{ flow.source }} ({{ flow.direction.value }}, {{ flow.flow_type.value }})
+{% endfor %}
+
+{% endif -%}
+{% if outgoing -%}
+**Outgoing:**
+
+{% for flow in outgoing -%}
+- {{ flow.label }} → {{ flow.target }} ({{ flow.direction.value }}, {{ flow.flow_type.value }})
+{% endfor %}
+
+{% endif %}
+
+{% if game.logic -%}
+### Internal Logic
+
+> {{ game.logic }}
+
+{% endif -%}
+
+{% if game.constraints -%}
+### Constraints
+
+{% for c in game.constraints -%}
+- {{ c }}
+{% endfor %}
+{% endif -%}
+
+---
+
+{% endfor %}
+
+## Flow Summary
+
+| # | Source | Target | Label | Direction | Type |
+|---|--------|--------|-------|-----------|------|
+{% for flow in pattern.flows -%}
+| {{ loop.index }} | {{ flow.source }} | {{ flow.target }} | {{ flow.label }} | {{ flow.direction.value }} | {{ flow.flow_type.value }} |
+{% endfor %}

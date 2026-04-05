@@ -18,7 +18,7 @@ Every game has a `Signature` — a mapping from game-theoretic ports `(x, y, r, 
 A strategic agent that observes state, chooses an action, receives utility, and emits coutility.
 
 ```python
-from ogs.dsl.games import DecisionGame
+from gds_domains.games.dsl.games import DecisionGame
 
 agent = DecisionGame(name="Agent", x="signal", y="action", r="reward", s="experience")
 ```
@@ -30,7 +30,7 @@ Has all four ports: x, y, r, s.
 A forward-only transformation — no backward ports.
 
 ```python
-from ogs.dsl.games import CovariantFunction
+from gds_domains.games.dsl.games import CovariantFunction
 
 sensor = CovariantFunction(name="Sensor", x="observation", y="signal")
 ```
@@ -42,7 +42,7 @@ Has x and y only.
 A backward-only transformation — no forward ports.
 
 ```python
-from ogs.dsl.games import ContravariantFunction
+from gds_domains.games.dsl.games import ContravariantFunction
 
 cost = ContravariantFunction(name="Cost", r="total_cost", s="unit_cost")
 ```
@@ -54,7 +54,7 @@ Has r and s only.
 Discards a forward signal — has x but no y.
 
 ```python
-from ogs.dsl.games import DeletionGame
+from gds_domains.games.dsl.games import DeletionGame
 
 sink = DeletionGame(name="Sink", x="unused_signal")
 ```
@@ -64,7 +64,7 @@ sink = DeletionGame(name="Sink", x="unused_signal")
 Copies a forward signal — has x and produces two copies.
 
 ```python
-from ogs.dsl.games import DuplicationGame
+from gds_domains.games.dsl.games import DuplicationGame
 
 split = DuplicationGame(name="Split", x="signal", y="signal+signal")
 ```
@@ -74,7 +74,7 @@ split = DuplicationGame(name="Split", x="signal", y="signal+signal")
 Terminal evaluation — has r but no s.
 
 ```python
-from ogs.dsl.games import CounitGame
+from gds_domains.games.dsl.games import CounitGame
 
 evaluate = CounitGame(name="Evaluate", r="final_utility")
 ```

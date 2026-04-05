@@ -5,8 +5,8 @@ gds-games includes 6 Mermaid diagram generators in `ogs.viz`.
 ## Generating Diagrams
 
 ```python
-from ogs import compile_to_ir
-from ogs.viz import generate_all_views
+from gds_domains.games import compile_to_ir
+from gds_domains.games.viz import generate_all_views
 
 ir = compile_to_ir(pattern)
 views = generate_all_views(ir.patterns[0])
@@ -29,7 +29,7 @@ for name, mermaid in views.items():
 ## Individual Views
 
 ```python
-from ogs.viz import structural_to_mermaid, hierarchy_to_mermaid
+from gds_domains.games.viz import structural_to_mermaid, hierarchy_to_mermaid
 
 structural = structural_to_mermaid(pattern_ir)
 hierarchy = hierarchy_to_mermaid(pattern_ir)

@@ -27,48 +27,41 @@ classifiers = [
 dependencies = ["gds-framework>=0.2.3"]
 
 [project.optional-dependencies]
-# Domain DSLs
+# Domain DSLs (consolidated)
+domains = ["gds-domains[all]>=0.1.0"]
 viz = ["gds-viz>=0.1.0"]
-games = ["gds-games>=0.1.0"]
-stockflow = ["gds-stockflow>=0.1.0"]
-control = ["gds-control>=0.1.0"]
-software = ["gds-software>=0.1.0"]
-business = ["gds-business>=0.1.0"]
 # Simulation & analysis
 sim = ["gds-sim>=0.1.0"]
 continuous = ["gds-continuous>=0.1.0"]
-symbolic = ["gds-symbolic>=0.1.0"]
-analysis = ["gds-analysis>=0.1.0"]
-psuu = ["gds-psuu>=0.1.0"]
-# Formal methods
-owl = ["gds-owl>=0.1.0"]
+analysis = ["gds-analysis[all]>=0.1.0"]
+# Interchange
+interchange = ["gds-interchange[all]>=0.1.0"]
 # Tutorials
 examples = [
     "gds-examples>=0.1.0",
     "gds-viz>=0.1.0",
-    "gds-games>=0.1.0",
-    "gds-stockflow>=0.1.0",
-    "gds-control>=0.1.0",
-    "gds-software>=0.1.0",
-    "gds-business>=0.1.0",
+    "gds-domains[all]>=0.1.0",
     "gds-sim>=0.1.0",
 ]
 # Everything
 all = [
+    "gds-domains[all]>=0.1.0",
     "gds-viz>=0.1.0",
-    "gds-games>=0.1.0",
-    "gds-stockflow>=0.1.0",
-    "gds-control>=0.1.0",
-    "gds-software>=0.1.0",
-    "gds-business>=0.1.0",
     "gds-sim>=0.1.0",
     "gds-continuous>=0.1.0",
-    "gds-symbolic>=0.1.0",
-    "gds-analysis>=0.1.0",
-    "gds-psuu>=0.1.0",
-    "gds-owl>=0.1.0",
+    "gds-analysis[all]>=0.1.0",
+    "gds-interchange[all]>=0.1.0",
     "gds-examples>=0.1.0",
 ]
+# Deprecated aliases (use consolidated packages above)
+games = ["gds-domains[games]>=0.1.0"]
+stockflow = ["gds-domains>=0.1.0"]
+control = ["gds-domains>=0.1.0"]
+software = ["gds-domains>=0.1.0"]
+business = ["gds-domains>=0.1.0"]
+symbolic = ["gds-domains[symbolic]>=0.1.0"]
+psuu = ["gds-analysis[psuu]>=0.1.0"]
+owl = ["gds-interchange>=0.1.0"]
 
 [project.urls]
 Homepage = "https://github.com/BlockScience/gds-core"
@@ -96,6 +89,8 @@ gds-continuous = { workspace = true }
 gds-symbolic = { workspace = true }
 gds-analysis = { workspace = true }
 gds-psuu = { workspace = true }
+gds-domains = { workspace = true }
+gds-interchange = { workspace = true }
 gds-owl = { workspace = true }
 
 [tool.uv.workspace]
@@ -113,7 +108,7 @@ select = ["E", "W", "F", "I", "UP", "B", "SIM", "TCH", "RUF"]
 "packages/gds-examples/prisoners_dilemma/visualize.py" = ["E501"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["gds", "gds_viz", "ogs", "stockflow", "gds_control", "gds_software", "gds_business", "gds_sim", "gds_continuous", "gds_symbolic", "gds_psuu", "gds_owl"]
+known-first-party = ["gds", "gds_viz", "ogs", "stockflow", "gds_control", "gds_software", "gds_business", "gds_sim", "gds_continuous", "gds_symbolic", "gds_psuu", "gds_owl", "gds_interchange", "gds_domains"]
 
 [dependency-groups]
 docs = [

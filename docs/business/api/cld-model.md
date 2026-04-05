@@ -1,5 +1,5 @@
-# gds_business.cld.model
+# gds_domains.business.cld.model
 
 CausalLoopModel — declarative container for causal loop diagrams.
 
-::: gds_business.cld.model.CausalLoopModel
+::: gds_domains.business.cld.model.CausalLoopModel

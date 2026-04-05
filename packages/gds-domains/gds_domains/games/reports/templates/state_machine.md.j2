@@ -1,0 +1,64 @@
+# {{ pattern.name }} — State Machine & Execution Sequence
+
+> Auto-generated state machine report from `{{ pattern.source_canvas }}`
+
+## Composition
+
+| Property | Value |
+|----------|-------|
+| **Composition Type** | {{ pattern.composition_type.value }} |
+| **Has Feedback** | {{ "Yes" if has_feedback else "No" }} |
+| **Game Count** | {{ pattern.games | length }} |
+
+{% if gds_games %}
+## State Transition Table (GDS Functions)
+
+| Game | GDS Function | Equation | Constraints |
+|------|-------------|----------|-------------|
+{% for game in gds_games -%}
+| {{ game.name }} | `{{ game.gds_function }}` | See below | {{ game.constraints | join("; ") if game.constraints else "—" }} |
+{% endfor %}
+
+{% for game in gds_games %}
+### {{ game.name }}
+
+- **GDS Function:** `{{ game.gds_function }}`
+{% if game.constraints -%}
+- **Constraints:**
+{% for c in game.constraints -%}
+  - `{{ c }}`
+{% endfor %}
+{% endif -%}
+
+{% endfor %}
+{% endif %}
+
+{% if feedback_flows %}
+## Feedback Loops
+
+The following contravariant flows create feedback in the composition:
+
+| Source | Target | Label | Flow Type |
+|--------|--------|-------|-----------|
+{% for flow in feedback_flows -%}
+| {{ flow.source }} | {{ flow.target }} | {{ flow.label }} | {{ flow.flow_type.value }} |
+{% endfor %}
+{% endif %}
+
+{% if pattern.initialization %}
+## Initial Conditions
+
+| Symbol | Space | Description | Game |
+|--------|-------|-------------|------|
+{% for init in pattern.initialization -%}
+| `{{ init.symbol }}` | `{{ init.space }}` | {{ init.description }} | {{ init.game if init.game else "—" }} |
+{% endfor %}
+{% endif %}
+
+{% if order_of_events %}
+## Order of Events (from Spec Notes)
+
+{% for event in order_of_events -%}
+{{ loop.index }}. {{ event }}
+{% endfor %}
+{% endif %}

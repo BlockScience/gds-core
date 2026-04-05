@@ -12,9 +12,9 @@ dynamical system where state = the registry contents.
 from gds import project_canonical, verify
 from gds.ir.models import SystemIR
 from gds.spec import GDSSpec
-from gds_software.erd.compile import compile_erd, compile_erd_to_system
-from gds_software.erd.elements import Attribute, Cardinality, ERDEntity, ERDRelationship
-from gds_software.erd.model import ERDModel
+from gds_domains.software.erd.compile import compile_erd, compile_erd_to_system
+from gds_domains.software.erd.elements import Attribute, Cardinality, ERDEntity, ERDRelationship
+from gds_domains.software.erd.model import ERDModel
 from gds_viz import system_to_mermaid
 
 

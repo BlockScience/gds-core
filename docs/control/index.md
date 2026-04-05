@@ -24,7 +24,7 @@ gds-framework (pip install gds-framework)
 |  Domain-neutral composition algebra, typed spaces,
 |  state model, verification engine, flat IR compiler.
 |
-+-- gds-control (pip install gds-control)
++-- gds-control (pip install gds-domains)
     |
     |  Control DSL: State, Input, Sensor, Controller elements,
     |  compile_model(), domain verification, verify() dispatch.
@@ -85,7 +85,7 @@ States carry state (X), dynamics blocks provide f, and sensors + controllers con
 
 ```bash
 uv add gds-control
-# or: pip install gds-control
+# or: pip install gds-domains
 ```
 
 See [Getting Started](getting-started.md) for a full walkthrough.

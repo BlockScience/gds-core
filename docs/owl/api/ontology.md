@@ -1,5 +1,5 @@
-# gds_owl.ontology
+# gds_interchange.owl.ontology
 
 OWL class hierarchy (TBox) -- core schema definitions.
 
-::: gds_owl.ontology
+::: gds_interchange.owl.ontology

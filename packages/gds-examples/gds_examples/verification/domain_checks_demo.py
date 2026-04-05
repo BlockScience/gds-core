@@ -14,14 +14,14 @@ Concepts Covered:
 Prerequisites: Read verification_demo.py for generic/semantic checks.
 """
 
-from stockflow.dsl.elements import Auxiliary, Converter, Flow, Stock
-from stockflow.dsl.model import StockFlowModel
-from stockflow.verification.checks import (
+from gds_domains.stockflow.dsl.elements import Auxiliary, Converter, Flow, Stock
+from gds_domains.stockflow.dsl.model import StockFlowModel
+from gds_domains.stockflow.verification.checks import (
     check_sf001_orphan_stocks,
     check_sf003_auxiliary_acyclicity,
     check_sf004_converter_connectivity,
 )
-from stockflow.verification.engine import verify
+from gds_domains.stockflow.verification.engine import verify
 
 # ══════════════════════════════════════════════════════════════════
 # Broken domain models

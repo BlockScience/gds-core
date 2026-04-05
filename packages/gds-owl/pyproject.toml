@@ -31,8 +31,7 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "gds-framework>=0.3.0",
-    "rdflib>=7.0",
+    "gds-interchange>=0.1.0",
 ]
 
 [project.optional-dependencies]
@@ -56,7 +55,7 @@ path = "gds_owl/__init__.py"
 packages = ["gds_owl"]
 
 [tool.uv.sources]
-gds-framework = { workspace = true }
+gds-interchange = { workspace = true }
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

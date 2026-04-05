@@ -1,11 +1,11 @@
-# ogs.dsl.composition
+# gds_domains.games.dsl.composition
 
-::: ogs.dsl.composition.Flow
+::: gds_domains.games.dsl.composition.Flow
 
-::: ogs.dsl.composition.SequentialComposition
+::: gds_domains.games.dsl.composition.SequentialComposition
 
-::: ogs.dsl.composition.ParallelComposition
+::: gds_domains.games.dsl.composition.ParallelComposition
 
-::: ogs.dsl.composition.FeedbackLoop
+::: gds_domains.games.dsl.composition.FeedbackLoop
 
-::: ogs.dsl.composition.CorecursiveLoop
+::: gds_domains.games.dsl.composition.CorecursiveLoop

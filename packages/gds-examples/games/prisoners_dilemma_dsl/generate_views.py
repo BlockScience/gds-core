@@ -11,7 +11,7 @@ Usage:
 import sys
 from pathlib import Path
 
-from ogs.viz import (
+from gds_domains.games.viz import (
     architecture_by_domain_to_mermaid,
     architecture_by_role_to_mermaid,
     flow_topology_to_mermaid,

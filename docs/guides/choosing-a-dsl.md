@@ -18,18 +18,18 @@ The natural workflow is: **Problem → What do I want to check? → DSL**. Once 
 
 | If your system has... | Use | Package | Why |
 |---|---|---|---|
-| Stocks accumulating over time | **gds-stockflow** | `stockflow` | Native stock/flow/auxiliary semantics with accumulation dynamics |
-| State-space dynamics (A, B, C, D matrices) | **gds-control** | `gds_control` | Control theory mapping with sensors, controllers, plant states |
-| Strategic agents making decisions | **gds-games** | `ogs` | Game-theoretic composition with utility/payoff channels |
-| Software architecture to formalize | **gds-software** | `gds_software` | Six diagram types: DFD, SM, Component, C4, ERD, Dependency |
-| Business processes or supply chains | **gds-business** | `gds_business` | Causal loop, supply chain network, value stream mapping |
+| Stocks accumulating over time | **gds-domains** | `gds_domains.stockflow` | Native stock/flow/auxiliary semantics with accumulation dynamics |
+| State-space dynamics (A, B, C, D matrices) | **gds-domains** | `gds_domains.control` | Control theory mapping with sensors, controllers, plant states |
+| Strategic agents making decisions | **gds-domains** | `gds_domains.games` | Game-theoretic composition with utility/payoff channels |
+| Software architecture to formalize | **gds-domains** | `gds_domains.software` | Six diagram types: DFD, SM, Component, C4, ERD, Dependency |
+| Business processes or supply chains | **gds-domains** | `gds_domains.business` | Causal loop, supply chain network, value stream mapping |
 | None of the above | **gds-framework** | `gds` | Build your own vocabulary on the composition algebra |
 
 ---
 
 ## DSL Profiles
 
-### gds-stockflow
+### gds-domains (stockflow)
 
 **Domain:** System dynamics -- stocks, flows, auxiliaries, converters.
 
@@ -38,8 +38,8 @@ The natural workflow is: **Problem → What do I want to check? → DSL**. Once 
 **Example:** SIR epidemic model, Lotka-Volterra predator-prey, inventory management.
 
 ```python
-from stockflow.dsl.elements import Auxiliary, Converter, Flow, Stock
-from stockflow.dsl.model import StockFlowModel
+from gds_domains.stockflow.dsl.elements import Auxiliary, Converter, Flow, Stock
+from gds_domains.stockflow.dsl.model import StockFlowModel
 
 model = StockFlowModel(
     name="Population",
@@ -61,7 +61,7 @@ model = StockFlowModel(
 
 ---
 
-### gds-control
+### gds-domains (control)
 
 **Domain:** Feedback control systems -- states, inputs, sensors, controllers.
 
@@ -70,8 +70,8 @@ model = StockFlowModel(
 **Example:** Temperature regulation, resource level tracking, robotic control.
 
 ```python
-from gds_control.dsl.elements import Controller, Input, Sensor, State
-from gds_control.dsl.model import ControlModel
+from gds_domains.control.dsl.elements import Controller, Input, Sensor, State
+from gds_domains.control.dsl.model import ControlModel
 
 model = ControlModel(
     name="Thermostat",
@@ -90,7 +90,7 @@ model = ControlModel(
 
 ---
 
-### gds-games (OGS)
+### gds-domains (games / OGS)
 
 **Domain:** Game theory -- strategic interactions, decision games, payoff computation.
 
@@ -99,9 +99,9 @@ model = ControlModel(
 **Example:** Prisoner's dilemma, resource extraction games, insurance contracts.
 
 ```python
-from ogs.dsl.games import CovariantFunction, DecisionGame
-from ogs.dsl.pattern import Pattern, PatternInput
-from ogs.dsl.types import InputType, Signature, port
+from gds_domains.games.dsl.games import CovariantFunction, DecisionGame
+from gds_domains.games.dsl.pattern import Pattern, PatternInput
+from gds_domains.games.dsl.types import InputType, Signature, port
 
 agent = DecisionGame(
     name="Player",
@@ -120,7 +120,7 @@ agent = DecisionGame(
 
 ---
 
-### gds-software
+### gds-domains (software)
 
 **Domain:** Software architecture -- six diagram types for formalizing system structure.
 
@@ -138,8 +138,8 @@ agent = DecisionGame(
 | Dependency | Module dependencies |
 
 ```python
-from gds_software.dsl.elements import DFDProcess, DFDDataStore, DFDExternalEntity
-from gds_software.dsl.model import SoftwareModel
+from gds_domains.software.dsl.elements import DFDProcess, DFDDataStore, DFDExternalEntity
+from gds_domains.software.dsl.model import SoftwareModel
 
 model = SoftwareModel(
     name="Order System",
@@ -156,7 +156,7 @@ model = SoftwareModel(
 
 ---
 
-### gds-business
+### gds-domains (business)
 
 **Domain:** Business dynamics -- causal loops, supply chains, value streams.
 
@@ -171,8 +171,8 @@ model = SoftwareModel(
 | VSM (Value Stream Map) | Process steps, buffers, cycle times |
 
 ```python
-from gds_business.cld.elements import Variable, CausalLink
-from gds_business.cld.model import CLDModel
+from gds_domains.business.cld.elements import Variable, CausalLink
+from gds_domains.business.cld.model import CLDModel
 
 model = CLDModel(
     name="Market Dynamics",
@@ -197,13 +197,13 @@ model = CLDModel(
 
 | DSL | Has State? | Canonical Form | Character |
 |-----|-----------|----------------|-----------|
-| gds-stockflow | Yes (stocks) | `h = f . g` | Dynamical -- state-dominant accumulation |
-| gds-control | Yes (plant states) | `h = f . g` | Dynamical -- full feedback control |
-| gds-games | No | `h = g` | Strategic -- pure policy computation |
-| gds-software | Varies by diagram | Varies | Diagram-dependent |
-| gds-business CLD | No | `h = g` | Stateless -- pure signal relay |
-| gds-business SCN | Yes (inventory) | `h = f . g` | Dynamical -- inventory accumulation |
-| gds-business VSM | Optional (buffers) | Varies | Stateful only with buffers |
+| gds-domains (stockflow) | Yes (stocks) | `h = f . g` | Dynamical -- state-dominant accumulation |
+| gds-domains (control) | Yes (plant states) | `h = f . g` | Dynamical -- full feedback control |
+| gds-domains (games) | No | `h = g` | Strategic -- pure policy computation |
+| gds-domains (software) | Varies by diagram | Varies | Diagram-dependent |
+| gds-domains (business CLD) | No | `h = g` | Stateless -- pure signal relay |
+| gds-domains (business SCN) | Yes (inventory) | `h = f . g` | Dynamical -- inventory accumulation |
+| gds-domains (business VSM) | Optional (buffers) | Varies | Stateful only with buffers |
 
 !!! note "The canonical spectrum"
     All DSLs compile to the same `h = f . g` decomposition with varying dimensionality of the state space X. When |X| = 0, the system is stateless and `h = g`. When both |f| > 0 and |g| > 0, the system is fully dynamical. GDS is a **unified transition calculus** -- not just a dynamical systems framework.
@@ -226,11 +226,11 @@ Every DSL maps its elements to the same four GDS roles:
 
 | DSL | Domain Checks | Generic (G-series) | Semantic (SC-series) |
 |-----|---------------|---------------------|---------------------|
-| gds-stockflow | 5 (SF-001..SF-005) | 6 (via SystemIR) | 7 (via GDSSpec) |
-| gds-control | Domain validation | 6 (via SystemIR) | 7 (via GDSSpec) |
-| gds-games | OGS-specific | 6 (via SystemIR) | 7 (via GDSSpec) |
-| gds-software | 27 across 6 diagrams | 6 (via SystemIR) | 7 (via GDSSpec) |
-| gds-business | 11 across 3 diagrams | 6 (via SystemIR) | 7 (via GDSSpec) |
+| gds-domains (stockflow) | 5 (SF-001..SF-005) | 6 (via SystemIR) | 7 (via GDSSpec) |
+| gds-domains (control) | Domain validation | 6 (via SystemIR) | 7 (via GDSSpec) |
+| gds-domains (games) | OGS-specific | 6 (via SystemIR) | 7 (via GDSSpec) |
+| gds-domains (software) | 27 across 6 diagrams | 6 (via SystemIR) | 7 (via GDSSpec) |
+| gds-domains (business) | 11 across 3 diagrams | 6 (via SystemIR) | 7 (via GDSSpec) |
 
 ---
 
@@ -304,10 +304,10 @@ For a concrete example of the same problem modeled through three different DSL l
 
 | Question | Answer |
 |----------|--------|
-| "I have accumulating stocks" | Use **gds-stockflow** |
-| "I have feedback control loops" | Use **gds-control** |
-| "I have strategic agents" | Use **gds-games** |
-| "I have software to document" | Use **gds-software** |
-| "I have business processes" | Use **gds-business** |
+| "I have accumulating stocks" | Use **gds-domains** (stockflow) |
+| "I have feedback control loops" | Use **gds-domains** (control) |
+| "I have strategic agents" | Use **gds-domains** (games) |
+| "I have software to document" | Use **gds-domains** (software) |
+| "I have business processes" | Use **gds-domains** (business) |
 | "None of these fit" | Use **gds-framework** directly |
 | "I want to compare across domains" | All compile to **GDSSpec** -- use the canonical decomposition |

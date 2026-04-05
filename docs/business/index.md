@@ -24,7 +24,7 @@ gds-framework (pip install gds-framework)
 │  Domain-neutral composition algebra, typed spaces,
 │  state model, verification engine, flat IR compiler.
 │
-└── gds-business (pip install gds-business)
+└── gds-business (pip install gds-domains)
     │
     │  Business dynamics DSL: CLD, SCN, VSM elements,
     │  compile_*(), domain verification, verify() dispatch.
@@ -39,11 +39,11 @@ gds-framework (pip install gds-framework)
 
 ```bash
 uv add gds-business
-# or: pip install gds-business
+# or: pip install gds-domains
 ```
 
 ```python
-from gds_business import (
+from gds_domains.business import (
     # CLD
     Variable, CausalLink, CausalLoopModel,
     # Supply Chain

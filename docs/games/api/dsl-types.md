@@ -1,11 +1,11 @@
-# ogs.dsl.types
+# gds_domains.games.dsl.types
 
-::: ogs.dsl.types.Signature
+::: gds_domains.games.dsl.types.Signature
 
-::: ogs.dsl.types.GameType
+::: gds_domains.games.dsl.types.GameType
 
-::: ogs.dsl.types.FlowType
+::: gds_domains.games.dsl.types.FlowType
 
-::: ogs.dsl.types.CompositionType
+::: gds_domains.games.dsl.types.CompositionType
 
-::: ogs.dsl.types.InputType
+::: gds_domains.games.dsl.types.InputType

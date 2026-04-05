@@ -3,7 +3,7 @@
 ## Installation
 
 ```bash
-pip install gds-games
+pip install gds-domains[games]
 ```
 
 Or with [uv](https://docs.astral.sh/uv/):
@@ -22,20 +22,20 @@ uv add gds-games
 
 ## Import
 
-The package is installed as `gds-games` but imported as `ogs`:
+The package is installed as `gds-domains[games]` and imported as `gds_domains.games`:
 
 ```python
-import ogs
-from ogs.dsl.games import DecisionGame
-from ogs import compile_to_ir, verify
+import gds_domains.games
+from gds_domains.games.dsl.games import DecisionGame
+from gds_domains.games import compile_to_ir, verify
 ```
 
 ## Basic Workflow
 
 ```python
-from ogs.dsl.games import DecisionGame, CovariantFunction
-from ogs.dsl.pattern import Pattern
-from ogs import compile_to_ir, verify, generate_reports, save_ir
+from gds_domains.games.dsl.games import DecisionGame, CovariantFunction
+from gds_domains.games.dsl.pattern import Pattern
+from gds_domains.games import compile_to_ir, verify, generate_reports, save_ir
 
 # 1. Define atomic games
 sensor = CovariantFunction(name="Sensor", x="observation", y="signal")

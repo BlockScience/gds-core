@@ -4,26 +4,22 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-`gds-core` — monorepo for the Generalized Dynamical Systems ecosystem. Typed compositional specifications for complex systems, grounded in [GDS theory](https://doi.org/10.57938/e8d456ea-d975-4111-ac41-052ce73cb0cc). Fourteen packages managed as a uv workspace.
+`gds-core` — monorepo for the Generalized Dynamical Systems ecosystem. Typed compositional specifications for complex systems, grounded in [GDS theory](https://doi.org/10.57938/e8d456ea-d975-4111-ac41-052ce73cb0cc). Eight packages managed as a uv workspace.
 
 ## Packages
 
 | Package | Import | Location | Role |
 |---------|--------|----------|------|
 | gds-framework | `gds` | `packages/gds-framework/` | Core engine |
-| gds-viz | `gds_viz` | `packages/gds-viz/` | Mermaid + phase portraits |
-| gds-games | `ogs` | `packages/gds-games/` | Game theory DSL |
-| gds-stockflow | `stockflow` | `packages/gds-stockflow/` | Stock-flow DSL |
-| gds-control | `gds_control` | `packages/gds-control/` | Control systems DSL |
-| gds-software | `gds_software` | `packages/gds-software/` | Software architecture DSL |
-| gds-business | `gds_business` | `packages/gds-business/` | Business dynamics DSL |
+| gds-domains | `gds_domains.{stockflow,control,business,software,games,symbolic}` | `packages/gds-domains/` | All domain DSLs |
 | gds-sim | `gds_sim` | `packages/gds-sim/` | Discrete-time simulation |
 | gds-continuous | `gds_continuous` | `packages/gds-continuous/` | Continuous-time ODE engine |
-| gds-symbolic | `gds_symbolic` | `packages/gds-symbolic/` | SymPy bridge for control |
-| gds-analysis | `gds_analysis` | `packages/gds-analysis/` | Spec-to-sim bridge |
-| gds-psuu | `gds_psuu` | `packages/gds-psuu/` | Parameter sweep + Optuna |
-| gds-owl | `gds_owl` | `packages/gds-owl/` | OWL/SHACL/SPARQL export |
+| gds-analysis | `gds_analysis`, `gds_analysis.psuu` | `packages/gds-analysis/` | Spec-to-sim bridge + PSUU |
+| gds-interchange | `gds_interchange.owl` | `packages/gds-interchange/` | OWL/SHACL/SPARQL + future bridges |
+| gds-viz | `gds_viz` | `packages/gds-viz/` | Mermaid + phase portraits |
 | gds-examples | — | `packages/gds-examples/` | Tutorials + examples |
+
+Deprecated shim packages (v0.99.0, re-export with DeprecationWarning): gds-owl, gds-psuu, gds-stockflow, gds-control, gds-games, gds-software, gds-business, gds-symbolic.
 
 ## Commands
 
@@ -32,24 +28,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 uv sync --all-packages
 
 # Run tests per-package
-uv run --package gds-framework pytest packages/gds-framework/tests -v
-uv run --package gds-viz pytest packages/gds-viz/tests -v
-uv run --package gds-games pytest packages/gds-games/tests -v
-uv run --package gds-stockflow pytest packages/gds-stockflow/tests -v
-uv run --package gds-control pytest packages/gds-control/tests -v
-uv run --package gds-software pytest packages/gds-software/tests -v
-uv run --package gds-continuous pytest packages/gds-continuous/tests -v
-uv run --package gds-symbolic pytest packages/gds-symbolic/tests -v
-uv run --package gds-analysis pytest packages/gds-analysis/tests -v
-uv run --package gds-sim pytest packages/gds-sim/tests -v
-uv run --package gds-owl pytest packages/gds-owl/tests -v
-uv run --package gds-examples pytest packages/gds-examples -v
+uv run python -m pytest packages/gds-framework/tests -v
+uv run python -m pytest packages/gds-domains/tests -v
+uv run python -m pytest packages/gds-sim/tests -v
+uv run python -m pytest packages/gds-continuous/tests -v
+uv run python -m pytest packages/gds-analysis/tests -v
+uv run python -m pytest packages/gds-interchange/tests -v
+uv run python -m pytest packages/gds-viz/tests -v
+uv run python -m pytest packages/gds-examples -v
 
 # Run a single test
-uv run --package gds-framework pytest packages/gds-framework/tests/test_blocks.py::TestStackComposition::test_rshift_operator -v
-
-# Run all tests across all packages
-uv run --package gds-framework pytest packages/gds-framework/tests packages/gds-viz/tests packages/gds-games/tests packages/gds-stockflow/tests packages/gds-control/tests packages/gds-software/tests packages/gds-continuous/tests packages/gds-symbolic/tests packages/gds-analysis/tests packages/gds-sim/tests packages/gds-owl/tests packages/gds-examples -v
+uv run python -m pytest packages/gds-framework/tests/test_blocks.py::TestStackComposition::test_rshift_operator -v
 
 # Lint & format
 uv run ruff check packages/
@@ -73,22 +62,16 @@ This is a **uv workspace** monorepo. The root `pyproject.toml` declares `package
 ```
 gds-framework  ←  core engine (pydantic only, no upstream deps)
     ↑
+    ├── gds-domains    ←  all domain DSLs [games: typer,jinja2] [symbolic: sympy] [nashpy: nashpy]
+    │     stockflow, control, business, software, games, symbolic
     ├── gds-viz        ←  Mermaid diagrams + phase portraits [matplotlib]
-    ├── gds-games      ←  game theory DSL + Nash equilibrium [nashpy]
-    ├── gds-stockflow  ←  stock-flow DSL
-    ├── gds-control    ←  control systems DSL
-    ├── gds-software   ←  software architecture DSL
-    ├── gds-business   ←  business dynamics DSL (CLD, SCN, VSM)
-    └── gds-owl        ←  OWL/SHACL/SPARQL export (rdflib, pyshacl)
+    └── gds-interchange ← OWL/SHACL/SPARQL + future bridges [shacl: pyshacl]
          ↑
-    gds-symbolic       ←  SymPy bridge (extends gds-control) [sympy]
-         ↑
-    gds-examples       ←  tutorials (depends on most DSLs + viz)
+    gds-examples       ←  tutorials (depends on most packages)
 
 gds-sim            ←  discrete-time simulation (standalone, pydantic only)
     ↑
-    ├── gds-analysis   ←  spec→sim bridge, reachability (gds-framework + gds-sim + gds-continuous[opt])
-    └── gds-psuu       ←  parameter sweep + Optuna (gds-sim)
+    gds-analysis       ←  spec→sim bridge, reachability, PSUU [psuu: optuna] [continuous: gds-continuous]
 
 gds-continuous     ←  continuous-time ODE engine (standalone, pydantic only) [scipy]
 ```
@@ -105,7 +88,7 @@ These layers are loosely coupled — you can use the composition algebra without
 
 ### Domain DSL Pattern
 
-Five domain DSLs (stockflow, control, games, software, business) compile to GDS. The stockflow, control, software, and business packages follow a shared pattern:
+Six domain DSLs live in `gds-domains` as subpackages (`gds_domains.stockflow`, `.control`, `.games`, `.software`, `.business`, `.symbolic`). The stockflow, control, software, and business subpackages follow a shared pattern:
 
 1. **Elements** — frozen Pydantic models for user-facing declarations (not GDS blocks)
 2. **Model** — mutable container with `@model_validator` construction-time validation
@@ -122,7 +105,7 @@ The composition tree follows a convergent tiered pattern:
     .loop(state dynamics → observers)
 ```
 
-`gds-games` is more complex — it subclasses `AtomicBlock` as `OpenGame` with its own IR (`PatternIR`), but projects back to `SystemIR` via `PatternIR.to_system_ir()`.
+`gds_domains.games` is more complex — it subclasses `AtomicBlock` as `OpenGame` with its own IR (`PatternIR`), but projects back to `SystemIR` via `PatternIR.to_system_ir()`.
 
 ### Two Type Systems
 

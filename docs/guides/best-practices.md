@@ -398,7 +398,7 @@ Run checks in order from fastest/cheapest to most comprehensive:
 If using a DSL, run its domain-specific checks first. These are the fastest and catch DSL-level errors in domain-native terms:
 
 ```python
-from stockflow.verification.engine import verify as sf_verify
+from gds_domains.stockflow.verification.engine import verify as sf_verify
 
 report = sf_verify(model)  # runs SF-001..SF-005
 ```

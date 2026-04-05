@@ -1,0 +1,130 @@
+# {{ pattern.name }} — Implementation Checklist
+
+> Auto-generated implementation checklist from `{{ pattern.source_canvas }}`
+
+## Core Logic (per Game)
+
+Each game component must be implemented with its internal logic:
+
+{% for game in pattern.games %}
+### {{ game.name }}
+
+- [ ] Implement `{{ game.name }}` ({{ game.game_type.value }})
+- [ ] Signature: X=`{{ game.signature[0] if game.signature[0] else "∅" }}`, Y=`{{ game.signature[1] if game.signature[1] else "∅" }}`, R=`{{ game.signature[2] if game.signature[2] else "∅" }}`, S=`{{ game.signature[3] if game.signature[3] else "∅" }}`
+{% if game.gds_function -%}
+- [ ] GDS function: `{{ game.gds_function }}`
+{% endif -%}
+{% if game.constraints -%}
+- [ ] Enforce constraints:
+{% for c in game.constraints -%}
+  - `{{ c }}`
+{% endfor -%}
+{% endif -%}
+{% if game.logic -%}
+- [ ] Internal logic: `{{ game.logic[:80] }}{{ "..." if game.logic|length > 80 else "" }}`
+{% endif %}
+
+{% endfor %}
+
+## Infrastructure
+
+### Boundary Actions
+
+{% for inp in pattern.inputs -%}
+- [ ] Wire input: **{{ inp.name }}** ({{ inp.input_type.value }}{{ ", schema: `" + inp.schema_hint + "`" if inp.schema_hint else "" }})
+{% endfor %}
+
+### State Persistence
+
+{% if pattern.initialization -%}
+- [ ] Initialize state variables:
+{% for init in pattern.initialization -%}
+  - `{{ init.symbol }} ∈ {{ init.space }}`{{ " — " + init.description if init.description else "" }}{{ " (game: " + init.game + ")" if init.game else "" }}
+{% endfor %}
+{% else -%}
+- [ ] No initialization parameters defined in spec notes
+{% endif %}
+
+### Composition Wiring
+
+- [ ] Composition type: **{{ pattern.composition_type.value }}**
+- [ ] Wire {{ pattern.flows | length }} flows between {{ pattern.games | length }} components
+{% if has_feedback -%}
+- [ ] Implement feedback loop(s):
+{% for flow in feedback_flows -%}
+  - {{ flow.source }} → {{ flow.target }} ({{ flow.label }})
+{% endfor %}
+{% endif %}
+
+{% if pattern.terminal_conditions %}
+## Terminal Conditions
+
+{% for tc in pattern.terminal_conditions %}
+### {{ tc.name }}
+
+- **Outcome:** {{ tc.outcome }}
+{% if tc.description -%}
+- **Description:** {{ tc.description }}
+{% endif -%}
+{% if tc.payoff_description -%}
+- **Payoff:** {{ tc.payoff_description }}
+{% endif -%}
+- **Action combination:**
+{% for game, action in tc.actions.items() -%}
+  - {{ game }}: `{{ action }}`
+{% endfor %}
+
+{% endfor %}
+{% endif %}
+
+{% if pattern.action_spaces %}
+## Decision Spaces
+
+{% for space in pattern.action_spaces %}
+### {{ space.game }}
+
+| Action |
+|--------|
+{% for action in space.actions -%}
+| {{ action }} |
+{% endfor %}
+{% if space.constraints %}
+
+**Constraints:**
+
+{% for c in space.constraints -%}
+- [ ] {{ c }}
+{% endfor %}
+{% endif %}
+
+{% endfor %}
+{% endif %}
+
+{% if all_constraints %}
+## Constraints
+
+All constraints that must be respected during implementation:
+
+{% for game_name, constraints in all_constraints.items() -%}
+**{{ game_name }}:**
+{% for c in constraints -%}
+- [ ] `{{ c }}`
+{% endfor %}
+
+{% endfor %}
+{% endif %}
+
+## Design Decisions
+
+The following decisions are left to the implementer:
+
+{% for game in pattern.games -%}
+{% if game.game_type.value == "decision" -%}
+- [ ] **{{ game.name }}**: Strategy selection mechanism (how `σ: X → Y` is chosen)
+{% endif -%}
+{% if game.game_type.value == "function_covariant" -%}
+- [ ] **{{ game.name }}**: Exact mapping function `f: X → Y`
+{% endif -%}
+{% endfor %}
+- [ ] Error handling and recovery for each boundary action
+- [ ] Logging and observability for state transitions

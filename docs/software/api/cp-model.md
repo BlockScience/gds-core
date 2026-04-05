@@ -1,5 +1,5 @@
-# gds_software.component.model
+# gds_domains.software.component.model
 
 ComponentModel -- declarative container for component diagrams.
 
-::: gds_software.component.model.ComponentModel
+::: gds_domains.software.component.model.ComponentModel

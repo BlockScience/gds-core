@@ -34,6 +34,9 @@ dependencies = [
 
 [project.optional-dependencies]
 continuous = ["gds-continuous[scipy]>=0.1.0", "numpy>=1.26"]
+psuu = ["optuna>=4.0"]
+pandas = ["pandas>=2.0"]
+all = ["gds-analysis[continuous,psuu,pandas]"]
 
 [project.urls]
 Homepage = "https://github.com/BlockScience/gds-core"
@@ -56,7 +59,7 @@ addopts = "--import-mode=importlib --cov=gds_analysis --cov-report=term-missing 
 
 [tool.coverage.run]
 source = ["gds_analysis"]
-omit = ["gds_analysis/__init__.py"]
+omit = ["gds_analysis/__init__.py", "gds_analysis/psuu/__init__.py"]
 
 [tool.coverage.report]
 fail_under = 80

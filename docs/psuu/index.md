@@ -24,7 +24,7 @@ gds-sim (pip install gds-sim)
 |  Simulation engine: Model, StateUpdateBlock,
 |  Simulation, Results (columnar storage).
 |
-+-- gds-psuu (pip install gds-psuu)
++-- gds-psuu (pip install gds-analysis[psuu])
     |
     |  Parameter search: ParameterSpace, Metric, Aggregation,
     |  KPI, Evaluator, Sweep, Optimizer.
@@ -82,7 +82,7 @@ Optimizer.suggest()  -->  Evaluator.evaluate(params)  -->  Optimizer.observe(sco
 
 ```bash
 uv add gds-psuu
-# or: pip install gds-psuu
+# or: pip install gds-analysis[psuu]
 ```
 
 See [Getting Started](getting-started.md) for a full walkthrough.

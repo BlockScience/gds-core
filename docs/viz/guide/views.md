@@ -370,7 +370,7 @@ All view functions operate on `GDSSpec` and `SystemIR`, which every compilation 
 
 ```python
 # All of these produce the same types -- gds-viz works with all of them:
-from stockflow.dsl.compile import compile_model, compile_to_system
-from gds_control.dsl.compile import compile_model, compile_to_system
-from ogs.dsl.spec_bridge import compile_pattern_to_spec
+from gds_domains.stockflow.dsl.compile import compile_model, compile_to_system
+from gds_domains.control.dsl.compile import compile_model, compile_to_system
+from gds_domains.games.dsl.spec_bridge import compile_pattern_to_spec
 ```

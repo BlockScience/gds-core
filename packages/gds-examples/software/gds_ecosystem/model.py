@@ -26,12 +26,12 @@ GDS Decomposition:
 
 from gds.ir.models import SystemIR
 from gds.spec import GDSSpec
-from gds_software.component.compile import (
+from gds_domains.software.component.compile import (
     compile_component,
     compile_component_to_system,
 )
-from gds_software.component.elements import Component, Connector, InterfaceDef
-from gds_software.component.model import ComponentModel
+from gds_domains.software.component.elements import Component, Connector, InterfaceDef
+from gds_domains.software.component.model import ComponentModel
 
 # ── Components (packages) ──────────────────────────────────────
 
