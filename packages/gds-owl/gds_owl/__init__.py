@@ -11,7 +11,7 @@ warnings.warn(
 
 __version__ = "0.99.0"
 
-from gds_interchange.owl import (  # noqa: F401, E402
+from gds_interchange.owl import (  # noqa: E402
     GDS,
     GDS_CORE,
     GDS_IR,

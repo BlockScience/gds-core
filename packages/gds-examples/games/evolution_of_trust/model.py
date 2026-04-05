@@ -32,7 +32,12 @@ from gds_domains.games.dsl.composition import (
     SequentialComposition,
 )
 from gds_domains.games.dsl.games import CovariantFunction, DecisionGame
-from gds_domains.games.dsl.pattern import ActionSpace, Pattern, PatternInput, TerminalCondition
+from gds_domains.games.dsl.pattern import (
+    ActionSpace,
+    Pattern,
+    PatternInput,
+    TerminalCondition,
+)
 from gds_domains.games.dsl.types import CompositionType, InputType, Signature, port
 from gds_domains.games.ir.models import PatternIR
 

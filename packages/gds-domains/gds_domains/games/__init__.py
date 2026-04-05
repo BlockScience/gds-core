@@ -1,6 +1,5 @@
 """Open Games — Typed DSL for Compositional Game Theory."""
 
-
 from gds_domains.games.dsl.base import OpenGame
 from gds_domains.games.dsl.compile import compile_to_ir
 from gds_domains.games.dsl.composition import FeedbackFlow
