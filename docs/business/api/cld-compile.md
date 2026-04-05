@@ -1,15 +1,15 @@
-# gds_business.cld.compile
+# gds_domains.business.cld.compile
 
 Compiler: CausalLoopModel → GDSSpec / SystemIR.
 
 ## Semantic Types
 
-::: gds_business.cld.compile.SignalType
+::: gds_domains.business.cld.compile.SignalType
 
-::: gds_business.cld.compile.SignalSpace
+::: gds_domains.business.cld.compile.SignalSpace
 
 ## Public Functions
 
-::: gds_business.cld.compile.compile_cld
+::: gds_domains.business.cld.compile.compile_cld
 
-::: gds_business.cld.compile.compile_cld_to_system
+::: gds_domains.business.cld.compile.compile_cld_to_system

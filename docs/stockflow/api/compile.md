@@ -1,27 +1,27 @@
-# stockflow.dsl.compile
+# gds_domains.stockflow.dsl.compile
 
 Compiler: StockFlowModel -> GDSSpec / SystemIR.
 
 ## Semantic Types
 
-::: stockflow.dsl.compile.LevelType
+::: gds_domains.stockflow.dsl.compile.LevelType
 
-::: stockflow.dsl.compile.LevelSpace
+::: gds_domains.stockflow.dsl.compile.LevelSpace
 
-::: stockflow.dsl.compile.UnconstrainedLevelType
+::: gds_domains.stockflow.dsl.compile.UnconstrainedLevelType
 
-::: stockflow.dsl.compile.UnconstrainedLevelSpace
+::: gds_domains.stockflow.dsl.compile.UnconstrainedLevelSpace
 
-::: stockflow.dsl.compile.RateType
+::: gds_domains.stockflow.dsl.compile.RateType
 
-::: stockflow.dsl.compile.RateSpace
+::: gds_domains.stockflow.dsl.compile.RateSpace
 
-::: stockflow.dsl.compile.SignalType
+::: gds_domains.stockflow.dsl.compile.SignalType
 
-::: stockflow.dsl.compile.SignalSpace
+::: gds_domains.stockflow.dsl.compile.SignalSpace
 
 ## Public Functions
 
-::: stockflow.dsl.compile.compile_model
+::: gds_domains.stockflow.dsl.compile.compile_model
 
-::: stockflow.dsl.compile.compile_to_system
+::: gds_domains.stockflow.dsl.compile.compile_to_system

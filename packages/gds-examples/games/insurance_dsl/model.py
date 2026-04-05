@@ -39,28 +39,28 @@ Architecture (OGS perspective):
 
 from pathlib import Path
 
-from ogs import (
+from gds_domains.games import (
     compile_pattern_to_spec,
     compile_to_ir,
     generate_reports,
     verify,
 )
-from ogs.dsl.composition import (
+from gds_domains.games.dsl.composition import (
     FeedbackFlow,
     FeedbackLoop,
     Flow,
     SequentialComposition,
 )
-from ogs.dsl.games import CovariantFunction, DecisionGame
-from ogs.dsl.pattern import (
+from gds_domains.games.dsl.games import CovariantFunction, DecisionGame
+from gds_domains.games.dsl.pattern import (
     ActionSpace,
     Pattern,
     PatternInput,
     TerminalCondition,
 )
-from ogs.dsl.types import CompositionType, InputType, Signature, port
-from ogs.ir.models import PatternIR
-from ogs.verification.findings import VerificationReport
+from gds_domains.games.dsl.types import CompositionType, InputType, Signature, port
+from gds_domains.games.ir.models import PatternIR
+from gds_domains.games.verification.findings import VerificationReport
 
 # ======================================================================
 # Atomic Games -- leaf nodes of the composition tree

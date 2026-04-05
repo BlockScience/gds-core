@@ -460,7 +460,7 @@ def run_domain_check(mo, domain_dropdown):
         unused_converter_model,
     )
 
-    from stockflow.verification.checks import (
+    from gds_domains.stockflow.verification.checks import (
         check_sf001_orphan_stocks,
         check_sf003_auxiliary_acyclicity,
         check_sf004_converter_connectivity,
@@ -556,7 +556,7 @@ def run_combined(mo, combined_dropdown):
         orphan_stock_model as _orphan_stock_model,
     )
 
-    from stockflow.verification.engine import verify as sf_verify
+    from gds_domains.stockflow.verification.engine import verify as sf_verify
 
     if combined_dropdown.value == "good":
         _model = good_stockflow_model()

@@ -210,9 +210,9 @@ Rebuild the same thermostat using the **gds-control** DSL. Declare states, input
 ### ControlModel Declaration
 
 ```python
-from gds_control.dsl.compile import compile_model, compile_to_system
-from gds_control.dsl.elements import Controller, Input, Sensor, State
-from gds_control.dsl.model import ControlModel
+from gds_domains.control.dsl.compile import compile_model, compile_to_system
+from gds_domains.control.dsl.elements import Controller, Input, Sensor, State
+from gds_domains.control.dsl.model import ControlModel
 
 model = ControlModel(
     name="Thermostat DSL",

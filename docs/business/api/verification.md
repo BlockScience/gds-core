@@ -1,5 +1,5 @@
-# gds_business.verification
+# gds_domains.business.verification
 
 Verification engine — union dispatch across all business diagram types.
 
-::: gds_business.verification.engine.verify
+::: gds_domains.business.verification.engine.verify

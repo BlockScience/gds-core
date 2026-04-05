@@ -24,7 +24,7 @@ gds-framework (pip install gds-framework)
 |  Domain-neutral composition algebra, typed spaces,
 |  state model, verification engine, flat IR compiler.
 |
-+-- gds-software (pip install gds-software)
++-- gds-software (pip install gds-domains)
     |
     |  Software architecture DSL: 6 diagram types,
     |  compile_*(), domain verification, verify() dispatch.
@@ -59,7 +59,7 @@ All six diagram types follow a shared mapping pattern:
 
 ```bash
 uv add gds-software
-# or: pip install gds-software
+# or: pip install gds-domains
 ```
 
 See [Getting Started](getting-started.md) for a full walkthrough.

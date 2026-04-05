@@ -4,7 +4,7 @@
 
 ```bash
 uv add gds-software
-# or: pip install gds-software
+# or: pip install gds-domains
 ```
 
 For development (monorepo):
@@ -20,7 +20,7 @@ uv sync --all-packages
 A Data Flow Diagram models processes, external entities, data stores, and the flows between them:
 
 ```python
-from gds_software import (
+from gds_domains.software import (
     ExternalEntity, Process, DataStore, DataFlow,
     DFDModel, compile_dfd, compile_dfd_to_system, verify,
 )
@@ -57,7 +57,7 @@ for f in report.findings:
 A State Machine models states, events, and transitions:
 
 ```python
-from gds_software import (
+from gds_domains.software import (
     State, Event, Transition, StateMachineModel,
     compile_sm, verify,
 )
@@ -91,7 +91,7 @@ for f in report.findings:
 A Component Diagram models software components with provided and required interfaces:
 
 ```python
-from gds_software import (
+from gds_domains.software import (
     Component, InterfaceDef, Connector,
     ComponentModel, compile_component, verify,
 )

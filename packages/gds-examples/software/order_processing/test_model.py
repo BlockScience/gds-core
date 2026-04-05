@@ -16,7 +16,7 @@ from gds.verification.spec_checks import (
     check_determinism,
     check_type_safety,
 )
-from gds_software.verification.engine import verify as sw_verify
+from gds_domains.software.verification.engine import verify as sw_verify
 from software.order_processing.model import (
     build_canonical,
     build_model,

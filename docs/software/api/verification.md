@@ -1,5 +1,5 @@
-# gds_software.verification
+# gds_domains.software.verification
 
 Verification engine -- union dispatch across all software diagram types.
 
-::: gds_software.verification.engine.verify
+::: gds_domains.software.verification.engine.verify

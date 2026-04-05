@@ -1,0 +1,114 @@
+# {{ pattern.name }} — Verification Summary
+
+> Auto-generated verification report
+
+## Summary
+
+| Metric | Value |
+|--------|-------|
+| **Checks Passed** | {{ report.checks_passed }} / {{ report.checks_total }} |
+| **Errors** | {{ report.errors }} |
+| **Warnings** | {{ report.warnings }} |
+| **Info** | {{ report.info_count }} |
+
+{% if report.errors == 0 and report.warnings == 0 -%}
+> **All verification checks passed successfully.**
+{% elif report.errors == 0 -%}
+> **No errors.** {{ report.warnings }} warning(s) to review below.
+{% else -%}
+> **{{ report.errors }} error(s) found.** See Issues section below.
+{% endif %}
+
+{% if failed_findings %}
+## Issues
+
+{% for f in failed_findings %}
+### {{ f.severity.value | upper }}: {{ f.check_id }} — {{ f.message }}
+
+{% if f.source_elements -%}
+**Affected components:** {{ f.source_elements | join(", ") }}
+
+{% endif -%}
+{% if f.check_id.startswith("T-") -%}
+**Category:** Type consistency check
+{% elif f.check_id.startswith("S-") -%}
+**Category:** Structural composition check
+{% endif %}
+{% if f.check_id == "T-001" -%}
+**Recommended fix:** Verify that flow labels match the source codomain (Y) or target domain (X) tokens.
+{% elif f.check_id == "T-002" -%}
+**Recommended fix:** Ensure the game has at least one defined input (X or R) and one defined output (Y or S).
+{% elif f.check_id == "T-003" -%}
+**Recommended fix:** Check that covariant flows use solid arrows and contravariant flows use dashed arrows.
+{% elif f.check_id == "T-006" -%}
+**Recommended fix:** Ensure the flow's source and target exist as games or inputs in the pattern.
+{% elif f.check_id == "S-001" -%}
+**Recommended fix:** In sequential composition G1;G2, the flow label must be a subset of both Y(G1) and X(G2).
+{% elif f.check_id == "S-003" -%}
+**Recommended fix:** In feedback composition, the feedback flow label must be a subset of the source's S (coutility) tokens.
+{% elif f.check_id == "S-004" -%}
+**Recommended fix:** Remove the cycle from covariant flows, or reclassify the flow as contravariant (feedback).
+{% elif f.check_id == "S-008" -%}
+**Recommended fix:** Update spec notes or canvas to ensure all components are cross-referenced.
+{% endif %}
+---
+
+{% endfor %}
+{% endif %}
+
+## Checks Performed
+
+{% set ns = namespace(checks={}) -%}
+{% for f in report.findings -%}
+{% if f.check_id not in ns.checks -%}
+{% set _ = ns.checks.update({f.check_id: {"total": 0, "passed": 0, "failed": 0}}) -%}
+{% endif -%}
+{% set _ = ns.checks[f.check_id].update({"total": ns.checks[f.check_id]["total"] + 1}) -%}
+{% if f.passed -%}
+{% set _ = ns.checks[f.check_id].update({"passed": ns.checks[f.check_id]["passed"] + 1}) -%}
+{% else -%}
+{% set _ = ns.checks[f.check_id].update({"failed": ns.checks[f.check_id]["failed"] + 1}) -%}
+{% endif -%}
+{% endfor -%}
+
+| Check | Name | Passed | Failed | Status |
+|-------|------|--------|--------|--------|
+| T-001 | Domain/codomain matching | {{ ns.checks.get("T-001", {}).get("passed", 0) }} | {{ ns.checks.get("T-001", {}).get("failed", 0) }} | {{ "FAIL" if ns.checks.get("T-001", {}).get("failed", 0) > 0 else "OK" }} |
+| T-002 | Signature completeness | {{ ns.checks.get("T-002", {}).get("passed", 0) }} | {{ ns.checks.get("T-002", {}).get("failed", 0) }} | {{ "FAIL" if ns.checks.get("T-002", {}).get("failed", 0) > 0 else "OK" }} |
+| T-003 | Flow type consistency | {{ ns.checks.get("T-003", {}).get("passed", 0) }} | {{ ns.checks.get("T-003", {}).get("failed", 0) }} | {{ "FAIL" if ns.checks.get("T-003", {}).get("failed", 0) > 0 else "OK" }} |
+| T-004 | Input type resolution | {{ ns.checks.get("T-004", {}).get("passed", 0) }} | {{ ns.checks.get("T-004", {}).get("failed", 0) }} | {{ "FAIL" if ns.checks.get("T-004", {}).get("failed", 0) > 0 else "OK" }} |
+| T-005 | Unused inputs | {{ ns.checks.get("T-005", {}).get("passed", 0) }} | {{ ns.checks.get("T-005", {}).get("failed", 0) }} | {{ "FAIL" if ns.checks.get("T-005", {}).get("failed", 0) > 0 else "OK" }} |
+| T-006 | Dangling flows | {{ ns.checks.get("T-006", {}).get("passed", 0) }} | {{ ns.checks.get("T-006", {}).get("failed", 0) }} | {{ "FAIL" if ns.checks.get("T-006", {}).get("failed", 0) > 0 else "OK" }} |
+| S-001 | Sequential type compatibility | {{ ns.checks.get("S-001", {}).get("passed", 0) }} | {{ ns.checks.get("S-001", {}).get("failed", 0) }} | {{ "FAIL" if ns.checks.get("S-001", {}).get("failed", 0) > 0 else "OK" }} |
+| S-002 | Parallel independence | {{ ns.checks.get("S-002", {}).get("passed", 0) }} | {{ ns.checks.get("S-002", {}).get("failed", 0) }} | {{ "FAIL" if ns.checks.get("S-002", {}).get("failed", 0) > 0 else "OK" }} |
+| S-003 | Feedback type compatibility | {{ ns.checks.get("S-003", {}).get("passed", 0) }} | {{ ns.checks.get("S-003", {}).get("failed", 0) }} | {{ "FAIL" if ns.checks.get("S-003", {}).get("failed", 0) > 0 else "OK" }} |
+| S-004 | Covariant acyclicity | {{ ns.checks.get("S-004", {}).get("passed", 0) }} | {{ ns.checks.get("S-004", {}).get("failed", 0) }} | {{ "FAIL" if ns.checks.get("S-004", {}).get("failed", 0) > 0 else "OK" }} |
+| S-005 | Decision space validation | {{ ns.checks.get("S-005", {}).get("passed", 0) }} | {{ ns.checks.get("S-005", {}).get("failed", 0) }} | {{ "FAIL" if ns.checks.get("S-005", {}).get("failed", 0) > 0 else "OK" }} |
+| S-007 | Initialization completeness | {{ ns.checks.get("S-007", {}).get("passed", 0) }} | {{ ns.checks.get("S-007", {}).get("failed", 0) }} | {{ "FAIL" if ns.checks.get("S-007", {}).get("failed", 0) > 0 else "OK" }} |
+
+<details>
+<summary>Full check results ({{ report.checks_total }} individual checks)</summary>
+<table>
+<tr><th>#</th><th>Check</th><th>Result</th><th>Message</th></tr>
+{% for f in report.findings -%}
+<tr><td>{{ loop.index }}</td><td>{{ f.check_id }}</td><td>{{ "PASS" if f.passed else "<strong>FAIL</strong>" }}</td><td>{{ f.message[:100] }}{{ "..." if f.message|length > 100 else "" }}</td></tr>
+{% endfor %}
+</table>
+</details>
+
+## Check Descriptions
+
+| Check ID | Name | Description |
+|----------|------|-------------|
+| T-001 | Domain/codomain matching | Flow labels must be subsets of source Y or target X |
+| T-002 | Signature completeness | Every game must have at least one input and one output slot |
+| T-003 | Flow type consistency | Covariant flows connect covariant ports; contravariant to contravariant |
+| T-004 | Input type resolution | Input schema hints should resolve to known types |
+| T-005 | Unused inputs | Inputs with no outgoing flows |
+| T-006 | Dangling flows | Flows whose source or target is not in the pattern |
+| S-001 | Sequential type compatibility | In G1;G2, Y(G1) and X(G2) must share flow label tokens |
+| S-002 | Parallel independence | Parallel games should have no direct flows |
+| S-003 | Feedback type compatibility | Feedback flow labels must match source coutility tokens |
+| S-004 | Covariant acyclicity | Covariant flow graph must be a DAG |
+| S-005 | Decision space validation | Decision games need non-empty Y and contravariant input |
+| S-007 | Initialization completeness | All initialization inputs must have outgoing flows |

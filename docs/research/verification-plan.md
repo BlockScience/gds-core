@@ -127,8 +127,8 @@ For each R1 concept, show the OWL class/property structure is a valid SROIQ
 axiom. For each R2 concept, show the SPARQL query terminates and correctly
 validates the property.
 
-The existing SHACL shapes (`gds_owl.shacl`) and SPARQL queries
-(`gds_owl.sparql`) serve as constructive evidence. The proof obligation is
+The existing SHACL shapes (`gds_interchange.owl.shacl`) and SPARQL queries
+(`gds_interchange.owl.sparql`) serve as constructive evidence. The proof obligation is
 to show they are *complete* for their respective tiers.
 
 ### 2c. Partition Independence

@@ -5,7 +5,7 @@
 A `Pattern` groups games, flows, and metadata into a compilable unit.
 
 ```python
-from ogs.dsl.pattern import Pattern
+from gds_domains.games.dsl.pattern import Pattern
 
 pattern = Pattern(
     name="Simple Decision",
@@ -62,7 +62,7 @@ Extends GDS with a CORECURSIVE composition type — cross-timestep feedback spec
 Patterns can include domain-specific metadata:
 
 ```python
-from ogs.dsl.pattern import TerminalCondition, ActionSpace, StateInitialization
+from gds_domains.games.dsl.pattern import TerminalCondition, ActionSpace, StateInitialization
 
 pattern = Pattern(
     name="Iterated PD",

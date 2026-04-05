@@ -5,7 +5,7 @@ gds-games includes 7 Markdown report generators powered by Jinja2 templates.
 ## Generating Reports
 
 ```python
-from ogs import compile_to_ir, generate_reports
+from gds_domains.games import compile_to_ir, generate_reports
 
 ir = compile_to_ir(pattern)
 reports = generate_reports(ir)

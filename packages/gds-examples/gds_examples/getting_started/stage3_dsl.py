@@ -22,9 +22,9 @@ New concepts:
 from gds.canonical import CanonicalGDS, project_canonical
 from gds.ir.models import SystemIR
 from gds.spec import GDSSpec
-from gds_control.dsl.compile import compile_model, compile_to_system
-from gds_control.dsl.elements import Controller, Input, Sensor, State
-from gds_control.dsl.model import ControlModel
+from gds_domains.control.dsl.compile import compile_model, compile_to_system
+from gds_domains.control.dsl.elements import Controller, Input, Sensor, State
+from gds_domains.control.dsl.model import ControlModel
 
 
 def build_model() -> ControlModel:

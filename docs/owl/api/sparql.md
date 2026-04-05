@@ -1,5 +1,5 @@
-# gds_owl.sparql
+# gds_interchange.owl.sparql
 
 SPARQL query templates for GDS analysis.
 
-::: gds_owl.sparql
+::: gds_interchange.owl.sparql

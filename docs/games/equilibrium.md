@@ -31,7 +31,7 @@ The `[nash]` extra installs `nashpy` and `numpy`.
 Define payoffs via `TerminalCondition` entries, then compute equilibria:
 
 ```python
-from ogs.dsl.pattern import TerminalCondition
+from gds_domains.games.dsl.pattern import TerminalCondition
 
 # Prisoner's Dilemma payoff structure
 terminal_conditions = [
@@ -65,7 +65,7 @@ terminal_conditions = [
 Extract matrices and solve:
 
 ```python
-from ogs.equilibrium import extract_payoff_matrices, compute_nash
+from gds_domains.games.equilibrium import extract_payoff_matrices, compute_nash
 
 # Extract payoff matrices from a compiled PatternIR
 matrices = extract_payoff_matrices(pattern_ir)
@@ -96,7 +96,7 @@ You can also bypass IR extraction and supply payoff matrices directly:
 
 ```python
 import numpy as np
-from ogs.equilibrium import compute_nash_from_matrices
+from gds_domains.games.equilibrium import compute_nash_from_matrices
 
 A = np.array([[3, 0], [5, 1]])  # Player 1 payoffs
 B = np.array([[3, 5], [0, 1]])  # Player 2 payoffs

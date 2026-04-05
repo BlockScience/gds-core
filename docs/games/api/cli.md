@@ -1,3 +1,3 @@
-# ogs.cli
+# gds_domains.games.cli
 
-::: ogs.cli
+::: gds_domains.games.cli

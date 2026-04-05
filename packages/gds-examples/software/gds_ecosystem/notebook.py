@@ -9,32 +9,32 @@ def imports():
     import marimo as mo
 
     from gds import project_canonical, verify
-    from gds_software.component.compile import (
+    from gds_domains.software.component.compile import (
         compile_component,
         compile_component_to_system,
     )
-    from gds_software.component.elements import (
+    from gds_domains.software.component.elements import (
         Component,
         Connector,
         InterfaceDef,
     )
-    from gds_software.component.model import ComponentModel
-    from gds_software.dfd.compile import compile_dfd, compile_dfd_to_system
-    from gds_software.dfd.elements import (
+    from gds_domains.software.component.model import ComponentModel
+    from gds_domains.software.dfd.compile import compile_dfd, compile_dfd_to_system
+    from gds_domains.software.dfd.elements import (
         DataFlow,
         DataStore,
         ExternalEntity,
         Process,
     )
-    from gds_software.dfd.model import DFDModel
-    from gds_software.erd.compile import compile_erd, compile_erd_to_system
-    from gds_software.erd.elements import (
+    from gds_domains.software.dfd.model import DFDModel
+    from gds_domains.software.erd.compile import compile_erd, compile_erd_to_system
+    from gds_domains.software.erd.elements import (
         Attribute,
         Cardinality,
         ERDEntity,
         ERDRelationship,
     )
-    from gds_software.erd.model import ERDModel
+    from gds_domains.software.erd.model import ERDModel
     from gds_viz import system_to_mermaid
 
     return (

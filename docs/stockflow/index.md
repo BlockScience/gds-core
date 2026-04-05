@@ -24,7 +24,7 @@ gds-framework (pip install gds-framework)
 |  Domain-neutral composition algebra, typed spaces,
 |  state model, verification engine, flat IR compiler.
 |
-+-- gds-stockflow (pip install gds-stockflow)
++-- gds-stockflow (pip install gds-domains)
     |
     |  Stock-flow DSL: Stock, Flow, Auxiliary, Converter elements,
     |  compile_model(), domain verification, verify() dispatch.
@@ -74,7 +74,7 @@ Stocks carry state (X), mechanisms provide f, and all other elements contribute 
 
 ```bash
 uv add gds-stockflow
-# or: pip install gds-stockflow
+# or: pip install gds-domains
 ```
 
 See [Getting Started](getting-started.md) for a full walkthrough.

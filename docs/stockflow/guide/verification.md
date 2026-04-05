@@ -7,7 +7,7 @@
 The `verify()` function runs domain checks on the stock-flow model:
 
 ```python
-from stockflow import verify
+from gds_domains.stockflow import verify
 
 report = verify(model)                          # Domain checks only
 report = verify(model, include_gds_checks=True) # Domain + GDS checks

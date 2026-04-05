@@ -1,3 +1,3 @@
-# ogs.dsl.base
+# gds_domains.games.dsl.base
 
-::: ogs.dsl.base.OpenGame
+::: gds_domains.games.dsl.base.OpenGame

@@ -22,7 +22,7 @@ from sir_epidemic_dsl.model import (
     build_spec,
     build_system,
 )
-from stockflow.verification.engine import verify as sf_verify
+from gds_domains.stockflow.verification.engine import verify as sf_verify
 
 # ── Model Declaration ──────────────────────────────────────────
 

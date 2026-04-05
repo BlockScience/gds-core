@@ -1,30 +1,44 @@
-"""Open Games — Typed DSL for Compositional Game Theory."""
+"""gds-games — DEPRECATED: use gds_domains.games instead."""
 
-__version__ = "0.3.2"
+import warnings
 
-from ogs.dsl.base import OpenGame
-from ogs.dsl.compile import compile_to_ir
-from ogs.dsl.composition import FeedbackFlow
-from ogs.dsl.spec_bridge import compile_pattern_to_spec
-from ogs.dsl.games import AtomicGame, DecisionGame
-from ogs.dsl.pattern import Pattern
-from ogs.ir.models import (
+warnings.warn(
+    "Import from gds_domains.games instead of ogs. "
+    "The gds-games package will be removed in v0.3.0.",
+    DeprecationWarning,
+    stacklevel=2,
+)
+
+__version__ = "0.99.0"
+
+from gds_domains.games import (  # noqa: F401, E402
+    AtomicGame,
     CompositionType,
+    DecisionGame,
+    FeedbackFlow,
+    Finding,
     FlowDirection,
     FlowIR,
     FlowType,
     GameType,
     HierarchyNodeIR,
+    IRDocument,
     InputIR,
     InputType,
+    OpenGame,
     OpenGameIR,
+    Pattern,
     PatternIR,
+    Severity,
+    VerificationReport,
+    compile_pattern_to_spec,
+    compile_to_ir,
+    discover_patterns,
+    generate_reports,
+    load_ir,
+    save_ir,
+    verify,
 )
-from ogs.ir.serialization import IRDocument, load_ir, save_ir
-from ogs.registry import discover_patterns
-from ogs.reports.generator import generate_reports
-from ogs.verification.engine import verify
-from ogs.verification.findings import Finding, Severity, VerificationReport
 
 __all__ = [
     # DSL (re-exported for convenience)
@@ -72,7 +86,7 @@ def __getattr__(name: str) -> object:
         "NashResult",
         "PayoffMatrices",
     ):
-        from ogs import equilibrium
+        from gds_domains.games import equilibrium  # noqa: E402
 
         return getattr(equilibrium, name)
     raise AttributeError(f"module 'ogs' has no attribute {name!r}")

@@ -31,12 +31,8 @@ classifiers = [
 dependencies = [
     "gds-framework>=0.3.0",
     "gds-viz>=0.1.0",
-    "gds-control>=0.1.0",
-    "gds-stockflow>=0.1.0",
-    "gds-games>=0.3.0",
-    "gds-software>=0.1.0",
+    "gds-domains[games,symbolic]>=0.1.0",
     "gds-continuous>=0.1.0",
-    "gds-symbolic>=0.1.0",
 ]
 
 [project.urls]
@@ -47,12 +43,8 @@ Documentation = "https://blockscience.github.io/gds-core"
 [tool.uv.sources]
 gds-framework = { workspace = true }
 gds-viz = { workspace = true }
-gds-control = { workspace = true }
-gds-stockflow = { workspace = true }
-gds-games = { workspace = true }
-gds-software = { workspace = true }
+gds-domains = { workspace = true }
 gds-continuous = { workspace = true }
-gds-symbolic = { workspace = true }
 
 [build-system]
 requires = ["hatchling"]
@@ -110,7 +102,7 @@ files = [
 ]
 
 [[tool.mypy.overrides]]
-module = ["gds_viz.*", "gds_control.*", "stockflow.*", "ogs.*", "gds_software.*", "pytest"]
+module = ["gds_viz.*", "gds_domains.*", "pytest"]
 ignore_missing_imports = true
 
 [project.optional-dependencies]

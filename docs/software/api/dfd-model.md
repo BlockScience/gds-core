@@ -1,5 +1,5 @@
-# gds_software.dfd.model
+# gds_domains.software.dfd.model
 
 DFDModel -- declarative container for data flow diagrams.
 
-::: gds_software.dfd.model.DFDModel
+::: gds_domains.software.dfd.model.DFDModel

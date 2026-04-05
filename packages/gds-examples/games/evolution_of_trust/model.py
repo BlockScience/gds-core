@@ -23,18 +23,18 @@ References:
 
 import re
 
-from ogs.dsl.compile import compile_to_ir
-from ogs.dsl.composition import (
+from gds_domains.games.dsl.compile import compile_to_ir
+from gds_domains.games.dsl.composition import (
     FeedbackFlow,
     FeedbackLoop,
     Flow,
     ParallelComposition,
     SequentialComposition,
 )
-from ogs.dsl.games import CovariantFunction, DecisionGame
-from ogs.dsl.pattern import ActionSpace, Pattern, PatternInput, TerminalCondition
-from ogs.dsl.types import CompositionType, InputType, Signature, port
-from ogs.ir.models import PatternIR
+from gds_domains.games.dsl.games import CovariantFunction, DecisionGame
+from gds_domains.games.dsl.pattern import ActionSpace, Pattern, PatternInput, TerminalCondition
+from gds_domains.games.dsl.types import CompositionType, InputType, Signature, port
+from gds_domains.games.ir.models import PatternIR
 
 # ======================================================================
 # Payoff parameters — Nicky Case's version: T > R > P > S, 2R > T + S

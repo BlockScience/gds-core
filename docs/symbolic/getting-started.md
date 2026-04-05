@@ -19,7 +19,7 @@ uv sync --all-packages
 Define a damped harmonic oscillator symbolically: two state variables (position and velocity), one input (external force).
 
 ```python
-from gds_symbolic import (
+from gds_domains.symbolic import (
     SymbolicControlModel,
     StateEquation,
     OutputEquation,
@@ -81,7 +81,7 @@ plt.show()
 Compute Jacobian matrices at an operating point to get the standard state-space form `(A, B, C, D)`:
 
 ```python
-from gds_symbolic import linearize
+from gds_domains.symbolic import linearize
 
 # Linearize around the equilibrium (x1=0, x2=0, u=0)
 lin = linearize(
@@ -112,7 +112,7 @@ print(f"Stable: {all(e.real < 0 for e in eigenvalues)}")
 A classic nonlinear system where linearization reveals local stability:
 
 ```python
-from gds_symbolic import SymbolicControlModel, StateEquation, linearize
+from gds_domains.symbolic import SymbolicControlModel, StateEquation, linearize
 
 vdp = SymbolicControlModel(
     name="VanDerPol",

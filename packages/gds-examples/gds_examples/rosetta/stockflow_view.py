@@ -20,9 +20,9 @@ Composition (auto-generated):
 from gds.canonical import CanonicalGDS, project_canonical
 from gds.ir.models import SystemIR
 from gds.spec import GDSSpec
-from stockflow.dsl.compile import compile_model, compile_to_system
-from stockflow.dsl.elements import Auxiliary, Converter, Flow, Stock
-from stockflow.dsl.model import StockFlowModel
+from gds_domains.stockflow.dsl.compile import compile_model, compile_to_system
+from gds_domains.stockflow.dsl.elements import Auxiliary, Converter, Flow, Stock
+from gds_domains.stockflow.dsl.model import StockFlowModel
 
 
 def build_model() -> StockFlowModel:

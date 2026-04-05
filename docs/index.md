@@ -35,18 +35,18 @@ Install just what you need: `uv add gds-core[control,continuous]`
 |---|---|---|
 | [`gds-framework`](framework/index.md) | `gds` | Core engine -- composition algebra, compiler, verification |
 | [`gds-viz`](viz/index.md) | `gds_viz` | Mermaid diagrams + [phase portraits](viz/index.md) `[phase]` |
-| [`gds-owl`](owl/index.md) | `gds_owl` | OWL/SHACL/SPARQL export for formal representability |
+| [`gds-interchange`](owl/index.md) | `gds_interchange.owl` | OWL/SHACL/SPARQL export for formal representability |
 
 ### Domain DSLs
 
 | Package | Import | Description |
 |---|---|---|
-| [`gds-stockflow`](stockflow/index.md) | `stockflow` | Declarative stock-flow DSL |
-| [`gds-control`](control/index.md) | `gds_control` | State-space control DSL |
-| [`gds-games`](games/index.md) | `ogs` | Compositional game theory + [Nash equilibrium](games/equilibrium.md) `[nash]` |
-| [`gds-software`](software/index.md) | `gds_software` | Software architecture DSL (DFD, SM, C4, ERD) |
-| [`gds-business`](business/index.md) | `gds_business` | Business dynamics DSL (CLD, SCN, VSM) |
-| [`gds-symbolic`](symbolic/index.md) | `gds_symbolic` | SymPy bridge for control models `[sympy]` |
+| [`gds-domains`](stockflow/index.md) | `gds_domains.stockflow` | Declarative stock-flow DSL |
+| | `gds_domains.control` | State-space control DSL |
+| | `gds_domains.games` | Compositional game theory + [Nash equilibrium](games/equilibrium.md) `[games]` |
+| | `gds_domains.software` | Software architecture DSL (DFD, SM, C4, ERD) |
+| | `gds_domains.business` | Business dynamics DSL (CLD, SCN, VSM) |
+| | `gds_domains.symbolic` | SymPy bridge for control models `[symbolic]` |
 
 ### Simulation & Analysis
 
@@ -55,7 +55,7 @@ Install just what you need: `uv add gds-core[control,continuous]`
 | [`gds-sim`](https://pypi.org/project/gds-sim/) | `gds_sim` | Discrete-time simulation engine (standalone) |
 | [`gds-continuous`](continuous/index.md) | `gds_continuous` | Continuous-time ODE engine `[scipy]` |
 | [`gds-analysis`](analysis/index.md) | `gds_analysis` | GDSSpec-to-gds-sim bridge, reachability |
-| [`gds-psuu`](psuu/index.md) | `gds_psuu` | Parameter sweep + Optuna optimization |
+| [`gds-analysis[psuu]`](psuu/index.md) | `gds_analysis.psuu` | Parameter sweep + Optuna optimization |
 
 ### Tutorials
 
@@ -76,20 +76,20 @@ graph TD
     FW["gds-framework<br/><small>core engine (pydantic only)</small>"]:::core
 
     VIZ["gds-viz<br/><small>Mermaid + phase portraits</small>"]:::tool
-    OWL["gds-owl<br/><small>OWL / SHACL / SPARQL</small>"]:::tool
+    OWL["gds-interchange<br/><small>OWL / SHACL / SPARQL</small>"]:::tool
 
-    GAMES["gds-games<br/><small>game theory DSL</small>"]:::dsl
-    SF["gds-stockflow<br/><small>stock-flow DSL</small>"]:::dsl
-    CTRL["gds-control<br/><small>control systems DSL</small>"]:::dsl
-    SW["gds-software<br/><small>software architecture DSL</small>"]:::dsl
-    BIZ["gds-business<br/><small>business dynamics DSL</small>"]:::dsl
+    GAMES["gds-domains.games<br/><small>game theory DSL</small>"]:::dsl
+    SF["gds-domains.stockflow<br/><small>stock-flow DSL</small>"]:::dsl
+    CTRL["gds-domains.control<br/><small>control systems DSL</small>"]:::dsl
+    SW["gds-domains.software<br/><small>software architecture DSL</small>"]:::dsl
+    BIZ["gds-domains.business<br/><small>business dynamics DSL</small>"]:::dsl
 
-    SYM["gds-symbolic<br/><small>SymPy + Hamiltonian</small>"]:::tool
+    SYM["gds-domains.symbolic<br/><small>SymPy + Hamiltonian</small>"]:::tool
     EX["gds-examples<br/><small>tutorials + notebooks</small>"]:::ext
 
     SIM["gds-sim<br/><small>discrete-time simulation</small>"]:::sim
     AN["gds-analysis<br/><small>reachability + metrics</small>"]:::sim
-    PSUU["gds-psuu<br/><small>parameter sweep</small>"]:::sim
+    PSUU["gds-analysis.psuu<br/><small>parameter sweep</small>"]:::sim
 
     CONT["gds-continuous<br/><small>ODE engine (scipy)</small>"]:::sim
 

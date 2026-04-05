@@ -1,15 +1,15 @@
-# gds_business.vsm.elements
+# gds_domains.business.vsm.elements
 
 VSM element declarations — frozen Pydantic models.
 
-::: gds_business.vsm.elements.ProcessStep
+::: gds_domains.business.vsm.elements.ProcessStep
 
-::: gds_business.vsm.elements.InventoryBuffer
+::: gds_domains.business.vsm.elements.InventoryBuffer
 
-::: gds_business.vsm.elements.Supplier
+::: gds_domains.business.vsm.elements.Supplier
 
-::: gds_business.vsm.elements.Customer
+::: gds_domains.business.vsm.elements.Customer
 
-::: gds_business.vsm.elements.MaterialFlow
+::: gds_domains.business.vsm.elements.MaterialFlow
 
-::: gds_business.vsm.elements.InformationFlow
+::: gds_domains.business.vsm.elements.InformationFlow

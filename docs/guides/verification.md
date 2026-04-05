@@ -246,8 +246,8 @@ The StockFlow DSL provides SF-001..SF-005, running before GDS compilation for ea
 A stock has no connected flows -- nothing fills or drains it.
 
 ```python
-from stockflow.dsl.elements import Flow, Stock
-from stockflow.dsl.model import StockFlowModel
+from gds_domains.stockflow.dsl.elements import Flow, Stock
+from gds_domains.stockflow.dsl.model import StockFlowModel
 
 model = StockFlowModel(
     name="Orphan Stock Demo",
@@ -263,7 +263,7 @@ model = StockFlowModel(
 ```
 
 ```python
-from stockflow.verification.checks import check_sf001_orphan_stocks
+from gds_domains.stockflow.verification.checks import check_sf001_orphan_stocks
 
 findings = check_sf001_orphan_stocks(model)
 # -> SF-001 WARNING: Stock 'Inventory' has no connected flows
@@ -274,8 +274,8 @@ findings = check_sf001_orphan_stocks(model)
 Circular dependency between auxiliaries -- Price depends on Demand, which depends on Price.
 
 ```python
-from stockflow.dsl.elements import Auxiliary, Stock
-from stockflow.dsl.model import StockFlowModel
+from gds_domains.stockflow.dsl.elements import Auxiliary, Stock
+from gds_domains.stockflow.dsl.model import StockFlowModel
 
 model = StockFlowModel(
     name="Cyclic Auxiliary Demo",
@@ -288,7 +288,7 @@ model = StockFlowModel(
 ```
 
 ```python
-from stockflow.verification.checks import check_sf003_auxiliary_acyclicity
+from gds_domains.stockflow.verification.checks import check_sf003_auxiliary_acyclicity
 
 findings = check_sf003_auxiliary_acyclicity(model)
 # -> SF-003 ERROR: cycle detected in auxiliary dependency graph
@@ -299,8 +299,8 @@ findings = check_sf003_auxiliary_acyclicity(model)
 A converter is declared but no auxiliary reads from it.
 
 ```python
-from stockflow.dsl.elements import Auxiliary, Converter, Flow, Stock
-from stockflow.dsl.model import StockFlowModel
+from gds_domains.stockflow.dsl.elements import Auxiliary, Converter, Flow, Stock
+from gds_domains.stockflow.dsl.model import StockFlowModel
 
 model = StockFlowModel(
     name="Unused Converter Demo",
@@ -312,7 +312,7 @@ model = StockFlowModel(
 ```
 
 ```python
-from stockflow.verification.checks import check_sf004_converter_connectivity
+from gds_domains.stockflow.verification.checks import check_sf004_converter_connectivity
 
 findings = check_sf004_converter_connectivity(model)
 # -> SF-004 WARNING: Converter 'Tax Rate' is NOT referenced by any auxiliary
@@ -323,7 +323,7 @@ findings = check_sf004_converter_connectivity(model)
 The StockFlow verification engine can run domain checks (SF) **and** generic GDS checks (G) together:
 
 ```python
-from stockflow.verification.engine import verify
+from gds_domains.stockflow.verification.engine import verify
 
 report = verify(model, include_gds_checks=True)
 

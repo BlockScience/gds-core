@@ -73,7 +73,7 @@ def model_setup():
         run_evolution,
     )
 
-    from ogs.viz import (
+    from gds_domains.games.viz import (
         architecture_by_domain_to_mermaid,
         structural_to_mermaid,
         terminal_conditions_to_mermaid,

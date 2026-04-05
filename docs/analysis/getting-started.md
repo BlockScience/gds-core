@@ -19,7 +19,7 @@ uv sync --all-packages
 The typical workflow: build a GDS specification from a domain model, supply behavioral functions, then simulate.
 
 ```python
-from gds_control import (
+from gds_domains.control import (
     State, Input, Sensor, Controller,
     ControlModel, compile_model,
 )
