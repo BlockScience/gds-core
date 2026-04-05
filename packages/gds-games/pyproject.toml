@@ -38,9 +38,6 @@ dependencies = [
 [tool.uv.sources]
 gds-domains = { workspace = true }
 
-[project.scripts]
-ogs = "ogs.cli:app"
-
 [project.urls]
 Homepage = "https://github.com/BlockScience/gds-core"
 Repository = "https://github.com/BlockScience/gds-core"

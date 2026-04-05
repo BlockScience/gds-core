@@ -22,21 +22,23 @@ jobs:
       matrix:
         package:
           - gds-framework
+          - gds-domains
+          - gds-sim
+          - gds-continuous
+          - gds-analysis
+          - gds-interchange
           - gds-viz
-          - gds-games
-          - gds-stockflow
-          - gds-control
           - gds-examples
     steps:
       - uses: actions/checkout@v6
       - uses: astral-sh/setup-uv@v7
-      - run: uv sync --package ${{ matrix.package }}
+      - run: uv sync --all-packages
       - name: Run tests
         env:
           HYPOTHESIS_PROFILE: ci
         run: |
           if [ "${{ matrix.package }}" = "gds-examples" ]; then
-            uv run --package ${{ matrix.package }} pytest packages/gds-examples -v
+            uv run python -m pytest packages/gds-examples -v
           else
-            uv run --package ${{ matrix.package }} pytest packages/${{ matrix.package }}/tests -v
+            uv run python -m pytest packages/${{ matrix.package }}/tests -v
           fi
