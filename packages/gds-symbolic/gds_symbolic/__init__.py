@@ -1,18 +1,28 @@
-"""gds-symbolic: Symbolic math bridge for the GDS ecosystem."""
+"""gds-symbolic — DEPRECATED: use gds_domains.symbolic instead."""
 
-__version__ = "0.1.0"
+import warnings
 
-from gds_symbolic.elements import OutputEquation, StateEquation
-from gds_symbolic.errors import SymbolicError
-from gds_symbolic.hamiltonian import (
+warnings.warn(
+    "Import from gds_domains.symbolic instead of gds_symbolic. "
+    "The gds-symbolic package will be removed in v0.3.0.",
+    DeprecationWarning,
+    stacklevel=2,
+)
+
+__version__ = "0.99.0"
+
+from gds_domains.symbolic import (  # noqa: F401, E402
     HamiltonianSpec,
     HamiltonianSystem,
+    LinearizedSystem,
+    OutputEquation,
+    StateEquation,
+    SymbolicControlModel,
+    SymbolicError,
     derive_from_model,
     derive_hamiltonian,
     verify_conservation,
 )
-from gds_symbolic.linearize import LinearizedSystem
-from gds_symbolic.model import SymbolicControlModel
 
 __all__ = [
     "HamiltonianSpec",

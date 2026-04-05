@@ -1,5 +1,5 @@
-# gds_software.dependency.model
+# gds_domains.software.dependency.model
 
 DependencyModel -- declarative container for dependency graphs.
 
-::: gds_software.dependency.model.DependencyModel
+::: gds_domains.software.dependency.model.DependencyModel

@@ -1,8 +1,8 @@
-# ogs
+# gds_domains.games
 
 Public API — top-level exports.
 
-::: ogs
+::: gds_domains.games
     options:
       show_submodules: false
       members: false

@@ -37,7 +37,7 @@ Canonical:   h = g (stateless)
 ### Example
 
 ```python
-from gds_business import Variable, CausalLink, CausalLoopModel
+from gds_domains.business import Variable, CausalLink, CausalLoopModel
 
 model = CausalLoopModel(
     name="Market Dynamics",
@@ -91,7 +91,7 @@ Canonical:   h = f ∘ g (stateful — inventory stocks are state X)
 ### Example
 
 ```python
-from gds_business import (
+from gds_domains.business import (
     SupplyNode, Shipment, DemandSource, OrderPolicy,
     SupplyChainModel,
 )
@@ -160,7 +160,7 @@ VSM-002 identifies where the flow type transitions, marking the **push/pull boun
 ### Example
 
 ```python
-from gds_business import (
+from gds_domains.business import (
     ProcessStep, InventoryBuffer, Supplier, Customer,
     MaterialFlow, InformationFlow, ValueStreamModel,
 )

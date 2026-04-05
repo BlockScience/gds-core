@@ -19,7 +19,7 @@
 ## Architecture
 
 ```
-gds-control (pip install gds-control)
+gds-control (pip install gds-domains)
 |
 |  State-space control DSL: State, Input, Sensor, Controller.
 |

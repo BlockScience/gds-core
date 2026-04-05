@@ -1,5 +1,71 @@
 # Changelog
 
+## 2026-04-05 — Package Consolidation (14 → 8 packages)
+
+Implements the consolidation plan from issue #143. Reduces the monorepo from
+14 independently published packages to 8, eliminating the N^2 integration
+problem and simplifying user installation.
+
+### New packages
+
+- **gds-domains v0.1.0** — consolidates all 6 domain DSLs (stockflow, control,
+  business, software, games, symbolic) into a single package with optional extras.
+  Install what you need: `pip install gds-domains[games,symbolic]`.
+  Import paths: `from gds_domains.stockflow import StockFlowModel`, etc.
+
+- **gds-interchange v0.1.0** — replaces gds-owl as a broader interchange hub.
+  OWL/RDF functionality lives at `gds_interchange.owl`. Future bridges (SysML,
+  FMI, SBML) will land as additional subpackages.
+
+### Merged packages
+
+- **gds-analysis v0.2.0** — absorbs gds-psuu. PSUU functionality is now at
+  `gds_analysis.psuu`. Install with `pip install gds-analysis[psuu]` for Optuna.
+
+### Deprecated packages (shim-only, v0.99.0)
+
+The following packages now re-export from their consolidated locations with a
+`DeprecationWarning`. They will be removed in v0.3.0:
+
+- `gds-owl` → use `gds-interchange` (`from gds_interchange.owl import ...`)
+- `gds-psuu` → use `gds-analysis` (`from gds_analysis.psuu import ...`)
+- `gds-stockflow` → use `gds-domains` (`from gds_domains.stockflow import ...`)
+- `gds-control` → use `gds-domains` (`from gds_domains.control import ...`)
+- `gds-business` → use `gds-domains` (`from gds_domains.business import ...`)
+- `gds-software` → use `gds-domains` (`from gds_domains.software import ...`)
+- `gds-games` → use `gds-domains` (`from gds_domains.games import ...`)
+- `gds-symbolic` → use `gds-domains` (`from gds_domains.symbolic import ...`)
+
+### Unchanged packages
+
+- `gds-framework` ��� core engine (no changes)
+- `gds-sim` — discrete-time simulation (standalone, no changes)
+- `gds-continuous` — continuous-time ODE engine (standalone, no changes)
+- `gds-viz` — visualization (no changes)
+- `gds-examples` — updated imports to use `gds_domains.*`
+
+### Migration guide
+
+Replace old imports with new paths:
+
+```python
+# Before
+from stockflow import StockFlowModel
+from gds_control import ControlModel
+from ogs import OpenGame
+from gds_owl import spec_to_graph
+
+# After
+from gds_domains.stockflow import StockFlowModel
+from gds_domains.control import ControlModel
+from gds_domains.games import OpenGame
+from gds_interchange.owl import spec_to_graph
+```
+
+Old imports continue to work with a deprecation warning until v0.3.0.
+
+---
+
 ## 2026-04-03 — Tier 0 + Tier 1 Complete
 
 Driven by external reviews from Zargham and Jamsheed (Shorish) against the

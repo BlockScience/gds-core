@@ -1,5 +1,5 @@
-# gds_owl.serialize
+# gds_interchange.owl.serialize
 
 RDF serialization utilities (Turtle format).
 
-::: gds_owl.serialize
+::: gds_interchange.owl.serialize

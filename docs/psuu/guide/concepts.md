@@ -23,7 +23,7 @@ A `ParameterSpace` defines what to search. Each dimension has a name and a type:
 | `Discrete(values=(...))` | Explicit set of values | All values |
 
 ```python
-from gds_psuu import Continuous, Integer, Discrete, ParameterSpace
+from gds_analysis.psuu import Continuous, Integer, Discrete, ParameterSpace
 
 space = ParameterSpace(params={
     "learning_rate": Continuous(min_val=0.001, max_val=0.1),
@@ -41,10 +41,10 @@ Validation enforces `min_val < max_val` and at least one parameter.
 A `Metric` extracts a **single scalar from one simulation run**. It receives the full `Results` object and a run ID.
 
 ```python
-from gds_psuu import Metric
+from gds_analysis.psuu import Metric
 
 # Built-in factories
-from gds_psuu import final_value, trajectory_mean, max_value, min_value
+from gds_analysis.psuu import final_value, trajectory_mean, max_value, min_value
 
 final_value("population")      # value at last timestep
 trajectory_mean("population")  # mean over all timesteps
@@ -72,7 +72,7 @@ The `MetricFn` signature is `(Results, int) -> float` where the int is the run I
 An `Aggregation` reduces a **list of per-run values into a single scalar**. It operates on `list[float]` and returns `float`.
 
 ```python
-from gds_psuu import mean_agg, std_agg, percentile_agg, probability_above, probability_below
+from gds_analysis.psuu import mean_agg, std_agg, percentile_agg, probability_above, probability_below
 
 mean_agg                    # arithmetic mean
 std_agg                     # sample standard deviation
@@ -85,7 +85,7 @@ probability_below(0.0)      # fraction of runs < 0 (risk measure)
 Custom aggregations:
 
 ```python
-from gds_psuu import Aggregation
+from gds_analysis.psuu import Aggregation
 
 cv_agg = Aggregation(
     name="cv",
@@ -104,7 +104,7 @@ cv_agg = Aggregation(
 A `KPI` composes a Metric and an Aggregation into a named score:
 
 ```python
-from gds_psuu import KPI, final_value, std_agg
+from gds_analysis.psuu import KPI, final_value, std_agg
 
 kpi = KPI(
     name="uncertainty",
@@ -130,7 +130,7 @@ aggregated = kpi.compute(results)       # single float
 The older `fn`-based interface operates on the full `Results` at once:
 
 ```python
-from gds_psuu import KPI, final_state_mean
+from gds_analysis.psuu import KPI, final_state_mean
 
 kpi = KPI(name="pop", fn=lambda r: final_state_mean(r, "population"))
 ```
@@ -150,7 +150,7 @@ The `Evaluator` bridges parameter points to scored KPIs:
 5. Returns `EvaluationResult` with scores and distributions
 
 ```python
-from gds_psuu import Evaluator
+from gds_analysis.psuu import Evaluator
 
 evaluator = Evaluator(
     base_model=model,
@@ -192,7 +192,7 @@ while not optimizer.is_exhausted():
 `Sweep` is the top-level orchestrator that connects everything:
 
 ```python
-from gds_psuu import Sweep
+from gds_analysis.psuu import Sweep
 
 sweep = Sweep(
     model=model,

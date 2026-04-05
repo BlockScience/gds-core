@@ -171,9 +171,9 @@ Both models decompose into the same `h = f . g` structure, but with different di
 | Source | Path to GDSSpec | Path to SystemIR |
 |--------|----------------|------------------|
 | Raw GDS | Manual `build_spec()` | `compile_system(name, root)` |
-| gds-stockflow | `stockflow.dsl.compile.compile_model()` | `stockflow.dsl.compile.compile_to_system()` |
-| gds-control | `gds_control.dsl.compile.compile_model()` | `gds_control.dsl.compile.compile_to_system()` |
-| gds-games | `ogs.dsl.spec_bridge.compile_pattern_to_spec()` | via `PatternIR.to_system_ir()` |
+| gds-domains (stockflow) | `gds_domains.stockflow.dsl.compile.compile_model()` | `gds_domains.stockflow.dsl.compile.compile_to_system()` |
+| gds-domains (control) | `gds_domains.control.dsl.compile.compile_model()` | `gds_domains.control.dsl.compile.compile_to_system()` |
+| gds-domains (games) | `gds_domains.games.dsl.spec_bridge.compile_pattern_to_spec()` | via `PatternIR.to_system_ir()` |
 
 ---
 

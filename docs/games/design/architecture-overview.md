@@ -62,7 +62,7 @@ All three packages are **developed by BlockScience**. During delivery:
               ┌─────────────────────────────────┐
               │  Client team receives:           │
               │                                  │
-              │  pip install gds-games     │
+              │  pip install gds-domains[games]     │
               │  + their own repo with patterns  │
               │    notebooks, and analysis        │
               │                                  │
@@ -212,7 +212,7 @@ gds-games/
 ├── tests/                  # DSL unit tests + IR tests + verification tests
 ├── docs/
 ├── pyproject.toml          # dependencies: gds-framework>=0.1, pydantic, typer, jinja2
-└── README.md               # "pip install gds-games"
+└── README.md               # "pip install gds-domains[games]"
 ```
 
 No `examples/`, no `notebooks/` — those belong to the client.
@@ -300,7 +300,7 @@ DSL packages are designed to be forkable by clients:
 
 ```
 Option A: Use OGS as-is (recommended)
-  pip install gds-games
+  pip install gds-domains[games]
 
 Option B: Fork and extend
   1. Fork gds-games
@@ -324,5 +324,5 @@ The key guarantee: **GDS is stable infrastructure.** DSL packages can diverge, f
 | Package | PyPI | Import | Layer | Visibility |
 |---------|------|--------|-------|------------|
 | GDS Framework | `gds-framework` | `gds` | Framework | Public (open source) |
-| GDS Games | `gds-games` | `ogs` | DSL | Public (open source) |
+| GDS Games | `gds-domains[games]` | `gds_domains.games` | DSL | Public (open source) |
 | Client App | — | — | Client | Private (delivered to client) |

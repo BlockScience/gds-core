@@ -61,29 +61,29 @@ plugins:
           - {viz/getting-started.md: "First diagram in 3 lines of code"}
           - viz/guide/*.md
           - viz/api/*.md
-        Games (gds-games / ogs):
+        Games (gds-domains):
           - {games/index.md: "Typed DSL for compositional game theory (Open Games)"}
           - {games/getting-started.md: "Model a Prisoner's Dilemma game"}
           - {games/equilibrium.md: "Nash equilibrium computation via Nashpy"}
           - games/guide/*.md
           - games/design/*.md
           - games/api/*.md
-        Business (gds-business):
+        Business (gds-domains):
           - {business/index.md: "Business dynamics DSL — CLD, supply chain, value stream map"}
           - {business/getting-started.md: "Model a causal loop diagram"}
           - business/guide/*.md
           - business/api/*.md
-        Stock-Flow (gds-stockflow):
+        Stock-Flow (gds-domains):
           - {stockflow/index.md: "Declarative stock-flow DSL over GDS semantics"}
           - {stockflow/getting-started.md: "Model an SIR epidemic as stocks and flows"}
           - stockflow/guide/*.md
           - stockflow/api/*.md
-        Control (gds-control):
+        Control (gds-domains):
           - {control/index.md: "State-space control systems DSL over GDS semantics"}
           - {control/getting-started.md: "Model a PID thermostat controller"}
           - control/guide/*.md
           - control/api/*.md
-        Software (gds-software):
+        Software (gds-domains):
           - {software/index.md: "Software architecture DSL — DFD, state machine, C4, ERD, component, dependency"}
           - {software/getting-started.md: "Model a data flow diagram"}
           - software/guide/*.md
@@ -110,12 +110,12 @@ plugins:
           - guides/dsl-roadmap.md
           - research/research-boundaries.md
           - guides/view-stratification.md
-        OWL (gds-owl):
+        OWL (gds-interchange):
           - {owl/index.md: "OWL/SHACL/SPARQL for GDS specifications — semantic web interoperability"}
           - {owl/getting-started.md: "Export a spec to Turtle, import back, validate with SHACL"}
           - owl/guide/*.md
           - owl/api/*.md
-        PSUU (gds-psuu):
+        PSUU (gds-analysis):
           - {psuu/index.md: "Parameter space search under uncertainty for gds-sim"}
           - {psuu/getting-started.md: "Installation + first parameter sweep"}
           - psuu/guide/*.md
@@ -123,15 +123,15 @@ plugins:
         Continuous-Time (gds-continuous):
           - {continuous/index.md: "Continuous-time ODE integration engine — 6 SciPy solvers"}
           - {continuous/getting-started.md: "Define and simulate an ODE system"}
-        Symbolic Math (gds-symbolic):
-          - {symbolic/index.md: "SymPy bridge for gds-control — symbolic equations and linearization"}
+        Symbolic Math (gds-domains):
+          - {symbolic/index.md: "SymPy bridge for gds-domains (control) — symbolic equations and linearization"}
           - {symbolic/getting-started.md: "Compile symbolic equations to ODE functions"}
         Analysis (gds-analysis):
           - {analysis/index.md: "Bridge GDSSpec structural annotations to gds-sim runtime"}
           - {analysis/getting-started.md: "Convert a GDSSpec to a runnable simulation model"}
         Case Studies:
           - {case-studies/index.md: "Real-world projects built on the GDS ecosystem"}
-          - {case-studies/axelrod.md: "Axelrod tournament — one model, many views with gds-games, gds-sim, gds-psuu, gds-viz"}
+          - {case-studies/axelrod.md: "Axelrod tournament — one model, many views with gds-domains, gds-sim, gds-analysis, gds-viz"}
         Design & Research:
           - {framework/design/assurance-claims.md: "Verification passport and assurance claims"}
           - {framework/design/check-specifications.md: "Formal property statements for all verification checks"}
@@ -258,19 +258,19 @@ nav:
           - Design:
               - Architecture Overview: games/design/architecture-overview.md
           - API Reference:
-              - ogs: games/api/init.md
-              - ogs.dsl.types: games/api/dsl-types.md
-              - ogs.dsl.base: games/api/dsl-base.md
-              - ogs.dsl.games: games/api/dsl-games.md
-              - ogs.dsl.composition: games/api/dsl-composition.md
-              - ogs.dsl.pattern: games/api/dsl-pattern.md
-              - ogs.dsl.compile: games/api/dsl-compile.md
-              - ogs.dsl.library: games/api/dsl-library.md
-              - ogs.ir: games/api/ir.md
-              - ogs.verification: games/api/verification.md
-              - ogs.viz: games/api/viz.md
-              - ogs.reports: games/api/reports.md
-              - ogs.cli: games/api/cli.md
+              - gds_domains.games: games/api/init.md
+              - gds_domains.games.dsl.types: games/api/dsl-types.md
+              - gds_domains.games.dsl.base: games/api/dsl-base.md
+              - gds_domains.games.dsl.games: games/api/dsl-games.md
+              - gds_domains.games.dsl.composition: games/api/dsl-composition.md
+              - gds_domains.games.dsl.pattern: games/api/dsl-pattern.md
+              - gds_domains.games.dsl.compile: games/api/dsl-compile.md
+              - gds_domains.games.dsl.library: games/api/dsl-library.md
+              - gds_domains.games.ir: games/api/ir.md
+              - gds_domains.games.verification: games/api/verification.md
+              - gds_domains.games.viz: games/api/viz.md
+              - gds_domains.games.reports: games/api/reports.md
+              - gds_domains.games.cli: games/api/cli.md
       - Business:
           - Overview: business/index.md
           - Getting Started: business/getting-started.md
@@ -279,21 +279,21 @@ nav:
               - Verification: business/guide/verification.md
           - API Reference:
               - Overview: business/api/index.md
-              - gds_business: business/api/init.md
-              - gds_business.common: business/api/common.md
-              - gds_business.cld.elements: business/api/cld-elements.md
-              - gds_business.cld.model: business/api/cld-model.md
-              - gds_business.cld.compile: business/api/cld-compile.md
-              - gds_business.cld.checks: business/api/cld-checks.md
-              - gds_business.supplychain.elements: business/api/scn-elements.md
-              - gds_business.supplychain.model: business/api/scn-model.md
-              - gds_business.supplychain.compile: business/api/scn-compile.md
-              - gds_business.supplychain.checks: business/api/scn-checks.md
-              - gds_business.vsm.elements: business/api/vsm-elements.md
-              - gds_business.vsm.model: business/api/vsm-model.md
-              - gds_business.vsm.compile: business/api/vsm-compile.md
-              - gds_business.vsm.checks: business/api/vsm-checks.md
-              - gds_business.verification: business/api/verification.md
+              - gds_domains.business: business/api/init.md
+              - gds_domains.business.common: business/api/common.md
+              - gds_domains.business.cld.elements: business/api/cld-elements.md
+              - gds_domains.business.cld.model: business/api/cld-model.md
+              - gds_domains.business.cld.compile: business/api/cld-compile.md
+              - gds_domains.business.cld.checks: business/api/cld-checks.md
+              - gds_domains.business.supplychain.elements: business/api/scn-elements.md
+              - gds_domains.business.supplychain.model: business/api/scn-model.md
+              - gds_domains.business.supplychain.compile: business/api/scn-compile.md
+              - gds_domains.business.supplychain.checks: business/api/scn-checks.md
+              - gds_domains.business.vsm.elements: business/api/vsm-elements.md
+              - gds_domains.business.vsm.model: business/api/vsm-model.md
+              - gds_domains.business.vsm.compile: business/api/vsm-compile.md
+              - gds_domains.business.vsm.checks: business/api/vsm-checks.md
+              - gds_domains.business.verification: business/api/verification.md
       - Stock-Flow:
           - Overview: stockflow/index.md
           - Getting Started: stockflow/getting-started.md
@@ -301,12 +301,12 @@ nav:
               - Elements & GDS Mapping: stockflow/guide/elements.md
               - Verification: stockflow/guide/verification.md
           - API Reference:
-              - stockflow: stockflow/api/init.md
-              - stockflow.dsl.elements: stockflow/api/elements.md
-              - stockflow.dsl.model: stockflow/api/model.md
-              - stockflow.dsl.compile: stockflow/api/compile.md
-              - stockflow.verification.checks: stockflow/api/checks.md
-              - stockflow.verification: stockflow/api/verification.md
+              - gds_domains.stockflow: stockflow/api/init.md
+              - gds_domains.stockflow.dsl.elements: stockflow/api/elements.md
+              - gds_domains.stockflow.dsl.model: stockflow/api/model.md
+              - gds_domains.stockflow.dsl.compile: stockflow/api/compile.md
+              - gds_domains.stockflow.verification.checks: stockflow/api/checks.md
+              - gds_domains.stockflow.verification: stockflow/api/verification.md
       - Control:
           - Overview: control/index.md
           - Getting Started: control/getting-started.md
@@ -314,12 +314,12 @@ nav:
               - Elements & GDS Mapping: control/guide/elements.md
               - Verification: control/guide/verification.md
           - API Reference:
-              - gds_control: control/api/init.md
-              - gds_control.dsl.elements: control/api/elements.md
-              - gds_control.dsl.model: control/api/model.md
-              - gds_control.dsl.compile: control/api/compile.md
-              - gds_control.verification.checks: control/api/checks.md
-              - gds_control.verification: control/api/verification.md
+              - gds_domains.control: control/api/init.md
+              - gds_domains.control.dsl.elements: control/api/elements.md
+              - gds_domains.control.dsl.model: control/api/model.md
+              - gds_domains.control.dsl.compile: control/api/compile.md
+              - gds_domains.control.verification.checks: control/api/checks.md
+              - gds_domains.control.verification: control/api/verification.md
       - Software:
           - Overview: software/index.md
           - Getting Started: software/getting-started.md
@@ -328,33 +328,33 @@ nav:
               - Verification: software/guide/verification.md
           - API Reference:
               - Overview: software/api/index.md
-              - gds_software: software/api/init.md
-              - gds_software.common: software/api/common.md
-              - gds_software.dfd.elements: software/api/dfd-elements.md
-              - gds_software.dfd.model: software/api/dfd-model.md
-              - gds_software.dfd.compile: software/api/dfd-compile.md
-              - gds_software.dfd.checks: software/api/dfd-checks.md
-              - gds_software.statemachine.elements: software/api/sm-elements.md
-              - gds_software.statemachine.model: software/api/sm-model.md
-              - gds_software.statemachine.compile: software/api/sm-compile.md
-              - gds_software.statemachine.checks: software/api/sm-checks.md
-              - gds_software.component.elements: software/api/cp-elements.md
-              - gds_software.component.model: software/api/cp-model.md
-              - gds_software.component.compile: software/api/cp-compile.md
-              - gds_software.component.checks: software/api/cp-checks.md
-              - gds_software.c4.elements: software/api/c4-elements.md
-              - gds_software.c4.model: software/api/c4-model.md
-              - gds_software.c4.compile: software/api/c4-compile.md
-              - gds_software.c4.checks: software/api/c4-checks.md
-              - gds_software.erd.elements: software/api/erd-elements.md
-              - gds_software.erd.model: software/api/erd-model.md
-              - gds_software.erd.compile: software/api/erd-compile.md
-              - gds_software.erd.checks: software/api/erd-checks.md
-              - gds_software.dependency.elements: software/api/dep-elements.md
-              - gds_software.dependency.model: software/api/dep-model.md
-              - gds_software.dependency.compile: software/api/dep-compile.md
-              - gds_software.dependency.checks: software/api/dep-checks.md
-              - gds_software.verification: software/api/verification.md
+              - gds_domains.software: software/api/init.md
+              - gds_domains.software.common: software/api/common.md
+              - gds_domains.software.dfd.elements: software/api/dfd-elements.md
+              - gds_domains.software.dfd.model: software/api/dfd-model.md
+              - gds_domains.software.dfd.compile: software/api/dfd-compile.md
+              - gds_domains.software.dfd.checks: software/api/dfd-checks.md
+              - gds_domains.software.statemachine.elements: software/api/sm-elements.md
+              - gds_domains.software.statemachine.model: software/api/sm-model.md
+              - gds_domains.software.statemachine.compile: software/api/sm-compile.md
+              - gds_domains.software.statemachine.checks: software/api/sm-checks.md
+              - gds_domains.software.component.elements: software/api/cp-elements.md
+              - gds_domains.software.component.model: software/api/cp-model.md
+              - gds_domains.software.component.compile: software/api/cp-compile.md
+              - gds_domains.software.component.checks: software/api/cp-checks.md
+              - gds_domains.software.c4.elements: software/api/c4-elements.md
+              - gds_domains.software.c4.model: software/api/c4-model.md
+              - gds_domains.software.c4.compile: software/api/c4-compile.md
+              - gds_domains.software.c4.checks: software/api/c4-checks.md
+              - gds_domains.software.erd.elements: software/api/erd-elements.md
+              - gds_domains.software.erd.model: software/api/erd-model.md
+              - gds_domains.software.erd.compile: software/api/erd-compile.md
+              - gds_domains.software.erd.checks: software/api/erd-checks.md
+              - gds_domains.software.dependency.elements: software/api/dep-elements.md
+              - gds_domains.software.dependency.model: software/api/dep-model.md
+              - gds_domains.software.dependency.compile: software/api/dep-compile.md
+              - gds_domains.software.dependency.checks: software/api/dep-checks.md
+              - gds_domains.software.verification: software/api/verification.md
       - OWL:
           - Overview: owl/index.md
           - Getting Started: owl/getting-started.md
@@ -362,13 +362,13 @@ nav:
               - Representability: owl/guide/representability.md
               - Formal Analysis: research/formal-representability.md
           - API Reference:
-              - gds_owl: owl/api/init.md
-              - gds_owl.ontology: owl/api/ontology.md
-              - gds_owl.export: owl/api/export.md
-              - gds_owl.import_: owl/api/import.md
-              - gds_owl.shacl: owl/api/shacl.md
-              - gds_owl.sparql: owl/api/sparql.md
-              - gds_owl.serialize: owl/api/serialize.md
+              - gds_interchange.owl: owl/api/init.md
+              - gds_interchange.owl.ontology: owl/api/ontology.md
+              - gds_interchange.owl.export: owl/api/export.md
+              - gds_interchange.owl.import_: owl/api/import.md
+              - gds_interchange.owl.shacl: owl/api/shacl.md
+              - gds_interchange.owl.sparql: owl/api/sparql.md
+              - gds_interchange.owl.serialize: owl/api/serialize.md
       - PSUU:
           - Overview: psuu/index.md
           - Getting Started: psuu/getting-started.md
@@ -377,14 +377,14 @@ nav:
               - Parameter Spaces: psuu/guide/spaces.md
               - Optimizers: psuu/guide/optimizers.md
           - API Reference:
-              - gds_psuu: psuu/api/init.md
-              - gds_psuu.metric: psuu/api/metric.md
-              - gds_psuu.kpi: psuu/api/kpi.md
-              - gds_psuu.evaluation: psuu/api/evaluation.md
-              - gds_psuu.space: psuu/api/space.md
-              - gds_psuu.optimizers: psuu/api/optimizers.md
-              - gds_psuu.sweep: psuu/api/sweep.md
-              - gds_psuu.results: psuu/api/results.md
+              - gds_analysis.psuu: psuu/api/init.md
+              - gds_analysis.psuu.metric: psuu/api/metric.md
+              - gds_analysis.psuu.kpi: psuu/api/kpi.md
+              - gds_analysis.psuu.evaluation: psuu/api/evaluation.md
+              - gds_analysis.psuu.space: psuu/api/space.md
+              - gds_analysis.psuu.optimizers: psuu/api/optimizers.md
+              - gds_analysis.psuu.sweep: psuu/api/sweep.md
+              - gds_analysis.psuu.results: psuu/api/results.md
       - Continuous-Time:
           - Overview: continuous/index.md
           - Getting Started: continuous/getting-started.md

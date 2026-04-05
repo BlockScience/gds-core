@@ -16,7 +16,7 @@ from gds.verification.spec_checks import (
     check_determinism,
     check_type_safety,
 )
-from gds_control.verification.engine import verify as cs_verify
+from gds_domains.control.verification.engine import verify as cs_verify
 from thermostat_dsl.model import (
     build_canonical,
     build_model,

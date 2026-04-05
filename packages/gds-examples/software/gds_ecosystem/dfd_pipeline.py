@@ -16,9 +16,9 @@ GDS Decomposition:
 from gds import project_canonical, verify
 from gds.ir.models import SystemIR
 from gds.spec import GDSSpec
-from gds_software.dfd.compile import compile_dfd, compile_dfd_to_system
-from gds_software.dfd.elements import DataFlow, DataStore, ExternalEntity, Process
-from gds_software.dfd.model import DFDModel
+from gds_domains.software.dfd.compile import compile_dfd, compile_dfd_to_system
+from gds_domains.software.dfd.elements import DataFlow, DataStore, ExternalEntity, Process
+from gds_domains.software.dfd.model import DFDModel
 from gds_viz import system_to_mermaid
 
 

@@ -1,3 +1,3 @@
-# ogs.dsl.compile
+# gds_domains.games.dsl.compile
 
-::: ogs.dsl.compile.compile_to_ir
+::: gds_domains.games.dsl.compile.compile_to_ir

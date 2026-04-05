@@ -4,14 +4,14 @@
 
 ```bash
 uv add gds-psuu
-# or: pip install gds-psuu
+# or: pip install gds-analysis[psuu]
 ```
 
 For Bayesian optimization (optional):
 
 ```bash
 uv add "gds-psuu[bayesian]"
-# or: pip install gds-psuu[bayesian]
+# or: pip install gds-analysis[psuu][bayesian]
 ```
 
 For development (monorepo):
@@ -28,7 +28,7 @@ Define a `gds-sim` model, then sweep a parameter to find the best value:
 
 ```python
 from gds_sim import Model, StateUpdateBlock
-from gds_psuu import (
+from gds_analysis.psuu import (
     KPI,
     Continuous,
     GridSearchOptimizer,
@@ -94,7 +94,7 @@ print(f"Best avg final pop: {best.scores['avg_final_pop']:.1f}")
 The key design is the **Metric + Aggregation = KPI** pattern:
 
 ```python
-from gds_psuu import (
+from gds_analysis.psuu import (
     KPI,
     final_value,
     trajectory_mean,
@@ -144,7 +144,7 @@ for ev in results.evaluations:
 ## Multiple Optimizers
 
 ```python
-from gds_psuu import GridSearchOptimizer, RandomSearchOptimizer
+from gds_analysis.psuu import GridSearchOptimizer, RandomSearchOptimizer
 
 # Exhaustive grid (good for 1-2 dimensions)
 grid = GridSearchOptimizer(n_steps=10)  # 10 points per continuous dim
@@ -156,7 +156,7 @@ rand = RandomSearchOptimizer(n_samples=50, seed=42)
 For Bayesian optimization (requires `gds-psuu[bayesian]`):
 
 ```python
-from gds_psuu.optimizers.bayesian import BayesianOptimizer
+from gds_analysis.psuu.optimizers.bayesian import BayesianOptimizer
 
 bayes = BayesianOptimizer(n_calls=30, target_kpi="avg_final_pop", seed=42)
 ```
@@ -166,7 +166,7 @@ bayes = BayesianOptimizer(n_calls=30, target_kpi="avg_final_pop", seed=42)
 The older `fn`-based KPI interface still works:
 
 ```python
-from gds_psuu import KPI, final_state_mean
+from gds_analysis.psuu import KPI, final_state_mean
 
 # Legacy style (backwards compatible)
 kpi = KPI(name="pop", fn=lambda r: final_state_mean(r, "population"))

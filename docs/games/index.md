@@ -26,7 +26,7 @@ gds-framework (pip install gds-framework)
 │  Domain-neutral composition algebra, typed spaces,
 │  state model, verification engine, flat IR compiler.
 │
-└── gds-games (pip install gds-games)
+└── gds-games (pip install gds-domains[games])
     │
     │  Game-theoretic DSL: OpenGame types, Pattern composition,
     │  compile_to_ir(), domain verification, reports, visualization.
@@ -41,13 +41,13 @@ gds-framework (pip install gds-framework)
 
 ```bash
 uv add gds-games
-# or: pip install gds-games
+# or: pip install gds-domains[games]
 ```
 
 ```python
-from ogs.dsl.games import DecisionGame, CovariantFunction
-from ogs.dsl.pattern import Pattern
-from ogs import compile_to_ir, verify
+from gds_domains.games.dsl.games import DecisionGame, CovariantFunction
+from gds_domains.games.dsl.pattern import Pattern
+from gds_domains.games import compile_to_ir, verify
 
 # Define atomic games with typed signatures
 sensor = CovariantFunction(name="Sensor", x="observation", y="signal")

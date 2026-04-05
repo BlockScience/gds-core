@@ -22,10 +22,10 @@ Composition:
 
 from gds.canonical import CanonicalGDS, project_canonical
 from gds.spec import GDSSpec
-from ogs.dsl.games import CovariantFunction, DecisionGame
-from ogs.dsl.pattern import Pattern, PatternInput
-from ogs.dsl.spec_bridge import compile_pattern_to_spec
-from ogs.dsl.types import InputType, Signature, port
+from gds_domains.games.dsl.games import CovariantFunction, DecisionGame
+from gds_domains.games.dsl.pattern import Pattern, PatternInput
+from gds_domains.games.dsl.spec_bridge import compile_pattern_to_spec
+from gds_domains.games.dsl.types import InputType, Signature, port
 
 
 def build_pattern() -> Pattern:

@@ -1,0 +1,68 @@
+# {{ pattern.name }} — System Overview
+
+> Auto-generated specification report from `{{ pattern.source_canvas }}`
+
+## Pattern Summary
+
+| Property | Value |
+|----------|-------|
+| **Composition Type** | {{ pattern.composition_type.value }} |
+| **Games** | {{ pattern.games | length }} |
+| **Flows** | {{ pattern.flows | length }} |
+| **External Inputs** | {{ pattern.inputs | length }} |
+
+## Composition Formula
+
+{{ composition_formula }}
+
+## Entity Table
+
+| Game | Type | Signature (X, Y, R, S) |
+|------|------|------------------------|
+{% for game in pattern.games -%}
+| {{ game.name }} | {{ game.game_type.value }} | `({{ game.signature | join(', ') }})` |
+{% endfor %}
+
+## External Inputs
+
+| Input | Type | Schema Hint |
+|-------|------|-------------|
+{% for inp in pattern.inputs -%}
+| {{ inp.name }} | {{ inp.input_type.value }} | {{ inp.schema_hint if inp.schema_hint else "—" }} |
+{% endfor %}
+
+## Lifecycle Stages
+
+{% for stage_name in lifecycle_stages -%}
+{{ loop.index }}. **{{ stage_name }}**
+{% endfor %}
+
+## Flow Diagram
+
+```mermaid
+{{ flowchart }}
+```
+
+## Sequence Diagram
+
+```mermaid
+{{ sequence_diagram }}
+```
+
+{% if verification -%}
+## Verification Summary
+
+| Metric | Count |
+|--------|-------|
+| **Checks Passed** | {{ verification.checks_passed }} / {{ verification.checks_total }} |
+| **Errors** | {{ verification.errors }} |
+| **Warnings** | {{ verification.warnings }} |
+
+{% if failed_findings -%}
+### Issues
+
+{% for f in failed_findings -%}
+- **{{ f.check_id }}** ({{ f.severity.value }}): {{ f.message }}
+{% endfor %}
+{% endif -%}
+{% endif -%}

@@ -1,0 +1,89 @@
+[project]
+name = "gds-domains"
+dynamic = ["version"]
+description = "Domain DSLs for the GDS ecosystem — stockflow, control, business, software, games, symbolic"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.12"
+authors = [
+    { name = "Rohan Mehta", email = "rohan@block.science" },
+]
+keywords = [
+    "generalized-dynamical-systems",
+    "domain-specific-language",
+    "stockflow",
+    "control-systems",
+    "game-theory",
+    "software-architecture",
+    "business-dynamics",
+    "gds-framework",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+dependencies = [
+    "gds-framework>=0.3.0",
+    "pydantic>=2.10",
+]
+
+[project.optional-dependencies]
+games = ["typer>=0.15", "jinja2>=3.1"]
+symbolic = ["sympy>=1.13"]
+nashpy = ["nashpy>=0.0.41", "numpy>=1.26"]
+all = ["gds-domains[games,symbolic,nashpy]"]
+
+[project.scripts]
+ogs = "gds_domains.games.cli:app"
+
+[project.urls]
+Homepage = "https://github.com/BlockScience/gds-core"
+Repository = "https://github.com/BlockScience/gds-core"
+Documentation = "https://blockscience.github.io/gds-core"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "gds_domains/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["gds_domains"]
+
+[tool.uv.sources]
+gds-framework = { workspace = true }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--import-mode=importlib --cov=gds_domains --cov-report=term-missing --no-header -q"
+
+[tool.coverage.run]
+source = ["gds_domains"]
+omit = ["gds_domains/__init__.py"]
+
+[tool.coverage.report]
+fail_under = 70
+show_missing = true
+exclude_lines = [
+    "if TYPE_CHECKING:",
+    "pragma: no cover",
+]
+
+[dependency-groups]
+dev = [
+    "hypothesis>=6.151.9",
+    "mypy>=1.19.1",
+    "pyright>=1.1.408",
+    "pytest>=8.0",
+    "pytest-cov>=6.0",
+    "ruff>=0.8",
+]

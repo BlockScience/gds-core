@@ -1,11 +1,11 @@
-# ogs.dsl.pattern
+# gds_domains.games.dsl.pattern
 
-::: ogs.dsl.pattern.Pattern
+::: gds_domains.games.dsl.pattern.Pattern
 
-::: ogs.dsl.pattern.PatternInput
+::: gds_domains.games.dsl.pattern.PatternInput
 
-::: ogs.dsl.pattern.TerminalCondition
+::: gds_domains.games.dsl.pattern.TerminalCondition
 
-::: ogs.dsl.pattern.ActionSpace
+::: gds_domains.games.dsl.pattern.ActionSpace
 
-::: ogs.dsl.pattern.StateInitialization
+::: gds_domains.games.dsl.pattern.StateInitialization

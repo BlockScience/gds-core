@@ -1,46 +1,47 @@
-"""Stock-flow DSL over GDS semantics — system dynamics with formal guarantees.
+"""gds-stockflow — DEPRECATED: use gds_domains.stockflow instead."""
 
-Declare stocks, flows, auxiliaries, and converters as plain data models.
-The compiler maps them to GDS role blocks, entities, and composition trees.
-All downstream GDS tooling works immediately — canonical projection,
-semantic checks, SpecQuery, serialization, gds-viz.
-"""
+import warnings
 
-__version__ = "0.1.1"
+warnings.warn(
+    "Import from gds_domains.stockflow instead of stockflow. "
+    "The gds-stockflow package will be removed in v0.3.0.",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
-# ── DSL declarations ────────────────────────────────────────
-from stockflow.dsl.elements import Auxiliary, Converter, Flow, Stock
-from stockflow.dsl.errors import SFCompilationError, SFError, SFValidationError
-from stockflow.dsl.model import StockFlowModel
-from stockflow.dsl.types import ElementType
+__version__ = "0.99.0"
 
-# ── Compilation ─────────────────────────────────────────────
-from stockflow.dsl.compile import (
+from gds_domains.stockflow import (  # noqa: F401, E402
+    ALL_SF_CHECKS,
+    Auxiliary,
+    Converter,
+    Finding,
+    Flow,
     LevelSpace,
     LevelType,
     RateSpace,
     RateType,
+    SFCompilationError,
+    SFError,
+    SFValidationError,
+    Severity,
     SignalSpace,
     SignalType,
+    Stock,
+    StockFlowModel,
     UnconstrainedLevelSpace,
     UnconstrainedLevelType,
-    compile_model,
-    compile_to_system,
-)
-
-# ── Verification ────────────────────────────────────────────
-from stockflow.verification.checks import (
-    ALL_SF_CHECKS,
+    VerificationReport,
     check_sf001_orphan_stocks,
     check_sf002_flow_stock_validity,
     check_sf003_auxiliary_acyclicity,
     check_sf004_converter_connectivity,
     check_sf005_flow_completeness,
+    compile_model,
+    compile_to_system,
+    verify,
 )
-from stockflow.verification.engine import verify
-
-# ── Re-exports from gds-framework ──────────────────────────
-from gds.verification.findings import Finding, Severity, VerificationReport
+from gds_domains.stockflow import ElementType  # noqa: F401, E402
 
 __all__ = [
     # DSL

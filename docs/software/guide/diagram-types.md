@@ -32,7 +32,7 @@ DFD-001..DFD-005 (5 checks). See [Verification](verification.md#dfd-checks).
 ### Example
 
 ```python
-from gds_software import (
+from gds_domains.software import (
     ExternalEntity, Process, DataStore, DataFlow, DFDModel,
 )
 
@@ -83,7 +83,7 @@ SM-001..SM-006 (6 checks). See [Verification](verification.md#state-machine-chec
 ### Example
 
 ```python
-from gds_software import (
+from gds_domains.software import (
     State, Event, Transition, StateMachineModel,
 )
 
@@ -138,7 +138,7 @@ CP-001..CP-004 (4 checks). See [Verification](verification.md#component-checks).
 ### Example
 
 ```python
-from gds_software import (
+from gds_domains.software import (
     Component, InterfaceDef, Connector, ComponentModel,
 )
 
@@ -187,7 +187,7 @@ C4-001..C4-004 (4 checks). See [Verification](verification.md#c4-checks).
 ### Example
 
 ```python
-from gds_software import (
+from gds_domains.software import (
     Person, ExternalSystem, Container, C4Relationship, C4Model,
 )
 
@@ -240,7 +240,7 @@ ER-001..ER-004 (4 checks). See [Verification](verification.md#erd-checks).
 ### Example
 
 ```python
-from gds_software import (
+from gds_domains.software import (
     ERDEntity, Attribute, ERDRelationship, Cardinality, ERDModel,
 )
 
@@ -304,7 +304,7 @@ DG-001..DG-004 (4 checks). See [Verification](verification.md#dependency-checks)
 ### Example
 
 ```python
-from gds_software import (
+from gds_domains.software import (
     Module, Dep, Layer, DependencyModel,
 )
 

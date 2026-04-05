@@ -3,7 +3,7 @@
 ## Running Verification
 
 ```python
-from ogs import compile_to_ir, verify
+from gds_domains.games import compile_to_ir, verify
 
 ir = compile_to_ir(pattern)
 report = verify(ir)
