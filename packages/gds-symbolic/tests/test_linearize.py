@@ -6,8 +6,9 @@ import pytest
 
 sympy = pytest.importorskip("sympy")
 
-from gds_symbolic import SymbolicControlModel  # noqa: E402, TC001
 from gds_symbolic.linearize import LinearizedSystem  # noqa: E402
+
+from gds_symbolic import SymbolicControlModel  # noqa: E402, TC001
 
 
 class TestLinearizeDecay:

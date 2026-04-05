@@ -3,7 +3,11 @@
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from gds_domains.games.dsl.composition import FeedbackLoop, ParallelComposition, SequentialComposition
+from gds_domains.games.dsl.composition import (
+    FeedbackLoop,
+    ParallelComposition,
+    SequentialComposition,
+)
 from gds_domains.games.dsl.games import CovariantFunction, DecisionGame
 from gds_domains.games.ir.models import (
     CompositionType,

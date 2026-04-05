@@ -11,7 +11,6 @@ Usage:
 import sys
 from pathlib import Path
 
-from insurance_dsl.model import build_ir, build_spec
 from gds_domains.games.viz import (
     architecture_by_domain_to_mermaid,
     architecture_by_role_to_mermaid,
@@ -20,6 +19,7 @@ from gds_domains.games.viz import (
     structural_to_mermaid,
     terminal_conditions_to_mermaid,
 )
+from insurance_dsl.model import build_ir, build_spec
 
 TITLE = "Insurance Contract (OGS DSL)"
 

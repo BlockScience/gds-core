@@ -16,13 +16,13 @@ from gds.verification.spec_checks import (
     check_determinism,
     check_type_safety,
 )
+from gds_domains.stockflow.verification.engine import verify as sf_verify
 from lotka_volterra_dsl.model import (
     build_canonical,
     build_model,
     build_spec,
     build_system,
 )
-from gds_domains.stockflow.verification.engine import verify as sf_verify
 
 # -- Model Declaration -------------------------------------------------------
 
