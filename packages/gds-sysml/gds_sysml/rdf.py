@@ -397,8 +397,7 @@ def _emit_blocks(
         for port in action.ports:
             port_node = BNode()
             g.add((port_node, RDF.type, GDS_CORE["Port"]))
-            port_label = port.type_name or port.name
-            g.add((port_node, GDS_CORE["portName"], Literal(port_label)))
+            g.add((port_node, GDS_CORE["portName"], Literal(port.name)))
 
             if port.direction == "in":
                 g.add((iface_node, GDS_CORE["hasForwardIn"], port_node))
@@ -495,12 +494,15 @@ def _emit_wirings(
         wire_node = BNode()
         g.add((wiring_uri, GDS_CORE["hasWire"], wire_node))
         g.add((wire_node, RDF.type, GDS_CORE["Wire"]))
-        g.add((wire_node, GDS_CORE["source"], Literal(source_block)))
-        g.add((wire_node, GDS_CORE["target"], Literal(target_block)))
-        g.add((wire_node, GDS_CORE["optional"], Literal(False, datatype=XSD.boolean)))
+        g.add((wire_node, GDS_CORE["wireSource"], Literal(source_block)))
+        g.add((wire_node, GDS_CORE["wireTarget"], Literal(target_block)))
+        g.add(
+            (wire_node, GDS_CORE["wireOptional"], Literal(False, datatype=XSD.boolean))
+        )
 
     for name in block_names:
-        g.add((wiring_uri, GDS_CORE["blockName"], Literal(name)))
+        if name in block_uris:
+            g.add((wiring_uri, GDS_CORE["wiringBlock"], block_uris[name]))
 
     g.add((spec_uri, GDS_CORE["hasWiring"], wiring_uri))
 

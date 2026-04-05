@@ -3,6 +3,7 @@
 from pathlib import Path
 
 import pytest
+
 from gds_sysml.model import SysMLModel
 from gds_sysml.parser.regex import parse_sysml
 
