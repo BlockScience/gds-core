@@ -155,8 +155,8 @@ def parse_sysml(source: str | Path) -> SysMLModel:
     brace_depth = 0
     pending_annotations: list[GDSAnnotation] = []
 
-    # Collect all lines, stripping comments
-    lines = _strip_comments(text)
+    # Collect all lines, stripping comments and joining multi-line annotations
+    lines = _join_multiline_annotations(_strip_comments(text))
 
     for line in lines:
         stripped = line.strip()
@@ -316,6 +316,38 @@ def parse_sysml(source: str | Path) -> SysMLModel:
                 context_stack.pop()
 
     return model
+
+
+def _join_multiline_annotations(lines: list[str]) -> list[str]:
+    """Join multi-line @GDS* annotation bodies into single lines.
+
+    When a ``@GDS*`` annotation opens a ``{`` that isn't closed on the same
+    line, subsequent lines are concatenated until the closing ``}`` is found.
+    This allows the regex-based parser to handle annotations formatted across
+    multiple lines (common in SysON and OMG Pilot output).
+    """
+    result: list[str] = []
+    accumulator = ""
+    brace_depth = 0
+
+    for line in lines:
+        if accumulator:
+            accumulator += " " + line.strip()
+            brace_depth += line.count("{") - line.count("}")
+            if brace_depth <= 0:
+                result.append(accumulator)
+                accumulator = ""
+                brace_depth = 0
+        elif _GDS_ANNOTATION.search(line) and line.count("{") > line.count("}"):
+            accumulator = line
+            brace_depth = line.count("{") - line.count("}")
+        else:
+            result.append(line)
+
+    if accumulator:
+        result.append(accumulator)
+
+    return result
 
 
 def _strip_comments(text: str) -> list[str]:

@@ -1,10 +1,10 @@
 """Tests for SysML model → RDF conversion."""
 
-from gds_sysml.model import SysMLModel
-from gds_sysml.rdf import sysml_to_rdf
 from rdflib import RDF
 
 from gds_owl._namespace import GDS_CORE
+from gds_sysml.model import SysMLModel
+from gds_sysml.rdf import sysml_to_rdf
 
 
 class TestRDFConversion:

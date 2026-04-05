@@ -77,6 +77,24 @@ class TestSysMLToSpec:
         assert len(spec.wirings) > 0
         wiring = next(iter(spec.wirings.values()))
         assert len(wiring.wires) == 4
+        # Verify wire content survives round-trip (not just count)
+        wire_pairs = {(w.source, w.target) for w in wiring.wires}
+        assert ("SolarFluxSensor", "ThermalController") in wire_pairs
+        assert ("TemperatureSensor", "ThermalController") in wire_pairs
+        assert ("ThermalController", "HeaterActuator") in wire_pairs
+        assert ("ThermalController", "RadiatorActuator") in wire_pairs
+
+    def test_wiring_block_names(self, satellite_model: SysMLModel) -> None:
+        spec = sysml_to_spec(satellite_model)
+        wiring = next(iter(spec.wirings.values()))
+        expected_blocks = {
+            "SolarFluxSensor",
+            "TemperatureSensor",
+            "ThermalController",
+            "HeaterActuator",
+            "RadiatorActuator",
+        }
+        assert set(wiring.block_names) == expected_blocks
 
     def test_transition_signatures_imported(self, satellite_model: SysMLModel) -> None:
         spec = sysml_to_spec(satellite_model)
@@ -91,6 +109,48 @@ class TestSysMLToSpec:
         assert hasattr(heater, "updates")
         # Should have update entries for temperature
         assert len(heater.updates) > 0
+
+
+class TestMultilineAnnotations:
+    """Tests for multi-line @GDS* annotation body parsing."""
+
+    def test_multiline_annotation_body(self) -> None:
+        sysml = """
+        package Test {
+            part def State {
+                @GDSStateVariable {
+                    symbol = "T";
+                    units = "K";
+                }
+                attribute temperature : Real;
+            }
+        }
+        """
+        spec = sysml_to_spec(sysml)
+        assert "State" in spec.entities
+        entity = spec.entities["State"]
+        assert "temperature" in entity.variables
+        assert entity.variables["temperature"].symbol == "T"
+
+    def test_multiline_dynamics(self) -> None:
+        sysml = """
+        package Test {
+            part def State {
+                @GDSStateVariable { symbol = "x"; }
+                attribute x : Real;
+            }
+            @GDSMechanism
+            @GDSDynamics {
+                reads = [x];
+                writes = [x];
+            }
+            action def Updater {
+                in port input : Real;
+            }
+        }
+        """
+        spec = sysml_to_spec(sysml)
+        assert "Updater" in spec.blocks
 
 
 class TestMinimalImport:
