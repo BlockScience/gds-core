@@ -21,7 +21,13 @@ from gds.ir.models import SystemIR
 from gds.spec import GDSSpec
 
 # Skip entire module if any DSL package is missing (CI runs per-package)
-_REQUIRED = ["gds_domains.stockflow", "gds_domains.control", "gds_domains.games", "gds_domains.software", "gds_domains.business"]
+_REQUIRED = [
+    "gds_domains.stockflow",
+    "gds_domains.control",
+    "gds_domains.games",
+    "gds_domains.software",
+    "gds_domains.business",
+]
 _missing = [m for m in _REQUIRED if importlib.util.find_spec(m) is None]
 pytestmark = pytest.mark.skipif(
     len(_missing) > 0,

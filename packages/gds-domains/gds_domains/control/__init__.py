@@ -6,7 +6,6 @@ All downstream GDS tooling works immediately — canonical projection,
 semantic checks, SpecQuery, serialization, gds-viz.
 """
 
-
 # ── DSL declarations ────────────────────────────────────────
 # ── Re-exports from gds-framework ──────────────────────────
 from gds.verification.findings import Finding, Severity, VerificationReport

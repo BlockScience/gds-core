@@ -3,17 +3,6 @@
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from insurance_dsl.model import (
-    build_game,
-    build_ir,
-    build_pattern,
-    build_spec,
-    payout_processing,
-    premium_decision,
-    risk_assessment,
-    run_reports,
-    run_verification,
-)
 from gds_domains.games.dsl.composition import FeedbackLoop, SequentialComposition
 from gds_domains.games.dsl.games import CovariantFunction, DecisionGame
 from gds_domains.games.ir.models import (
@@ -37,6 +26,17 @@ from gds_domains.games.viz import (
     hierarchy_to_mermaid,
     structural_to_mermaid,
     terminal_conditions_to_mermaid,
+)
+from insurance_dsl.model import (
+    build_game,
+    build_ir,
+    build_pattern,
+    build_spec,
+    payout_processing,
+    premium_decision,
+    risk_assessment,
+    run_reports,
+    run_verification,
 )
 
 # ======================================================================

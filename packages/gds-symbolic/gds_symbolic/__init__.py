@@ -11,7 +11,7 @@ warnings.warn(
 
 __version__ = "0.99.0"
 
-from gds_domains.symbolic import (  # noqa: F401, E402
+from gds_domains.symbolic import (  # noqa: E402
     HamiltonianSpec,
     HamiltonianSystem,
     LinearizedSystem,
