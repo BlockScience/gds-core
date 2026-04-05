@@ -4,7 +4,7 @@
 
 ```bash
 uv add gds-stockflow
-# or: pip install gds-stockflow
+# or: pip install gds-domains
 ```
 
 For development (monorepo):
@@ -20,7 +20,7 @@ uv sync --all-packages
 A stock-flow model describes accumulation dynamics: stocks hold value, flows transfer it, auxiliaries compute intermediate values, and converters inject exogenous inputs.
 
 ```python
-from stockflow import (
+from gds_domains.stockflow import (
     Stock, Flow, Auxiliary, Converter,
     StockFlowModel, compile_model, compile_to_system, verify,
 )
@@ -59,7 +59,7 @@ print(f"{report.checks_passed}/{report.checks_total} checks passed")
 Stock-flow models shine with multiple interacting stocks:
 
 ```python
-from stockflow import (
+from gds_domains.stockflow import (
     Stock, Flow, Auxiliary, StockFlowModel, verify,
 )
 

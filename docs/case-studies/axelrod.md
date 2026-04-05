@@ -47,10 +47,10 @@ Each page presents the same underlying Prisoner's Dilemma model through a differ
 
 gds-axelrod exercises four GDS packages together, demonstrating the composability of the ecosystem:
 
-- **gds-games** (`ogs`) — defines the game as an OGS pattern, compiles to `PatternIR` and `GDSSpec`
+- **gds-domains** (`gds_domains.games`) — defines the game as an OGS pattern, compiles to `PatternIR` and `GDSSpec`
 - **gds-viz** (`gds_viz`) — renders Mermaid diagrams from the compiled `SystemIR`
 - **gds-sim** (`gds_sim`) — runs population dynamics simulation over iterated tournament rounds
-- **gds-psuu** (`gds_psuu`) — parameter sweeps compiled to WebAssembly via Pyodide for in-browser execution
+- **gds-analysis** (`gds_analysis.psuu`) — parameter sweeps compiled to WebAssembly via Pyodide for in-browser execution
 
 ## Key Patterns Demonstrated
 

@@ -1,5 +1,5 @@
-# gds_business.vsm.model
+# gds_domains.business.vsm.model
 
 ValueStreamModel — declarative container for value stream maps.
 
-::: gds_business.vsm.model.ValueStreamModel
+::: gds_domains.business.vsm.model.ValueStreamModel

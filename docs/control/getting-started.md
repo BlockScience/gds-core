@@ -4,7 +4,7 @@
 
 ```bash
 uv add gds-control
-# or: pip install gds-control
+# or: pip install gds-domains
 ```
 
 For development (monorepo):
@@ -20,7 +20,7 @@ uv sync --all-packages
 A control model describes a feedback control system: states represent the plant, inputs provide reference signals, sensors observe state, and controllers compute control actions.
 
 ```python
-from gds_control import (
+from gds_domains.control import (
     State, Input, Sensor, Controller,
     ControlModel, compile_model, compile_to_system, verify,
 )
@@ -59,7 +59,7 @@ print(f"{report.checks_passed}/{report.checks_total} checks passed")
 Control models support multiple states with multiple sensors and controllers:
 
 ```python
-from gds_control import (
+from gds_domains.control import (
     State, Input, Sensor, Controller,
     ControlModel, verify,
 )

@@ -61,12 +61,12 @@ from gds.verification.spec_checks import (
     check_completeness,
     check_determinism,
 )
-from stockflow.verification.checks import (
+from gds_domains.stockflow.verification.checks import (
     check_sf001_orphan_stocks,
     check_sf003_auxiliary_acyclicity,
     check_sf004_converter_connectivity,
 )
-from stockflow.verification.engine import verify as sf_verify
+from gds_domains.stockflow.verification.engine import verify as sf_verify
 
 # ══════════════════════════════════════════════════════════════════
 # Generic check tests (G-001..G-006 on SystemIR)

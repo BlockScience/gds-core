@@ -1,5 +1,5 @@
-# gds_control.dsl.model
+# gds_domains.control.dsl.model
 
 ControlModel -- declarative container for control system specifications.
 
-::: gds_control.dsl.model.ControlModel
+::: gds_domains.control.dsl.model.ControlModel

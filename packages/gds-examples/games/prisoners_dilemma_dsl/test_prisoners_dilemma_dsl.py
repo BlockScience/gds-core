@@ -3,22 +3,22 @@
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from ogs.dsl.composition import FeedbackLoop, ParallelComposition, SequentialComposition
-from ogs.dsl.games import CovariantFunction, DecisionGame
-from ogs.ir.models import (
+from gds_domains.games.dsl.composition import FeedbackLoop, ParallelComposition, SequentialComposition
+from gds_domains.games.dsl.games import CovariantFunction, DecisionGame
+from gds_domains.games.ir.models import (
     CompositionType,
     FlowDirection,
     GameType,
     PatternIR,
 )
-from ogs.reports.generator import (
+from gds_domains.games.reports.generator import (
     generate_implementation_checklist,
     generate_interface_contracts,
     generate_system_overview,
     generate_verification_summary,
 )
-from ogs.verification.findings import VerificationReport
-from ogs.viz import (
+from gds_domains.games.verification.findings import VerificationReport
+from gds_domains.games.viz import (
     architecture_by_domain_to_mermaid,
     architecture_by_role_to_mermaid,
     flow_topology_to_mermaid,

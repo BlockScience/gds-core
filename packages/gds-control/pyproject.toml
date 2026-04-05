@@ -30,12 +30,11 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "gds-framework>=0.3.0",
-    "pydantic>=2.10",
+    "gds-domains>=0.1.0",
 ]
 
 [tool.uv.sources]
-gds-framework = { workspace = true }
+gds-domains = { workspace = true }
 
 [project.urls]
 Homepage = "https://github.com/BlockScience/gds-core"

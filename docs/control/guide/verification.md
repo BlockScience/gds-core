@@ -7,7 +7,7 @@
 The `verify()` function runs domain checks on the control model:
 
 ```python
-from gds_control import verify
+from gds_domains.control import verify
 
 report = verify(model)                          # Domain checks only
 report = verify(model, include_gds_checks=True) # Domain + GDS checks

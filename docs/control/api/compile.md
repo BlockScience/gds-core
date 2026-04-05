@@ -1,27 +1,27 @@
-# gds_control.dsl.compile
+# gds_domains.control.dsl.compile
 
 Compiler: ControlModel -> GDSSpec / SystemIR.
 
 ## Semantic Types
 
-::: gds_control.dsl.compile.StateType
+::: gds_domains.control.dsl.compile.StateType
 
-::: gds_control.dsl.compile.StateSpace
+::: gds_domains.control.dsl.compile.StateSpace
 
-::: gds_control.dsl.compile.ReferenceType
+::: gds_domains.control.dsl.compile.ReferenceType
 
-::: gds_control.dsl.compile.ReferenceSpace
+::: gds_domains.control.dsl.compile.ReferenceSpace
 
-::: gds_control.dsl.compile.MeasurementType
+::: gds_domains.control.dsl.compile.MeasurementType
 
-::: gds_control.dsl.compile.MeasurementSpace
+::: gds_domains.control.dsl.compile.MeasurementSpace
 
-::: gds_control.dsl.compile.ControlType
+::: gds_domains.control.dsl.compile.ControlType
 
-::: gds_control.dsl.compile.ControlSpace
+::: gds_domains.control.dsl.compile.ControlSpace
 
 ## Public Functions
 
-::: gds_control.dsl.compile.compile_model
+::: gds_domains.control.dsl.compile.compile_model
 
-::: gds_control.dsl.compile.compile_to_system
+::: gds_domains.control.dsl.compile.compile_to_system

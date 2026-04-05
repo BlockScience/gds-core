@@ -1,8 +1,8 @@
-# gds_software
+# gds_domains.software
 
 Public API -- top-level exports.
 
-::: gds_software
+::: gds_domains.software
     options:
       show_submodules: false
       members: false

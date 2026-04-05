@@ -7,7 +7,7 @@ All optimizers implement the same `Optimizer` interface: `setup()`, `suggest()`,
 Exhaustive evaluation of every point in a regular grid.
 
 ```python
-from gds_psuu import GridSearchOptimizer
+from gds_analysis.psuu import GridSearchOptimizer
 
 optimizer = GridSearchOptimizer(n_steps=10)
 ```
@@ -29,7 +29,7 @@ optimizer = GridSearchOptimizer(n_steps=10)
 Uniform random sampling across the parameter space.
 
 ```python
-from gds_psuu import RandomSearchOptimizer
+from gds_analysis.psuu import RandomSearchOptimizer
 
 optimizer = RandomSearchOptimizer(n_samples=50, seed=42)
 ```
@@ -53,7 +53,7 @@ Gaussian process surrogate model that learns from past evaluations.
     Requires `scikit-optimize`. Install with: `uv add "gds-psuu[bayesian]"`
 
 ```python
-from gds_psuu.optimizers.bayesian import BayesianOptimizer
+from gds_analysis.psuu.optimizers.bayesian import BayesianOptimizer
 
 optimizer = BayesianOptimizer(
     n_calls=30,
@@ -81,9 +81,9 @@ optimizer = BayesianOptimizer(
 Subclass `Optimizer` to implement your own search strategy:
 
 ```python
-from gds_psuu.optimizers.base import Optimizer
-from gds_psuu.space import ParameterSpace
-from gds_psuu.types import KPIScores, ParamPoint
+from gds_analysis.psuu.optimizers.base import Optimizer
+from gds_analysis.psuu.space import ParameterSpace
+from gds_analysis.psuu.types import KPIScores, ParamPoint
 
 
 class MyOptimizer(Optimizer):

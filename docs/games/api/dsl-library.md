@@ -1,5 +1,5 @@
-# ogs.dsl.library
+# gds_domains.games.dsl.library
 
 Reusable game factories for common patterns.
 
-::: ogs.dsl.library
+::: gds_domains.games.dsl.library

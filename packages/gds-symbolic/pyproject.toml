@@ -28,14 +28,8 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "gds-framework>=0.3.0",
-    "gds-control>=0.1.0",
-    "pydantic>=2.10",
+    "gds-domains[symbolic]>=0.1.0",
 ]
-
-[project.optional-dependencies]
-sympy = ["sympy>=1.13", "numpy>=1.26"]
-continuous = ["gds-continuous>=0.1.0"]
 
 [project.urls]
 Homepage = "https://github.com/BlockScience/gds-core"
@@ -53,9 +47,7 @@ path = "gds_symbolic/__init__.py"
 packages = ["gds_symbolic"]
 
 [tool.uv.sources]
-gds-framework = { workspace = true }
-gds-control = { workspace = true }
-gds-continuous = { workspace = true }
+gds-domains = { workspace = true }
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

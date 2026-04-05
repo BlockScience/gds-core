@@ -7,7 +7,7 @@
 The `verify()` function auto-dispatches to the correct domain checks based on model type:
 
 ```python
-from gds_business import verify
+from gds_domains.business import verify
 
 report = verify(model)                          # Domain + GDS checks
 report = verify(model, include_gds_checks=False)  # Domain checks only

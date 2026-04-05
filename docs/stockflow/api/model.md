@@ -1,5 +1,5 @@
-# stockflow.dsl.model
+# gds_domains.stockflow.dsl.model
 
 StockFlowModel -- declarative container for stock-flow diagrams.
 
-::: stockflow.dsl.model.StockFlowModel
+::: gds_domains.stockflow.dsl.model.StockFlowModel

@@ -1,9 +1,9 @@
-# ogs.reports
+# gds_domains.games.reports
 
 ## Generator
 
-::: ogs.reports.generator.generate_reports
+::: gds_domains.games.reports.generator.generate_reports
 
 ## Domain Analysis
 
-::: ogs.reports.domain_analysis
+::: gds_domains.games.reports.domain_analysis

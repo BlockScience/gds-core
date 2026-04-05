@@ -1,0 +1,42 @@
+# {{ pattern.name }} — Data Schema Catalog
+
+> Auto-generated data schema catalog from `{{ pattern.source_canvas }}`
+
+## Information Spaces
+
+The following data spaces are identified from the pattern's flows and inputs.
+
+{% for space_name, space in spaces.items() %}
+### {{ space_name }}
+
+| Field | Direction | Source | Target | Flow Type |
+|-------|-----------|--------|--------|-----------|
+{% for entry in space.flows -%}
+| {{ entry.label }} | {{ entry.direction }} | {{ entry.source }} | {{ entry.target }} | {{ entry.flow_type }} |
+{% endfor %}
+
+{% endfor %}
+
+## Input Schemas
+
+| Input | Type | Schema Hint | Shape |
+|-------|------|-------------|-------|
+{% for inp in pattern.inputs -%}
+| {{ inp.name }} | {{ inp.input_type.value }} | `{{ inp.schema_hint if inp.schema_hint else "—" }}` | {{ inp.shape if inp.shape else "—" }} |
+{% endfor %}
+
+## Signature Summary
+
+| Game | X (observation) | Y (choice) | R (utility) | S (coutility) |
+|------|-----------------|------------|-------------|---------------|
+{% for game in pattern.games -%}
+| {{ game.name }} | `{{ game.signature[0] if game.signature[0] else "∅" }}` | `{{ game.signature[1] if game.signature[1] else "∅" }}` | `{{ game.signature[2] if game.signature[2] else "∅" }}` | `{{ game.signature[3] if game.signature[3] else "∅" }}` |
+{% endfor %}
+
+## Flow Inventory
+
+| # | Label | Source | Target | Direction | Type |
+|---|-------|--------|--------|-----------|------|
+{% for flow in pattern.flows -%}
+| {{ loop.index }} | {{ flow.label }} | {{ flow.source }} | {{ flow.target }} | {{ flow.direction.value }} | {{ flow.flow_type.value }} |
+{% endfor %}

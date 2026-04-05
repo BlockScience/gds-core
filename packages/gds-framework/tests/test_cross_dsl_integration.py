@@ -21,7 +21,7 @@ from gds.ir.models import SystemIR
 from gds.spec import GDSSpec
 
 # Skip entire module if any DSL package is missing (CI runs per-package)
-_REQUIRED = ["stockflow", "gds_control", "ogs", "gds_software", "gds_business"]
+_REQUIRED = ["gds_domains.stockflow", "gds_domains.control", "gds_domains.games", "gds_domains.software", "gds_domains.business"]
 _missing = [m for m in _REQUIRED if importlib.util.find_spec(m) is None]
 pytestmark = pytest.mark.skipif(
     len(_missing) > 0,
@@ -38,8 +38,8 @@ class TestStockFlowRoundTrip:
 
     @pytest.fixture
     def minimal_model(self):
-        from stockflow.dsl.elements import Flow, Stock
-        from stockflow.dsl.model import StockFlowModel
+        from gds_domains.stockflow.dsl.elements import Flow, Stock
+        from gds_domains.stockflow.dsl.model import StockFlowModel
 
         return StockFlowModel(
             name="Minimal SF",
@@ -49,8 +49,8 @@ class TestStockFlowRoundTrip:
 
     @pytest.fixture
     def two_stock_model(self):
-        from stockflow.dsl.elements import Auxiliary, Converter, Flow, Stock
-        from stockflow.dsl.model import StockFlowModel
+        from gds_domains.stockflow.dsl.elements import Auxiliary, Converter, Flow, Stock
+        from gds_domains.stockflow.dsl.model import StockFlowModel
 
         return StockFlowModel(
             name="Two Stock SF",
@@ -71,7 +71,7 @@ class TestStockFlowRoundTrip:
         )
 
     def test_minimal_compile_to_spec(self, minimal_model):
-        from stockflow.dsl.compile import compile_model
+        from gds_domains.stockflow.dsl.compile import compile_model
 
         spec = compile_model(minimal_model)
         assert isinstance(spec, GDSSpec)
@@ -80,7 +80,7 @@ class TestStockFlowRoundTrip:
         assert len(spec.entities) == 1
 
     def test_minimal_compile_to_system(self, minimal_model):
-        from stockflow.dsl.compile import compile_to_system
+        from gds_domains.stockflow.dsl.compile import compile_to_system
 
         ir = compile_to_system(minimal_model)
         assert isinstance(ir, SystemIR)
@@ -88,7 +88,7 @@ class TestStockFlowRoundTrip:
 
     def test_minimal_canonical(self, minimal_model):
         """1 stock → |X|=1, |f|=1, at least 1 policy."""
-        from stockflow.dsl.compile import compile_model
+        from gds_domains.stockflow.dsl.compile import compile_model
 
         spec = compile_model(minimal_model)
         canon = project_canonical(spec)
@@ -97,7 +97,7 @@ class TestStockFlowRoundTrip:
         assert len(canon.policy_blocks) >= 1
 
     def test_minimal_verify_no_domain_errors(self, minimal_model):
-        from stockflow.verification.engine import verify
+        from gds_domains.stockflow.verification.engine import verify
 
         report = verify(minimal_model, include_gds_checks=False)
         errors = [
@@ -107,7 +107,7 @@ class TestStockFlowRoundTrip:
 
     def test_two_stock_canonical(self, two_stock_model):
         """2 stocks → |X|=2, |f|=2, policies include auxiliaries + flows."""
-        from stockflow.dsl.compile import compile_model
+        from gds_domains.stockflow.dsl.compile import compile_model
 
         spec = compile_model(two_stock_model)
         canon = project_canonical(spec)
@@ -119,7 +119,7 @@ class TestStockFlowRoundTrip:
         assert len(canon.boundary_blocks) == 1
 
     def test_spec_validates(self, minimal_model):
-        from stockflow.dsl.compile import compile_model
+        from gds_domains.stockflow.dsl.compile import compile_model
 
         spec = compile_model(minimal_model)
         errors = spec.validate_spec()
@@ -136,8 +136,8 @@ class TestControlRoundTrip:
 
     @pytest.fixture
     def minimal_model(self):
-        from gds_control.dsl.elements import Controller, Input, Sensor, State
-        from gds_control.dsl.model import ControlModel
+        from gds_domains.control.dsl.elements import Controller, Input, Sensor, State
+        from gds_domains.control.dsl.model import ControlModel
 
         return ControlModel(
             name="Minimal Control",
@@ -149,8 +149,8 @@ class TestControlRoundTrip:
 
     @pytest.fixture
     def mimo_model(self):
-        from gds_control.dsl.elements import Controller, Input, Sensor, State
-        from gds_control.dsl.model import ControlModel
+        from gds_domains.control.dsl.elements import Controller, Input, Sensor, State
+        from gds_domains.control.dsl.model import ControlModel
 
         return ControlModel(
             name="MIMO Control",
@@ -167,7 +167,7 @@ class TestControlRoundTrip:
         )
 
     def test_minimal_compile_to_spec(self, minimal_model):
-        from gds_control.dsl.compile import compile_model
+        from gds_domains.control.dsl.compile import compile_model
 
         spec = compile_model(minimal_model)
         assert isinstance(spec, GDSSpec)
@@ -175,7 +175,7 @@ class TestControlRoundTrip:
         assert len(spec.blocks) == 4  # input + sensor + controller + state
 
     def test_minimal_compile_to_system(self, minimal_model):
-        from gds_control.dsl.compile import compile_to_system
+        from gds_domains.control.dsl.compile import compile_to_system
 
         ir = compile_to_system(minimal_model)
         assert isinstance(ir, SystemIR)
@@ -184,7 +184,7 @@ class TestControlRoundTrip:
 
     def test_minimal_canonical(self, minimal_model):
         """SISO: |X|=1, |f|=1, g = sensor + controller."""
-        from gds_control.dsl.compile import compile_model
+        from gds_domains.control.dsl.compile import compile_model
 
         spec = compile_model(minimal_model)
         canon = project_canonical(spec)
@@ -196,7 +196,7 @@ class TestControlRoundTrip:
 
     def test_mimo_canonical(self, mimo_model):
         """MIMO: |X|=2, |f|=2, g = 2 sensors + 2 controllers."""
-        from gds_control.dsl.compile import compile_model
+        from gds_domains.control.dsl.compile import compile_model
 
         spec = compile_model(mimo_model)
         canon = project_canonical(spec)
@@ -206,7 +206,7 @@ class TestControlRoundTrip:
         assert len(canon.boundary_blocks) == 2
 
     def test_verify_no_domain_errors(self, minimal_model):
-        from gds_control.verification.engine import verify
+        from gds_domains.control.verification.engine import verify
 
         report = verify(minimal_model, include_gds_checks=False)
         errors = [
@@ -215,7 +215,7 @@ class TestControlRoundTrip:
         assert errors == []
 
     def test_spec_validates(self, minimal_model):
-        from gds_control.dsl.compile import compile_model
+        from gds_domains.control.dsl.compile import compile_model
 
         spec = compile_model(minimal_model)
         errors = spec.validate_spec()
@@ -233,9 +233,9 @@ class TestOGSRoundTrip:
     @pytest.fixture
     def single_decision(self):
         from gds.types.interface import port
-        from ogs.dsl.games import DecisionGame
-        from ogs.dsl.pattern import Pattern
-        from ogs.dsl.types import Signature
+        from gds_domains.games.dsl.games import DecisionGame
+        from gds_domains.games.dsl.pattern import Pattern
+        from gds_domains.games.dsl.types import Signature
 
         game = DecisionGame(
             name="Player",
@@ -250,9 +250,9 @@ class TestOGSRoundTrip:
     @pytest.fixture
     def sequential_pattern(self):
         from gds.types.interface import port
-        from ogs.dsl.games import CovariantFunction
-        from ogs.dsl.pattern import Pattern, PatternInput
-        from ogs.dsl.types import InputType, Signature
+        from gds_domains.games.dsl.games import CovariantFunction
+        from gds_domains.games.dsl.pattern import Pattern, PatternInput
+        from gds_domains.games.dsl.types import InputType, Signature
 
         a = CovariantFunction(
             name="Observe",
@@ -282,7 +282,7 @@ class TestOGSRoundTrip:
         )
 
     def test_single_decision_to_spec(self, single_decision):
-        from ogs.dsl.spec_bridge import compile_pattern_to_spec
+        from gds_domains.games.dsl.spec_bridge import compile_pattern_to_spec
 
         spec = compile_pattern_to_spec(single_decision)
         assert isinstance(spec, GDSSpec)
@@ -290,7 +290,7 @@ class TestOGSRoundTrip:
 
     def test_single_decision_canonical(self, single_decision):
         """Games are pure policy: f=empty, X=empty, h=g."""
-        from ogs.dsl.spec_bridge import compile_pattern_to_spec
+        from gds_domains.games.dsl.spec_bridge import compile_pattern_to_spec
 
         spec = compile_pattern_to_spec(single_decision)
         canon = project_canonical(spec)
@@ -299,7 +299,7 @@ class TestOGSRoundTrip:
         assert len(canon.policy_blocks) == 1
 
     def test_sequential_to_spec_with_boundary(self, sequential_pattern):
-        from ogs.dsl.spec_bridge import compile_pattern_to_spec
+        from gds_domains.games.dsl.spec_bridge import compile_pattern_to_spec
 
         spec = compile_pattern_to_spec(sequential_pattern)
         assert len(spec.blocks) == 3  # 2 games + 1 boundary
@@ -307,7 +307,7 @@ class TestOGSRoundTrip:
 
     def test_sequential_canonical(self, sequential_pattern):
         """Sequential pipeline: 2 policies, 1 boundary, no state."""
-        from ogs.dsl.spec_bridge import compile_pattern_to_spec
+        from gds_domains.games.dsl.spec_bridge import compile_pattern_to_spec
 
         spec = compile_pattern_to_spec(sequential_pattern)
         canon = project_canonical(spec)
@@ -318,7 +318,7 @@ class TestOGSRoundTrip:
 
     def test_pattern_ir_to_system_ir(self, single_decision):
         """PatternIR projects to SystemIR for GDS tooling interop."""
-        from ogs.dsl.compile import compile_to_ir
+        from gds_domains.games.dsl.compile import compile_to_ir
 
         ir = compile_to_ir(single_decision)
         system_ir = ir.to_system_ir()
@@ -336,13 +336,13 @@ class TestSoftwareRoundTrip:
 
     @pytest.fixture
     def dfd_model(self):
-        from gds_software.dfd.elements import (
+        from gds_domains.software.dfd.elements import (
             DataFlow,
             DataStore,
             ExternalEntity,
             Process,
         )
-        from gds_software.dfd.model import DFDModel
+        from gds_domains.software.dfd.model import DFDModel
 
         return DFDModel(
             name="DFD",
@@ -357,8 +357,8 @@ class TestSoftwareRoundTrip:
 
     @pytest.fixture
     def sm_model(self):
-        from gds_software.statemachine.elements import Event, State, Transition
-        from gds_software.statemachine.model import StateMachineModel
+        from gds_domains.software.statemachine.elements import Event, State, Transition
+        from gds_domains.software.statemachine.model import StateMachineModel
 
         return StateMachineModel(
             name="SM",
@@ -372,8 +372,8 @@ class TestSoftwareRoundTrip:
 
     @pytest.fixture
     def dep_model(self):
-        from gds_software.dependency.elements import Dep, Module
-        from gds_software.dependency.model import DependencyModel
+        from gds_domains.software.dependency.elements import Dep, Module
+        from gds_domains.software.dependency.model import DependencyModel
 
         return DependencyModel(
             name="Dep",
@@ -413,7 +413,7 @@ class TestSoftwareRoundTrip:
         assert len(canon.policy_blocks) > 0
 
     def test_dfd_verify(self, dfd_model):
-        from gds_software.verification.engine import verify
+        from gds_domains.software.verification.engine import verify
 
         report = verify(dfd_model)
         assert report.system_name == "DFD"
@@ -430,8 +430,8 @@ class TestBusinessRoundTrip:
 
     @pytest.fixture
     def cld_model(self):
-        from gds_business.cld.elements import CausalLink, Variable
-        from gds_business.cld.model import CausalLoopModel
+        from gds_domains.business.cld.elements import CausalLink, Variable
+        from gds_domains.business.cld.model import CausalLoopModel
 
         return CausalLoopModel(
             name="Simple CLD",
@@ -444,13 +444,13 @@ class TestBusinessRoundTrip:
 
     @pytest.fixture
     def scn_model(self):
-        from gds_business.supplychain.elements import (
+        from gds_domains.business.supplychain.elements import (
             DemandSource,
             OrderPolicy,
             Shipment,
             SupplyNode,
         )
-        from gds_business.supplychain.model import SupplyChainModel
+        from gds_domains.business.supplychain.model import SupplyChainModel
 
         return SupplyChainModel(
             name="Simple SCN",
@@ -471,13 +471,13 @@ class TestBusinessRoundTrip:
 
     @pytest.fixture
     def vsm_stateless(self):
-        from gds_business.vsm.elements import (
+        from gds_domains.business.vsm.elements import (
             Customer,
             MaterialFlow,
             ProcessStep,
             Supplier,
         )
-        from gds_business.vsm.model import ValueStreamModel
+        from gds_domains.business.vsm.model import ValueStreamModel
 
         return ValueStreamModel(
             name="Stateless VSM",
@@ -496,13 +496,13 @@ class TestBusinessRoundTrip:
 
     @pytest.fixture
     def vsm_stateful(self):
-        from gds_business.vsm.elements import (
+        from gds_domains.business.vsm.elements import (
             InventoryBuffer,
             MaterialFlow,
             ProcessStep,
             Supplier,
         )
-        from gds_business.vsm.model import ValueStreamModel
+        from gds_domains.business.vsm.model import ValueStreamModel
 
         return ValueStreamModel(
             name="Stateful VSM",
@@ -558,7 +558,7 @@ class TestBusinessRoundTrip:
         assert len(canon.mechanism_blocks) > 0
 
     def test_business_verify(self, cld_model, scn_model):
-        from gds_business.verification.engine import verify
+        from gds_domains.business.verification.engine import verify
 
         cld_report = verify(cld_model)
         assert cld_report.system_name == "Simple CLD"
@@ -582,9 +582,9 @@ class TestCanonicalSpectrum:
 
     def test_stockflow_full_dynamical(self):
         """StockFlow is state-dominant: |X|=|stocks|, |f|=|stocks|."""
-        from stockflow.dsl.compile import compile_model
-        from stockflow.dsl.elements import Auxiliary, Flow, Stock
-        from stockflow.dsl.model import StockFlowModel
+        from gds_domains.stockflow.dsl.compile import compile_model
+        from gds_domains.stockflow.dsl.elements import Auxiliary, Flow, Stock
+        from gds_domains.stockflow.dsl.model import StockFlowModel
 
         model = StockFlowModel(
             name="SIR",
@@ -609,9 +609,9 @@ class TestCanonicalSpectrum:
 
     def test_control_full_dynamical(self):
         """Control is full dynamical: |X|=|states|, |f|=|states|."""
-        from gds_control.dsl.compile import compile_model
-        from gds_control.dsl.elements import Controller, Input, Sensor, State
-        from gds_control.dsl.model import ControlModel
+        from gds_domains.control.dsl.compile import compile_model
+        from gds_domains.control.dsl.elements import Controller, Input, Sensor, State
+        from gds_domains.control.dsl.model import ControlModel
 
         model = ControlModel(
             name="SISO",
@@ -628,10 +628,10 @@ class TestCanonicalSpectrum:
     def test_ogs_pure_policy(self):
         """OGS is pure policy: f=empty, X=empty, h=g."""
         from gds.types.interface import port
-        from ogs.dsl.games import DecisionGame
-        from ogs.dsl.pattern import Pattern
-        from ogs.dsl.spec_bridge import compile_pattern_to_spec
-        from ogs.dsl.types import Signature
+        from gds_domains.games.dsl.games import DecisionGame
+        from gds_domains.games.dsl.pattern import Pattern
+        from gds_domains.games.dsl.spec_bridge import compile_pattern_to_spec
+        from gds_domains.games.dsl.types import Signature
 
         game = DecisionGame(
             name="Agent",
@@ -649,8 +649,8 @@ class TestCanonicalSpectrum:
 
     def test_dependency_stateless(self):
         """Dependency graphs are stateless: h = g."""
-        from gds_software.dependency.elements import Dep, Module
-        from gds_software.dependency.model import DependencyModel
+        from gds_domains.software.dependency.elements import Dep, Module
+        from gds_domains.software.dependency.model import DependencyModel
 
         model = DependencyModel(
             name="Dep",
@@ -664,8 +664,8 @@ class TestCanonicalSpectrum:
 
     def test_cld_stateless(self):
         """CLD is stateless signal relay: h = g."""
-        from gds_business.cld.elements import CausalLink, Variable
-        from gds_business.cld.model import CausalLoopModel
+        from gds_domains.business.cld.elements import CausalLink, Variable
+        from gds_domains.business.cld.model import CausalLoopModel
 
         model = CausalLoopModel(
             name="CLD",
@@ -688,9 +688,9 @@ class TestStockFlowErrorConditions:
 
     def test_orphan_stock_warning(self):
         """SF-001: Stock with no flows triggers warning."""
-        from stockflow.dsl.elements import Stock
-        from stockflow.dsl.model import StockFlowModel
-        from stockflow.verification.engine import verify
+        from gds_domains.stockflow.dsl.elements import Stock
+        from gds_domains.stockflow.dsl.model import StockFlowModel
+        from gds_domains.stockflow.verification.engine import verify
 
         model = StockFlowModel(name="Orphan", stocks=[Stock(name="Lonely")])
         report = verify(model, include_gds_checks=False)
@@ -700,9 +700,9 @@ class TestStockFlowErrorConditions:
 
     def test_invalid_flow_target_rejected(self):
         """Flow referencing non-existent stock fails at construction time."""
-        from stockflow.dsl.elements import Flow, Stock
-        from stockflow.dsl.errors import SFValidationError
-        from stockflow.dsl.model import StockFlowModel
+        from gds_domains.stockflow.dsl.elements import Flow, Stock
+        from gds_domains.stockflow.dsl.errors import SFValidationError
+        from gds_domains.stockflow.dsl.model import StockFlowModel
 
         with pytest.raises(SFValidationError):
             StockFlowModel(
@@ -713,9 +713,9 @@ class TestStockFlowErrorConditions:
 
     def test_auxiliary_cycle_detected(self):
         """SF-003: Cycles in auxiliary dependency graph trigger error."""
-        from stockflow.dsl.elements import Auxiliary, Flow, Stock
-        from stockflow.dsl.model import StockFlowModel
-        from stockflow.verification.engine import verify
+        from gds_domains.stockflow.dsl.elements import Auxiliary, Flow, Stock
+        from gds_domains.stockflow.dsl.model import StockFlowModel
+        from gds_domains.stockflow.verification.engine import verify
 
         model = StockFlowModel(
             name="Cycle",
@@ -736,9 +736,9 @@ class TestControlErrorConditions:
 
     def test_undriven_state_warning(self):
         """CS-001: State not driven by any controller."""
-        from gds_control.dsl.elements import Sensor, State
-        from gds_control.dsl.model import ControlModel
-        from gds_control.verification.engine import verify
+        from gds_domains.control.dsl.elements import Sensor, State
+        from gds_domains.control.dsl.model import ControlModel
+        from gds_domains.control.verification.engine import verify
 
         model = ControlModel(
             name="Undriven",
@@ -751,9 +751,9 @@ class TestControlErrorConditions:
 
     def test_unobserved_state_warning(self):
         """CS-002: State not observed by any sensor."""
-        from gds_control.dsl.elements import Controller, State
-        from gds_control.dsl.model import ControlModel
-        from gds_control.verification.engine import verify
+        from gds_domains.control.dsl.elements import Controller, State
+        from gds_domains.control.dsl.model import ControlModel
+        from gds_domains.control.verification.engine import verify
 
         model = ControlModel(
             name="Unobserved",
@@ -766,9 +766,9 @@ class TestControlErrorConditions:
 
     def test_invalid_sensor_observes_rejected(self):
         """Sensor observing non-existent state fails at construction."""
-        from gds_control.dsl.elements import Sensor, State
-        from gds_control.dsl.errors import CSValidationError
-        from gds_control.dsl.model import ControlModel
+        from gds_domains.control.dsl.elements import Sensor, State
+        from gds_domains.control.dsl.errors import CSValidationError
+        from gds_domains.control.dsl.model import ControlModel
 
         with pytest.raises(CSValidationError):
             ControlModel(
@@ -783,8 +783,8 @@ class TestBusinessErrorConditions:
 
     def test_cld_self_loop_rejected_at_construction(self):
         """Self-loops are rejected by model_validator at construction time."""
-        from gds_business.cld.elements import CausalLink, Variable
-        from gds_business.cld.model import CausalLoopModel
+        from gds_domains.business.cld.elements import CausalLink, Variable
+        from gds_domains.business.cld.model import CausalLoopModel
 
         with pytest.raises(Exception, match="Self-loop"):
             CausalLoopModel(
@@ -795,9 +795,9 @@ class TestBusinessErrorConditions:
 
     def test_cld_unreachable_variable(self):
         """CLD-002: Variable not reachable from any other variable."""
-        from gds_business.cld.elements import CausalLink, Variable
-        from gds_business.cld.model import CausalLoopModel
-        from gds_business.verification.engine import verify
+        from gds_domains.business.cld.elements import CausalLink, Variable
+        from gds_domains.business.cld.model import CausalLoopModel
+        from gds_domains.business.verification.engine import verify
 
         model = CausalLoopModel(
             name="Disconnected",
@@ -828,9 +828,9 @@ class TestGDSGenericChecks:
     """
 
     def test_stockflow_gds_checks(self):
-        from stockflow.dsl.elements import Flow, Stock
-        from stockflow.dsl.model import StockFlowModel
-        from stockflow.verification.engine import verify
+        from gds_domains.stockflow.dsl.elements import Flow, Stock
+        from gds_domains.stockflow.dsl.model import StockFlowModel
+        from gds_domains.stockflow.verification.engine import verify
 
         model = StockFlowModel(
             name="SF",
@@ -842,9 +842,9 @@ class TestGDSGenericChecks:
         assert len(gds_findings) > 0
 
     def test_control_gds_checks(self):
-        from gds_control.dsl.elements import Controller, Input, Sensor, State
-        from gds_control.dsl.model import ControlModel
-        from gds_control.verification.engine import verify
+        from gds_domains.control.dsl.elements import Controller, Input, Sensor, State
+        from gds_domains.control.dsl.model import ControlModel
+        from gds_domains.control.verification.engine import verify
 
         model = ControlModel(
             name="CS",
@@ -858,9 +858,9 @@ class TestGDSGenericChecks:
         assert len(gds_findings) > 0
 
     def test_software_gds_checks(self):
-        from gds_software.dfd.elements import DataFlow, ExternalEntity, Process
-        from gds_software.dfd.model import DFDModel
-        from gds_software.verification.engine import verify
+        from gds_domains.software.dfd.elements import DataFlow, ExternalEntity, Process
+        from gds_domains.software.dfd.model import DFDModel
+        from gds_domains.software.verification.engine import verify
 
         model = DFDModel(
             name="DFD",
@@ -873,9 +873,9 @@ class TestGDSGenericChecks:
         assert len(gds_findings) > 0
 
     def test_business_gds_checks(self):
-        from gds_business.cld.elements import CausalLink, Variable
-        from gds_business.cld.model import CausalLoopModel
-        from gds_business.verification.engine import verify
+        from gds_domains.business.cld.elements import CausalLink, Variable
+        from gds_domains.business.cld.model import CausalLoopModel
+        from gds_domains.business.verification.engine import verify
 
         # Bidirectional CLD — both variables have inputs, so G-002 should pass
         model = CausalLoopModel(

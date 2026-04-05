@@ -1,13 +1,13 @@
-# ogs.dsl.games
+# gds_domains.games.dsl.games
 
-::: ogs.dsl.games.DecisionGame
+::: gds_domains.games.dsl.games.DecisionGame
 
-::: ogs.dsl.games.CovariantFunction
+::: gds_domains.games.dsl.games.CovariantFunction
 
-::: ogs.dsl.games.ContravariantFunction
+::: gds_domains.games.dsl.games.ContravariantFunction
 
-::: ogs.dsl.games.DeletionGame
+::: gds_domains.games.dsl.games.DeletionGame
 
-::: ogs.dsl.games.DuplicationGame
+::: gds_domains.games.dsl.games.DuplicationGame
 
-::: ogs.dsl.games.CounitGame
+::: gds_domains.games.dsl.games.CounitGame

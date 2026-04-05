@@ -1,7 +1,7 @@
-# gds_business.cld.elements
+# gds_domains.business.cld.elements
 
 CLD element declarations — frozen Pydantic models for user-facing declarations.
 
-::: gds_business.cld.elements.Variable
+::: gds_domains.business.cld.elements.Variable
 
-::: gds_business.cld.elements.CausalLink
+::: gds_domains.business.cld.elements.CausalLink

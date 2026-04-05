@@ -35,9 +35,9 @@ Models the resource pool as a stock that accumulates via a supply inflow and dep
 ### StockFlowModel Declaration
 
 ```python
-from stockflow.dsl.compile import compile_model, compile_to_system
-from stockflow.dsl.elements import Auxiliary, Converter, Flow, Stock
-from stockflow.dsl.model import StockFlowModel
+from gds_domains.stockflow.dsl.compile import compile_model, compile_to_system
+from gds_domains.stockflow.dsl.elements import Auxiliary, Converter, Flow, Stock
+from gds_domains.stockflow.dsl.model import StockFlowModel
 
 model = StockFlowModel(
     name="Resource Pool (Stock-Flow)",
@@ -124,9 +124,9 @@ Models the same resource pool as a feedback control system. The resource level i
 ### ControlModel Declaration
 
 ```python
-from gds_control.dsl.compile import compile_model, compile_to_system
-from gds_control.dsl.elements import Controller, Input, Sensor, State
-from gds_control.dsl.model import ControlModel
+from gds_domains.control.dsl.compile import compile_model, compile_to_system
+from gds_domains.control.dsl.elements import Controller, Input, Sensor, State
+from gds_domains.control.dsl.model import ControlModel
 
 model = ControlModel(
     name="Resource Pool (Control)",
@@ -213,9 +213,9 @@ This is a stateless strategic interaction: no persistent state updates, pure pol
 ### OGS Pattern Declaration
 
 ```python
-from ogs.dsl.games import CovariantFunction, DecisionGame
-from ogs.dsl.pattern import Pattern, PatternInput
-from ogs.dsl.types import InputType, Signature, port
+from gds_domains.games.dsl.games import CovariantFunction, DecisionGame
+from gds_domains.games.dsl.pattern import Pattern, PatternInput
+from gds_domains.games.dsl.types import InputType, Signature, port
 
 resource_input = PatternInput(
     name="Resource Availability",

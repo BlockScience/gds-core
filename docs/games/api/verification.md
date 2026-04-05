@@ -1,17 +1,17 @@
-# ogs.verification
+# gds_domains.games.verification
 
 ## Engine
 
-::: ogs.verification.engine.verify
+::: gds_domains.games.verification.engine.verify
 
 ## Findings
 
-::: ogs.verification.findings.VerificationReport
+::: gds_domains.games.verification.findings.VerificationReport
 
 ## Type Checks
 
-::: ogs.verification.type_checks
+::: gds_domains.games.verification.type_checks
 
 ## Structural Checks
 
-::: ogs.verification.structural_checks
+::: gds_domains.games.verification.structural_checks

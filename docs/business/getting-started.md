@@ -4,7 +4,7 @@
 
 ```bash
 uv add gds-business
-# or: pip install gds-business
+# or: pip install gds-domains
 ```
 
 For development (monorepo):
@@ -20,7 +20,7 @@ uv sync --all-packages
 A Causal Loop Diagram models feedback structure using variables and causal links:
 
 ```python
-from gds_business import (
+from gds_domains.business import (
     Variable, CausalLink, CausalLoopModel, verify
 )
 
@@ -55,7 +55,7 @@ for f in report.findings:
 A Supply Chain Network models inventory dynamics across nodes:
 
 ```python
-from gds_business import (
+from gds_domains.business import (
     SupplyNode, Shipment, DemandSource, OrderPolicy,
     SupplyChainModel, verify,
 )
@@ -97,7 +97,7 @@ for f in report.findings:
 A Value Stream Map models lean manufacturing flows:
 
 ```python
-from gds_business import (
+from gds_domains.business import (
     ProcessStep, InventoryBuffer, Supplier, Customer,
     MaterialFlow, ValueStreamModel, verify,
 )

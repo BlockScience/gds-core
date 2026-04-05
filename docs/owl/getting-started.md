@@ -3,13 +3,13 @@
 ## Installation
 
 ```bash
-pip install gds-owl
+pip install gds-interchange
 ```
 
 For SHACL validation:
 
 ```bash
-pip install gds-owl[shacl]
+pip install gds-interchange[shacl]
 ```
 
 ## Build an Ontology
@@ -17,7 +17,7 @@ pip install gds-owl[shacl]
 The core ontology defines OWL classes and properties for all GDS concepts:
 
 ```python
-from gds_owl import build_core_ontology, to_turtle
+from gds_interchange.owl import build_core_ontology, to_turtle
 
 ontology = build_core_ontology()
 print(to_turtle(ontology))
@@ -31,7 +31,7 @@ This produces a Turtle document with classes like `gds-core:GDSSpec`, `gds-core:
 from gds import GDSSpec, typedef, entity, state_var
 from gds.blocks.roles import Mechanism
 from gds.types.interface import Interface, port
-from gds_owl import spec_to_graph, to_turtle
+from gds_interchange.owl import spec_to_graph, to_turtle
 
 # Build a minimal spec
 Float = typedef("Float", float)
@@ -55,7 +55,7 @@ print(to_turtle(graph))
 
 ```python
 from rdflib import Graph
-from gds_owl import graph_to_spec, to_turtle, spec_to_graph
+from gds_interchange.owl import graph_to_spec, to_turtle, spec_to_graph
 
 # Round-trip: Pydantic -> Turtle -> Pydantic
 graph = spec_to_graph(spec)
@@ -72,7 +72,7 @@ assert "Tank" in spec2.entities
 ## Validate with SHACL
 
 ```python
-from gds_owl import build_all_shapes, validate_graph, spec_to_graph
+from gds_interchange.owl import build_all_shapes, validate_graph, spec_to_graph
 
 graph = spec_to_graph(spec)
 shapes = build_all_shapes()
@@ -86,7 +86,7 @@ if not conforms:
 ## Query with SPARQL
 
 ```python
-from gds_owl import TEMPLATES, spec_to_graph
+from gds_interchange.owl import TEMPLATES, spec_to_graph
 
 graph = spec_to_graph(spec)
 

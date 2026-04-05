@@ -24,7 +24,7 @@ gds-framework (pip install gds-framework)
 |  Domain-neutral composition algebra, typed spaces,
 |  state model, verification engine, flat IR compiler.
 |
-+-- gds-owl (pip install gds-owl)
++-- gds-owl (pip install gds-interchange)
     |
     |  OWL ontology (TBox), RDF export/import (ABox),
     |  SHACL validation, SPARQL query templates.
@@ -69,17 +69,17 @@ The export/import cycle preserves all structural fields. Known lossy fields:
 ## Installation
 
 ```bash
-pip install gds-owl
+pip install gds-interchange
 
 # With SHACL validation support:
-pip install gds-owl[shacl]
+pip install gds-interchange[shacl]
 ```
 
 ## Quick Example
 
 ```python
 from gds import GDSSpec
-from gds_owl import spec_to_graph, to_turtle, graph_to_spec
+from gds_interchange.owl import spec_to_graph, to_turtle, graph_to_spec
 
 # Export a spec to Turtle
 spec = GDSSpec(name="My System")

@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from ogs.ir.models import PatternIR
+from gds_domains.games.ir.models import PatternIR
 from prisoners_dilemma_nash.model import (
     P,
     R,

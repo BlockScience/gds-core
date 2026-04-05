@@ -1,0 +1,91 @@
+[project]
+name = "gds-interchange"
+dynamic = ["version"]
+description = "Bidirectional format bridges (OWL/RDF, SysML, FMI) for gds-framework specifications"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.12"
+authors = [
+    { name = "Rohan Mehta", email = "rohan@block.science" },
+]
+keywords = [
+    "generalized-dynamical-systems",
+    "owl",
+    "rdf",
+    "turtle",
+    "shacl",
+    "sparql",
+    "sysml",
+    "interchange",
+    "ontology",
+    "gds-framework",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+dependencies = [
+    "gds-framework>=0.3.0",
+    "rdflib>=7.0",
+]
+
+[project.optional-dependencies]
+shacl = [
+    "pyshacl>=0.27",
+]
+sysml = [
+    "httpx>=0.27",
+]
+all = ["gds-interchange[shacl,sysml]"]
+
+[project.urls]
+Homepage = "https://github.com/BlockScience/gds-core"
+Repository = "https://github.com/BlockScience/gds-core"
+Documentation = "https://blockscience.github.io/gds-core"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "gds_interchange/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["gds_interchange"]
+
+[tool.uv.sources]
+gds-framework = { workspace = true }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--import-mode=importlib --cov=gds_interchange --cov-report=term-missing --no-header -q"
+
+[tool.coverage.run]
+source = ["gds_interchange"]
+omit = ["gds_interchange/__init__.py"]
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true
+exclude_lines = [
+    "if TYPE_CHECKING:",
+    "pragma: no cover",
+]
+
+[dependency-groups]
+dev = [
+    "hypothesis>=6.151.9",
+    "mypy>=1.19.1",
+    "pyright>=1.1.408",
+    "pytest>=8.0",
+    "pytest-cov>=6.0",
+    "ruff>=0.8",
+]

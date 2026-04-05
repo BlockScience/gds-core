@@ -1,11 +1,11 @@
-# stockflow.dsl.elements
+# gds_domains.stockflow.dsl.elements
 
 Stock-flow element declarations -- frozen Pydantic models for user-facing declarations.
 
-::: stockflow.dsl.elements.Stock
+::: gds_domains.stockflow.dsl.elements.Stock
 
-::: stockflow.dsl.elements.Flow
+::: gds_domains.stockflow.dsl.elements.Flow
 
-::: stockflow.dsl.elements.Auxiliary
+::: gds_domains.stockflow.dsl.elements.Auxiliary
 
-::: stockflow.dsl.elements.Converter
+::: gds_domains.stockflow.dsl.elements.Converter

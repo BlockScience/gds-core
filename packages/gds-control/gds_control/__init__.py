@@ -1,47 +1,48 @@
-"""State-space control DSL over GDS semantics — control theory with formal guarantees.
+"""gds-control — DEPRECATED: use gds_domains.control instead."""
 
-Declare states, inputs, sensors, and controllers as plain data models.
-The compiler maps them to GDS role blocks, entities, and composition trees.
-All downstream GDS tooling works immediately — canonical projection,
-semantic checks, SpecQuery, serialization, gds-viz.
-"""
+import warnings
 
-__version__ = "0.1.1"
+warnings.warn(
+    "Import from gds_domains.control instead of gds_control. "
+    "The gds-control package will be removed in v0.3.0.",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
-# ── DSL declarations ────────────────────────────────────────
-from gds_control.dsl.elements import Controller, Input, Sensor, State
-from gds_control.dsl.errors import CSCompilationError, CSError, CSValidationError
-from gds_control.dsl.model import ControlModel
-from gds_control.dsl.types import ElementType
+__version__ = "0.99.0"
 
-# ── Compilation ─────────────────────────────────────────────
-from gds_control.dsl.compile import (
+from gds_domains.control import (  # noqa: F401, E402
+    ALL_CS_CHECKS,
+    CSCompilationError,
+    CSError,
+    CSValidationError,
+    Controller,
+    ControlModel,
     ControlSpace,
     ControlType,
+    Finding,
+    Input,
     MeasurementSpace,
     MeasurementType,
     ReferenceSpace,
     ReferenceType,
+    Sensor,
+    Severity,
+    State,
     StateSpace,
     StateType,
-    compile_model,
-    compile_to_system,
-)
-
-# ── Verification ────────────────────────────────────────────
-from gds_control.verification.checks import (
-    ALL_CS_CHECKS,
+    VerificationReport,
     check_cs001_undriven_states,
     check_cs002_unobserved_states,
     check_cs003_unused_inputs,
     check_cs004_controller_read_validity,
     check_cs005_controller_drive_validity,
     check_cs006_sensor_observe_validity,
+    compile_model,
+    compile_to_system,
+    verify,
 )
-from gds_control.verification.engine import verify
-
-# ── Re-exports from gds-framework ──────────────────────────
-from gds.verification.findings import Finding, Severity, VerificationReport
+from gds_domains.control import ElementType  # noqa: F401, E402
 
 __all__ = [
     # DSL
