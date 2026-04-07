@@ -34,6 +34,8 @@ viz = ["gds-viz>=0.1.0"]
 sim = ["gds-sim>=0.1.0"]
 continuous = ["gds-continuous>=0.1.0"]
 analysis = ["gds-analysis[all]>=0.1.0"]
+# Proof & verification
+proof = ["gds-proof>=0.1.0"]
 # Interchange
 interchange = ["gds-interchange[all]>=0.1.0"]
 # Tutorials
@@ -51,6 +53,7 @@ all = [
     "gds-continuous>=0.1.0",
     "gds-analysis[all]>=0.1.0",
     "gds-interchange[all]>=0.1.0",
+    "gds-proof>=0.1.0",
     "gds-examples>=0.1.0",
 ]
 # Deprecated aliases (use consolidated packages above)
@@ -88,6 +91,7 @@ gds-sim = { workspace = true }
 gds-continuous = { workspace = true }
 gds-symbolic = { workspace = true }
 gds-analysis = { workspace = true }
+gds-proof = { workspace = true }
 gds-psuu = { workspace = true }
 gds-domains = { workspace = true }
 gds-interchange = { workspace = true }
@@ -108,7 +112,7 @@ select = ["E", "W", "F", "I", "UP", "B", "SIM", "TCH", "RUF"]
 "packages/gds-examples/prisoners_dilemma/visualize.py" = ["E501"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["gds", "gds_viz", "ogs", "stockflow", "gds_control", "gds_software", "gds_business", "gds_sim", "gds_continuous", "gds_symbolic", "gds_psuu", "gds_owl", "gds_interchange", "gds_domains"]
+known-first-party = ["gds", "gds_viz", "ogs", "stockflow", "gds_control", "gds_software", "gds_business", "gds_sim", "gds_continuous", "gds_symbolic", "gds_psuu", "gds_owl", "gds_interchange", "gds_domains", "gds_proof"]
 
 [dependency-groups]
 docs = [
