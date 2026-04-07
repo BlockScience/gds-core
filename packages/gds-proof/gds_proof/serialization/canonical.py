@@ -16,7 +16,7 @@ import sympy
 
 from gds_proof.analysis.proof import ProofScript  # noqa: TC001
 from gds_proof.invariant import Invariant  # noqa: TC001
-from gds_proof.protocols import ProofableBlock  # noqa: TC001
+from gds_proof.protocols import SymbolicBlock  # noqa: TC001
 
 # ---------------------------------------------------------------------------
 # Core normalization
@@ -122,7 +122,7 @@ def canonical_proof_dict(script: ProofScript) -> dict:
 # ---------------------------------------------------------------------------
 
 
-def validate_block_predicates(block: ProofableBlock) -> list[str]:
+def validate_block_predicates(block: SymbolicBlock) -> list[str]:
     """Check predicate free symbols are in prev_state union input symbols.
 
     Predicates encode the state-dependent admissible input set ``U_{x_prev}``.

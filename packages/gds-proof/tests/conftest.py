@@ -1,14 +1,19 @@
 """Shared fixtures for the gds-proof test suite.
 
-Concrete implementations of ProofableBlock and ProofableModel are defined
-here for reuse across all test modules.
+Two fixture families are provided:
+
+1. **SimpleBlock / SimpleModel** — lightweight classes satisfying the
+   ``SymbolicBlock`` / ``SymbolicModel`` protocols via structural subtyping.
+   Used by existing tests that don't need GDS framework types.
+
+2. **GDS-based fixtures** — use ``GDSSymbolicBlock`` / ``GDSSymbolicModel``
+   adapters wrapping real ``Mechanism`` / ``GDSSpec`` objects.  Used by
+   integration tests validating the adapter layer.
 
 Symbol convention
 -----------------
 All symbols are PLAIN (no assumptions baked in).  Assumptions belong in
-``assumption_context()``, not on the symbol.  Baking ``nonnegative=True``
-into a symbol causes invariants like ``x >= 0`` to simplify to
-``sympy.true`` before the proof engine sees them — vacuity fires spuriously.
+``assumption_context()``, not on the symbol.
 
 Block catalogue
 ---------------
@@ -22,8 +27,18 @@ from __future__ import annotations
 
 import pytest
 import sympy
+from gds import (
+    Entity,
+    GDSSpec,
+    Mechanism,
+    interface,
+    state_var,
+    typedef,
+)
 
 from gds_proof import (
+    GDSSymbolicBlock,
+    GDSSymbolicModel,
     Invariant,
     make_canonical_dict,
     predicate_from_post_check,
@@ -40,12 +55,12 @@ Z = sympy.Symbol("z")  # disjoint state (different block)
 
 
 # ---------------------------------------------------------------------------
-# Reusable concrete block
+# Reusable concrete block (lightweight, no GDS dependency)
 # ---------------------------------------------------------------------------
 
 
 class SimpleBlock:
-    """Configurable concrete block satisfying ProofableBlock."""
+    """Configurable concrete block satisfying SymbolicBlock protocol."""
 
     def __init__(
         self,
@@ -94,12 +109,12 @@ class SimpleBlock:
 
 
 # ---------------------------------------------------------------------------
-# Reusable concrete model
+# Reusable concrete model (lightweight, no GDS dependency)
 # ---------------------------------------------------------------------------
 
 
 class SimpleModel:
-    """Configurable concrete model satisfying ProofableModel."""
+    """Configurable concrete model satisfying SymbolicModel protocol."""
 
     def __init__(
         self,
@@ -139,7 +154,24 @@ class SimpleModel:
 
 
 # ---------------------------------------------------------------------------
-# Block fixtures
+# Shared GDS types for integration fixtures
+# ---------------------------------------------------------------------------
+
+Balance = typedef("Balance", float, description="Account balance")
+
+ACCOUNT_ENTITY = Entity(
+    name="Account",
+    variables={"balance": state_var(Balance, symbol="x_prev")},
+)
+
+COUNTER_ENTITY = Entity(
+    name="Counter",
+    variables={"count": state_var(typedef("Count", int), symbol="z")},
+)
+
+
+# ---------------------------------------------------------------------------
+# SimpleBlock fixtures
 # ---------------------------------------------------------------------------
 
 
@@ -212,7 +244,7 @@ def open_output_block() -> SimpleBlock:
 
 
 # ---------------------------------------------------------------------------
-# Model fixtures
+# SimpleModel fixtures
 # ---------------------------------------------------------------------------
 
 STANDARD_ASSUMPTIONS = {
@@ -283,6 +315,61 @@ def multi_block_model(withdrawal_block, deposit_block) -> SimpleModel:
         },
         invariants_dict={
             "balance_nonneg": Invariant(name="balance_nonneg", expr=sympy.Ge(X, 0))
+        },
+        assumptions=STANDARD_ASSUMPTIONS,
+    )
+
+
+# ---------------------------------------------------------------------------
+# GDS-based integration fixtures
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture
+def gds_withdrawal_spec() -> GDSSpec:
+    """GDSSpec with a withdrawal mechanism and Account entity."""
+    spec = GDSSpec(name="bank_account")
+    spec.collect(
+        Balance,
+        ACCOUNT_ENTITY,
+        Mechanism(
+            name="withdrawal",
+            interface=interface(forward_in=["Balance Command"]),
+            updates=[("Account", "balance")],
+        ),
+    )
+    return spec
+
+
+@pytest.fixture
+def gds_withdrawal_model(gds_withdrawal_spec) -> GDSSymbolicModel:
+    """GDSSymbolicModel wrapping a real GDSSpec with symbolic enrichments."""
+    spec = gds_withdrawal_spec
+    mechanism = spec.blocks["withdrawal"]
+
+    pred = predicate_from_post_check(
+        name="no_overdraft",
+        post_state_check=sympy.Symbol("x") > 0,
+        state_transition={"x": X - U},
+    )
+
+    block = GDSSymbolicBlock(
+        block=mechanism,
+        spec=spec,
+        state_transition={"x_prev": X - U},
+        output_expressions={"balance": X - U},
+        predicates_list=[pred.expr],
+        inputs=frozenset({U}),
+    )
+
+    return GDSSymbolicModel(
+        spec=spec,
+        enrichments={"withdrawal": block},
+        invariants_dict={
+            "balance_nonneg": Invariant(
+                name="balance_nonneg",
+                expr=sympy.Ge(X, 0),
+            )
         },
         assumptions=STANDARD_ASSUMPTIONS,
     )

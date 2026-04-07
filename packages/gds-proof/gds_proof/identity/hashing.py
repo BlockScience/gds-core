@@ -34,7 +34,7 @@ from typing import Any
 import sympy
 
 from gds_proof.analysis.proof import ProofScript  # noqa: TC001
-from gds_proof.protocols import ProofableModel  # noqa: TC001
+from gds_proof.protocols import SymbolicModel  # noqa: TC001
 
 
 def _serialize_for_hash(data: dict) -> str:
@@ -46,7 +46,7 @@ def _serialize_for_hash(data: dict) -> str:
     return json.dumps(data, sort_keys=True, default=str)
 
 
-def hash_model(model: ProofableModel) -> str:
+def hash_model(model: SymbolicModel) -> str:
     """Deterministic SHA-256 hash of a model's declared components.
 
     Delegates to ``model.canonical_dict()``, which implementors build
@@ -55,7 +55,7 @@ def hash_model(model: ProofableModel) -> str:
     Parameters
     ----------
     model:
-        Any object satisfying the ``ProofableModel`` protocol.
+        Any object satisfying the ``SymbolicModel`` protocol.
 
     Returns
     -------

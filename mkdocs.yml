@@ -126,6 +126,9 @@ plugins:
         Symbolic Math (gds-domains):
           - {symbolic/index.md: "SymPy bridge for gds-domains (control) — symbolic equations and linearization"}
           - {symbolic/getting-started.md: "Compile symbolic equations to ODE functions"}
+        Proof (gds-proof):
+          - {proof/index.md: "Deterministic model identity and SymPy invariant proof verification"}
+          - {proof/getting-started.md: "Build your first invariant proof with GDS types"}
         Analysis (gds-analysis):
           - {analysis/index.md: "Bridge GDSSpec structural annotations to gds-sim runtime"}
           - {analysis/getting-started.md: "Convert a GDSSpec to a runnable simulation model"}
@@ -391,6 +394,9 @@ nav:
       - Symbolic Math:
           - Overview: symbolic/index.md
           - Getting Started: symbolic/getting-started.md
+      - Proof:
+          - Overview: proof/index.md
+          - Getting Started: proof/getting-started.md
       - Analysis:
           - Overview: analysis/index.md
           - Getting Started: analysis/getting-started.md
