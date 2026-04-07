@@ -6,7 +6,7 @@
 
 - **Import**: `import gds_viz`
 - **Dependencies**: `gds-framework>=0.2.3`
-- **Optional**: `[phase]` for matplotlib + numpy + gds-continuous (phase portraits)
+- **Optional**: `[phase]` for matplotlib + numpy + gds-continuous (phase portraits), `[control]` for matplotlib + numpy (frequency/response plots), `[plots]` for all plotting
 
 ## Architecture
 
@@ -32,6 +32,25 @@
 | `compute_trajectories(model, ics, ...)` | Integrate multiple ICs → list[ODEResults] |
 
 Supports >2D systems via `fixed_states` projection (e.g., Lorenz z=25 slice).
+
+### Frequency response plots (`gds_viz.frequency`, requires `[control]`)
+
+| Function | Purpose |
+|----------|---------|
+| `bode_plot(omega, mag_db, phase_deg)` | Magnitude + phase with margin annotations |
+| `nyquist_plot(real, imag)` | Complex plane with unit circle and critical point |
+| `nichols_plot(phase_deg, mag_db)` | Open-loop phase vs. gain with M-circles |
+| `root_locus_plot(num, den)` | Pole migration with gain sweep |
+
+### Time-domain response plots (`gds_viz.response`, requires `[control]`)
+
+| Function | Purpose |
+|----------|---------|
+| `step_response_plot(times, values, metrics=...)` | Annotated step response with metric overlays |
+| `impulse_response_plot(times, values)` | Basic impulse response |
+| `compare_responses(responses)` | Multi-response overlay comparison |
+
+All plot functions accept plain `list[float]` data — no coupling to gds-analysis types. Lazy-imported via `__getattr__`.
 
 ## Commands
 

@@ -167,7 +167,11 @@ def _annotate_metrics(ax: Any, t: Any, y: Any, metrics: Any) -> None:
 
 
 def _find_crossing_time(t: Any, y: Any, threshold: float) -> float:
-    """Find first time where y crosses threshold."""
+    """Find first time where y crosses threshold via linear interpolation.
+
+    Note: identical logic exists in ``gds_analysis.response._interpolate_crossing``.
+    Duplicated here to avoid a hard dependency on gds-analysis from gds-viz.
+    """
     for i in range(1, len(y)):
         if (y[i - 1] <= threshold <= y[i]) or (y[i - 1] >= threshold >= y[i]):
             dv = y[i] - y[i - 1]

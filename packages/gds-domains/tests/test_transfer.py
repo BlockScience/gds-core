@@ -17,7 +17,6 @@ from gds_domains.symbolic.transfer import (
     zeros,
 )
 
-
 # ---------------------------------------------------------------------------
 # Fixtures: canonical test systems
 # ---------------------------------------------------------------------------
@@ -181,9 +180,7 @@ class TestPolesZeros:
         assert p[0].real == pytest.approx(-1.0, abs=1e-6)
         assert abs(p[0].imag) < 1e-6
 
-    def test_double_integrator_poles(
-        self, double_integrator: LinearizedSystem
-    ) -> None:
+    def test_double_integrator_poles(self, double_integrator: LinearizedSystem) -> None:
         tf_mat = ss_to_tf(double_integrator)
         tf = tf_mat.elements[0][0]
         p = poles(tf)
@@ -280,7 +277,7 @@ class TestSensitivity:
 
         # S and T should have the same denominator
         assert len(s_tf.den) == len(t_tf.den)
-        for a, b in zip(s_tf.den, t_tf.den):
+        for a, b in zip(s_tf.den, t_tf.den, strict=False):
             assert a == pytest.approx(b, abs=1e-10)
 
         # S_num + T_num should equal the denominator
@@ -290,8 +287,8 @@ class TestSensitivity:
         t_padded = [0.0] * (max_len - len(t_tf.num)) + t_tf.num
         d_padded = [0.0] * (max_len - len(s_tf.den)) + s_tf.den
 
-        summed = [a + b for a, b in zip(s_padded, t_padded)]
-        for a, b in zip(summed, d_padded):
+        summed = [a + b for a, b in zip(s_padded, t_padded, strict=False)]
+        for a, b in zip(summed, d_padded, strict=False):
             assert a == pytest.approx(b, abs=1e-10)
 
     def test_returns_all_six(self) -> None:
@@ -300,3 +297,111 @@ class TestSensitivity:
 
         gang = sensitivity(plant, controller)
         assert set(gang.keys()) == {"S", "T", "CS", "PS", "KS", "KPS"}
+
+    def test_sensitivity_dc_values(self) -> None:
+        """Verify S(0) and T(0) at DC for P=1/(s+1), K=2.
+
+        L(0) = P(0)*K(0) = 1*2 = 2
+        S(0) = 1/(1+L(0)) = 1/3
+        T(0) = L(0)/(1+L(0)) = 2/3
+        """
+        plant = TransferFunction(num=[1.0], den=[1.0, 1.0])
+        controller = TransferFunction(num=[2.0], den=[1.0])
+
+        gang = sensitivity(plant, controller)
+
+        # Evaluate S at s=0: ratio of constant terms
+        s_tf = gang["S"]
+        s_dc = s_tf.num[-1] / s_tf.den[-1]
+        assert s_dc == pytest.approx(1.0 / 3.0, abs=1e-10)
+
+        t_tf = gang["T"]
+        t_dc = t_tf.num[-1] / t_tf.den[-1]
+        assert t_dc == pytest.approx(2.0 / 3.0, abs=1e-10)
+
+    def test_cs_is_controller_times_s(self) -> None:
+        """CS = K*S: verify CS(0) = K(0)*S(0) = 2*(1/3) = 2/3."""
+        plant = TransferFunction(num=[1.0], den=[1.0, 1.0])
+        controller = TransferFunction(num=[2.0], den=[1.0])
+
+        gang = sensitivity(plant, controller)
+        cs_tf = gang["CS"]
+        cs_dc = cs_tf.num[-1] / cs_tf.den[-1]
+        assert cs_dc == pytest.approx(2.0 / 3.0, abs=1e-10)
+
+
+# ---------------------------------------------------------------------------
+# MIMO transfer functions
+# ---------------------------------------------------------------------------
+
+
+class TestMIMO:
+    def test_2x2_system(self) -> None:
+        """2-input, 2-output system: verify matrix dimensions."""
+        ls = LinearizedSystem(
+            A=[[-1.0, 0.0], [0.0, -2.0]],
+            B=[[1.0, 0.0], [0.0, 1.0]],
+            C=[[1.0, 0.0], [0.0, 1.0]],
+            D=[[0.0, 0.0], [0.0, 0.0]],
+            x0=[0.0, 0.0],
+            u0=[0.0, 0.0],
+            state_names=["x1", "x2"],
+            input_names=["u1", "u2"],
+            output_names=["y1", "y2"],
+        )
+        tf_mat = ss_to_tf(ls)
+
+        # Should be 2x2
+        assert len(tf_mat.elements) == 2
+        assert len(tf_mat.elements[0]) == 2
+        assert len(tf_mat.elements[1]) == 2
+
+    def test_2x2_diagonal_system_dc_gains(self) -> None:
+        """Diagonal A, identity B and C: verify DC gains.
+
+        H11(s) = (s+2)/((s+1)(s+2)) → H11(0) = 2/2 = 1.0
+        H22(s) = (s+1)/((s+1)(s+2)) → H22(0) = 1/2 = 0.5
+        Note: denominator is the full characteristic polynomial for all elements.
+        """
+        ls = LinearizedSystem(
+            A=[[-1.0, 0.0], [0.0, -2.0]],
+            B=[[1.0, 0.0], [0.0, 1.0]],
+            C=[[1.0, 0.0], [0.0, 1.0]],
+            D=[[0.0, 0.0], [0.0, 0.0]],
+            x0=[0.0, 0.0],
+            u0=[0.0, 0.0],
+            state_names=["x1", "x2"],
+            input_names=["u1", "u2"],
+            output_names=["y1", "y2"],
+        )
+        tf_mat = ss_to_tf(ls)
+
+        # DC gain = num(0)/den(0) = constant_term_num / constant_term_den
+        h11 = tf_mat.elements[0][0]
+        h11_dc = h11.num[-1] / h11.den[-1]
+        assert h11_dc == pytest.approx(1.0, abs=1e-8)
+
+        h22 = tf_mat.elements[1][1]
+        h22_dc = h22.num[-1] / h22.den[-1]
+        assert h22_dc == pytest.approx(0.5, abs=1e-8)
+
+    def test_nonzero_D_feedthrough(self) -> None:
+        """System with D != 0: verify DC gain includes feedthrough."""
+        ls = LinearizedSystem(
+            A=[[-1.0]],
+            B=[[1.0]],
+            C=[[1.0]],
+            D=[[2.0]],
+            x0=[0.0],
+            u0=[0.0],
+            state_names=["x"],
+            input_names=["u"],
+            output_names=["y"],
+        )
+        tf_mat = ss_to_tf(ls)
+        tf = tf_mat.elements[0][0]
+
+        # H(s) = 1/(s+1) + 2 = (2s + 3)/(s + 1)
+        # DC gain H(0) = 3/1 = 3
+        dc_gain = tf.num[-1] / tf.den[-1]
+        assert dc_gain == pytest.approx(3.0, abs=1e-8)

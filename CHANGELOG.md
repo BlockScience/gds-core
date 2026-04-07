@@ -1,5 +1,70 @@
 # Changelog
 
+## 2026-04-07 — Classical Control Theory Analysis Stack
+
+Adds frequency-domain and time-domain control analysis across four packages,
+closing the gap between GDS structural specification and classical control
+engineering workflows. Tracking issue: #198.
+
+### gds-domains (symbolic layer)
+
+- **`symbolic/transfer.py`** — transfer function representation and analysis
+  - `ss_to_tf()`: state-space to transfer function matrix (SISO and MIMO)
+  - `poles()`, `zeros()`: polynomial root-finding via SymPy
+  - `characteristic_polynomial()`: det(sI - A) as coefficient list
+  - `controllability_matrix()`, `observability_matrix()`: Kalman rank tests
+  - `is_controllable()`, `is_observable()`: rank-based checks
+  - `is_minimum_phase()`: RHP zero detection
+  - `sensitivity()`: Gang of Six (S, T, CS, PS, KS, KPS)
+  - `TransferFunction`, `TransferFunctionMatrix` data types
+- **`symbolic/delay.py`** — time delay modeling
+  - `pade_approximation()`: (N,N) Padé approximant of e^{-sτ}
+  - `delay_system()`: cascade TF with Padé delay
+
+### gds-analysis (numerical layer)
+
+- **`linear.py`** — numerical linear systems analysis (requires `[continuous]`)
+  - `eigenvalues()`, `is_stable()`, `is_marginally_stable()`: stability checks
+  - `frequency_response()`: H(jω) magnitude/phase via scipy
+  - `gain_margin()`, `phase_margin()`: stability margin computation
+  - `discretize()`: continuous-to-discrete (Tustin, ZOH, Euler, backward Euler)
+  - `lqr()`, `dlqr()`: continuous/discrete Linear Quadratic Regulator
+  - `kalman()`: steady-state Kalman filter gain
+  - `gain_schedule()`: multi-point LQR across operating points
+- **`response.py`** — step/impulse response and time-domain metrics
+  - `step_response()`, `impulse_response()`: state-space simulation via scipy
+  - `step_response_metrics()`: rise time, settling time, overshoot, SSE
+  - `StepMetrics` data type (no scipy needed for metric extraction)
+  - `metrics_from_ode_results()`: convenience wrapper for gds-continuous
+
+### gds-proof (formal verification layer)
+
+- **`analysis/lyapunov.py`** — Lyapunov stability proofs
+  - `lyapunov_candidate()`: verify V(x) > 0 and dV/dt < 0 (continuous/discrete)
+  - `quadratic_lyapunov()`: verify V = x'Px via A'P + PA eigenvalue check
+  - `find_quadratic_lyapunov()`: solve Lyapunov equation A'P + PA = -Q
+  - `passivity_certificate()`: verify dV/dt ≤ s(u, y) for dissipativity
+
+### gds-viz (visualization layer)
+
+- **`frequency.py`** — frequency response plots (requires `[control]`)
+  - `bode_plot()`: magnitude + phase with optional margin annotations
+  - `nyquist_plot()`: complex plane with unit circle and critical point
+  - `nichols_plot()`: open-loop phase vs. gain with M-circles
+  - `root_locus_plot()`: pole migration with gain sweep
+- **`response.py`** — time-domain plots (requires `[control]`)
+  - `step_response_plot()`: with StepMetrics annotation overlays
+  - `impulse_response_plot()`: basic response plot
+  - `compare_responses()`: multi-response overlay
+- New `[control]` optional extra (matplotlib + numpy, no gds-continuous)
+- New `[plots]` extra (union of `[phase]` and `[control]`)
+
+Zero new third-party dependencies. 104 new tests across all packages.
+
+Closes #199, #200, #201, #202, #203, #204.
+
+---
+
 ## 2026-04-07 — gds-proof Layer 1 Integration
 
 Promotes gds-proof from a standalone package (Layer 0, protocol-only) to a

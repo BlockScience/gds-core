@@ -9,8 +9,8 @@ For continuous-time systems:
 For discrete-time systems:
     V(x) > 0 and V(f(x)) - V(x) < 0
 
-All proofs delegate to the existing five-strategy SymPy simplification
-engine in ``gds_proof.analysis.symbolic``.
+Uses SymPy's simplification engine directly for positive-definiteness
+and decrease condition checks via Hessian eigenvalue analysis.
 """
 
 from __future__ import annotations

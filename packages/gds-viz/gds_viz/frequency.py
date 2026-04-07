@@ -208,7 +208,6 @@ def nichols_plot(
     *,
     title: str = "Nichols Chart",
     m_circles: bool = True,
-    n_circles: bool = False,
     ax: Any | None = None,
     figsize: tuple[float, float] = (10, 8),
 ) -> Any:
@@ -224,8 +223,6 @@ def nichols_plot(
         Plot title.
     m_circles : bool
         If True, draw M-circles (constant closed-loop magnitude contours).
-    n_circles : bool
-        If True, draw N-circles (constant closed-loop phase contours).
     ax : Axes | None
         Existing axes.
     figsize : tuple[float, float]
