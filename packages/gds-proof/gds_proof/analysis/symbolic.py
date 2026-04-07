@@ -52,7 +52,7 @@ from typing import Literal
 import sympy
 from pydantic import BaseModel, ConfigDict, model_validator
 
-from gds_proof.protocols import ProofableBlock, ProofableModel  # noqa: TC001
+from gds_proof.protocols import SymbolicBlock, SymbolicModel  # noqa: TC001
 from gds_proof.types import SympyExpr  # noqa: TC001
 
 # ---------------------------------------------------------------------------
@@ -231,7 +231,7 @@ def _analyze_pair(
     invariant_name: str,
     invariant_expr: sympy.Basic,
     block_name: str,
-    block: ProofableBlock,
+    block: SymbolicBlock,
     assumptions: dict[sympy.Symbol, dict],
 ) -> InvariantMechanismResult:
     """Attempt to prove I(x_prev) ∧ predicates(x_prev, u) → I(f(x_prev, u)).
@@ -376,7 +376,7 @@ def _analyze_pair(
 # ---------------------------------------------------------------------------
 
 
-def analyze_invariants(model: ProofableModel) -> SymbolicAnalysisResult:
+def analyze_invariants(model: SymbolicModel) -> SymbolicAnalysisResult:
     """Run symbolic implication analysis over all (invariant, block) pairs.
 
     For each pair, attempts to prove that the block's state transition
@@ -385,7 +385,7 @@ def analyze_invariants(model: ProofableModel) -> SymbolicAnalysisResult:
     Parameters
     ----------
     model:
-        Any object satisfying ``ProofableModel``.  The proof engine calls
+        Any object satisfying ``SymbolicModel``.  The proof engine calls
         ``model.blocks()``, ``model.invariants()``, and
         ``model.assumption_context()`` — nothing else.
 

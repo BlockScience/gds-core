@@ -1,5 +1,63 @@
 # Changelog
 
+## 2026-04-07 — gds-proof Layer 1 Integration
+
+Promotes gds-proof from a standalone package (Layer 0, protocol-only) to a
+Layer 1 package that depends on `gds-framework` and integrates with the
+existing verification infrastructure.
+
+### gds-proof v0.2.0
+
+**Breaking:** `ProofableBlock` renamed to `SymbolicBlock`, `ProofableModel`
+renamed to `SymbolicModel`. Deprecated aliases remain until v1.0.0.
+
+**Breaking:** `analyze_reachability()` renamed to `analyze_inductive_safety()`,
+`ReachabilityAnalysisResult` renamed to `InductiveSafetyResult`. Deprecated
+aliases remain until v1.0.0. This resolves a naming collision with
+`gds_analysis.reachability` (simulation-based forward/backward state sets).
+
+New capabilities:
+
+- **gds-framework dependency** -- gds-proof is now a Layer 1 package alongside
+  gds-analysis, gds-domains, and gds-viz
+- **`GDSSymbolicBlock`** -- adapter wrapping `AtomicBlock` + `GDSSpec` with
+  user-supplied SymPy expressions. Auto-derives `prev_state_symbols` from
+  `Mechanism.updates` + `Entity.variables[var].symbol`
+- **`GDSSymbolicModel`** -- adapter wrapping `GDSSpec` with symbolic enrichments
+  and invariants. Auto-derives assumption context from `ParameterDef.bounds`
+- **`findings.py`** -- converts proof results to `Finding`/`VerificationReport`
+  objects. Populates `Finding.exportable_predicate` with canonical SymPy form.
+  Check ID: `PROOF-001` (invariant preservation)
+- **`derive_state_symbols()`** -- utility to extract SymPy symbols from mechanism
+  updates + entity variable symbols
+- **`derive_assumption_context()`** -- utility to build SymPy assumption dicts
+  from parameter schema bounds
+
+Documentation:
+
+- Added `docs/proof/index.md` and `docs/proof/getting-started.md`
+- Updated `CLAUDE.md` for Layer 1 architecture
+- Added gds-proof to mkdocs.yml navigation and llmstxt sections
+
+---
+
+## 2026-04-07 — gds-proof v0.1.0
+
+New package added via PR #193. Extracts the domain-agnostic proof engine from
+`crypto-econ-dynamics-skill` into gds-core as the ninth workspace package.
+
+Capabilities:
+
+- Deterministic SHA-256 model identity (`hash_model`, `hash_proof`)
+- 5-strategy symbolic implication prover (`analyze_invariants`)
+- 3-layer predicate-guarded reachability (`analyze_reachability`)
+- User-authored multi-lemma ProofScript with independent verification
+- Canonical srepr serialization for third-party evidence exchange
+
+112 tests, 95% coverage.
+
+---
+
 ## 2026-04-05 — Package Consolidation (14 → 8 packages)
 
 Implements the consolidation plan from issue #143. Reduces the monorepo from

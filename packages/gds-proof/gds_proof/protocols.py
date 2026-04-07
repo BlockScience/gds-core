@@ -1,4 +1,4 @@
-"""Structural protocols for the gds-proof engine.
+"""Structural protocols for the gds-proof symbolic analysis engine.
 
 Block formalism
 ---------------
@@ -25,16 +25,7 @@ Where:
 ``y``
     Observable output wired to downstream blocks.  ``y = c(x, u)``.
     ``c`` is an interface/port function — it determines what the outside
-    world can measure.  Examples:
-
-    - ``y = x``       — full post-state revealed
-    - ``y = g(x)``    — any projection of the post-state
-    - ``y = u``       — pure pass-through
-
-    ``x_prev`` does NOT appear as an explicit argument to ``c``.  If a
-    block needs to expose something like a difference (e.g. velocity), that
-    quantity is modelled as its own state component in ``x`` — the state
-    space is augmented rather than exposing the previous state directly.
+    world can measure.
 
 In SymPy terms
 --------------
@@ -65,10 +56,22 @@ The proof obligation for one (invariant ``I``, block ``k``) pair is:
 
 ``substitution()`` provides the map ``x_prev_sym → f_expr`` to build
 ``I(f(x_prev, u))`` from ``I(x_prev)`` by SymPy substitution.
+
+GDS framework integration
+--------------------------
+These protocols define the symbolic interface the proof engine requires.
+GDS framework blocks (``AtomicBlock``, ``Mechanism``, etc.) are structural
+(R1) and do not carry SymPy expressions natively.  The ``adapter`` module
+provides concrete implementations that bridge GDS types to these protocols
+by pairing an ``AtomicBlock`` with user-supplied symbolic expressions.
+
+See ``gds_proof.adapter.GDSSymbolicBlock`` and ``gds_proof.adapter.GDSSymbolicModel``
+for the recommended way to construct proof-ready objects from GDS specs.
 """
 
 from __future__ import annotations
 
+import warnings
 from typing import Protocol, runtime_checkable
 
 import sympy  # noqa: TC002
@@ -77,8 +80,12 @@ from gds_proof.invariant import Invariant  # noqa: TC001
 
 
 @runtime_checkable
-class ProofableBlock(Protocol):
-    """An open stateful system block participating in symbolic proof analysis.
+class SymbolicBlock(Protocol):
+    """A block enriched with symbolic expressions for proof analysis.
+
+    Provides the SymPy-level behavioral information (state transitions,
+    output maps, predicates) that the proof engine needs to verify
+    invariant preservation.
 
     Canonical form::
 
@@ -128,30 +135,6 @@ class ProofableBlock(Protocol):
 
         Empty list means the block is unconditionally admissible
         (``U_{x_prev} = U`` for all ``x_prev``).
-
-        Canonical construction
-        ~~~~~~~~~~~~~~~~~~~~~~
-        Predicates are typically constructed by choosing a desired post-state
-        property ``check(x)`` and pulling it back through the state
-        transition::
-
-            U_{x_prev} = {u ∈ U : check(f(x_prev, u)) = True}
-
-        Example: ``x = x_prev - u``, desired post-state ``x > 0`` gives
-        predicate ``x_prev - u > 0``, i.e. ``u < x_prev``.
-
-        Use ``gds_proof.predicate.predicate_from_post_check()`` to perform
-        this substitution automatically and preserve the ``post_state_form``
-        for auditors.
-
-        Local invariants
-        ~~~~~~~~~~~~~~~~
-        The post-state check ``check(x)`` is the *local invariant* this
-        block enforces: for every admitted transition, the post-state
-        satisfies ``check(x)``.  These local guarantees compose across
-        blocks through the wiring diagram to produce *emergent global
-        invariants* — properties no single block owns but the composed
-        system guarantees.
         """
         ...
 
@@ -182,10 +165,6 @@ class ProofableBlock(Protocol):
         ``c(f(x_prev, u), u)`` — i.e., ``c(x, u)`` with ``x`` substituted
         via ``state_transition``.  Values are over
         ``prev_state_symbols union input_symbols``.
-
-        ``x_prev`` does not appear as a distinct argument: if a block needs
-        to expose a difference or velocity, that quantity is a dedicated
-        state component in ``x``.
         """
         ...
 
@@ -201,58 +180,30 @@ class ProofableBlock(Protocol):
 
         **State symbols** (``x_prev → f(x_prev, u)``)
             Maps each pre-state symbol to its post-transition expression.
-            Used to build ``I(f(x_prev, u))`` from ``I(x_prev)``.
 
         **Output symbols** (``y → c(f(x_prev, u), u)``)
-            Maps each output port symbol to its expression, already stated
-            in terms of ``prev_state_symbols union input_symbols`` (``x``
-            substituted away).  Allows invariants to be stated over output
-            symbols of blocks with unwired (open) output ports — the proof
-            engine does not require outputs to be connected downstream.
+            Maps each output port symbol to its expression.
 
         Combined, ``invariant_expr.subs(block.substitution())`` correctly
-        handles invariants over any combination of state and output symbols
-        that this block produces.
-
-        Open-world inputs
-        ~~~~~~~~~~~~~~~~~
-        Input symbols need NOT be wired from an upstream block.  Open inputs
-        are universally quantified over ``U_{x_prev}`` — the predicate is the
-        type system.  The proof engine treats all inputs as universally
-        quantified regardless of wiring status.
+        handles invariants over any combination of state and output symbols.
         """
         ...
 
 
 @runtime_checkable
-class ProofableModel(Protocol):
-    """Interface the gds-proof engine requires of any model.
+class SymbolicModel(Protocol):
+    """A model enriched with symbolic information for proof analysis.
 
-    Any model that implements these four methods — without importing any
-    gds-proof types — satisfies the protocol via structural subtyping.
+    Provides the proof engine with blocks (as ``SymbolicBlock`` instances),
+    invariants to verify, assumption context for the Q-system strategy,
+    and a canonical dict for deterministic hashing.
+
+    For GDS-based models, use ``GDSSymbolicModel`` from ``gds_proof.adapter``
+    which wraps a ``GDSSpec`` and derives structural information automatically.
     """
 
-    def blocks(self) -> dict[str, ProofableBlock]:
-        """All blocks participating in proof analysis, keyed by block name.
-
-        Includes any block whose state or output symbols appear in declared
-        invariants, regardless of wiring status.  A block with unwired
-        (open) output ports is still included if its outputs are referenced
-        in invariants — the proof engine does not require port closure.
-
-        Open-world interpretation
-        ~~~~~~~~~~~~~~~~~~~~~~~~~
-        The composed model is itself interpretable as a single block whose:
-
-        - Inputs  = Cartesian product of all open (unwired) input ports.
-        - Outputs = Cartesian product of ALL output ports (outputs may fan
-          out to multiple downstream inputs unless cardinality is restricted).
-
-        Open inputs are universally quantified over ``U_{x_prev}`` — the
-        predicate defines the admissible set, not the wiring.  Port closure
-        is a property of a specific instantiation, not a precondition for
-        proof.
-        """
+    def blocks(self) -> dict[str, SymbolicBlock]:
+        """All blocks participating in proof analysis, keyed by block name."""
         ...
 
     def invariants(self) -> dict[str, Invariant]:
@@ -283,3 +234,24 @@ class ProofableModel(Protocol):
         Used as sole input to ``hash_model()``.
         """
         ...
+
+
+# ---------------------------------------------------------------------------
+# Deprecated aliases — remove in v1.0.0
+# ---------------------------------------------------------------------------
+
+
+def __getattr__(name: str) -> type:
+    _aliases = {
+        "ProofableBlock": SymbolicBlock,
+        "ProofableModel": SymbolicModel,
+    }
+    if name in _aliases:
+        warnings.warn(
+            f"gds_proof.protocols.{name} is deprecated, "
+            f"use {_aliases[name].__name__} instead",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return _aliases[name]
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

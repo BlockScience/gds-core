@@ -3,6 +3,29 @@
 All notable changes to the GDS ecosystem are documented here. Each release
 lists affected packages, breaking changes, and new capabilities.
 
+## 2026-04-07 — gds-proof Layer 1 Integration
+
+Promotes gds-proof from standalone (Layer 0, protocol-only) to Layer 1
+(depends on `gds-framework`, integrates with verification pipeline).
+
+### gds-proof v0.2.0
+
+**Breaking:** `ProofableBlock` -> `SymbolicBlock`, `ProofableModel` -> `SymbolicModel`.
+`analyze_reachability()` -> `analyze_inductive_safety()`. Deprecated aliases until v1.0.0.
+
+New:
+
+- **`GDSSymbolicBlock` / `GDSSymbolicModel`** -- adapters bridging GDS types to proof engine
+- **`findings.py`** -- converts proof results to `Finding`/`VerificationReport` (check ID: `PROOF-001`)
+- **`derive_state_symbols()`** / **`derive_assumption_context()`** -- GDS type utilities
+- Documentation: `docs/proof/` with overview and getting-started guide
+
+### gds-proof v0.1.0
+
+New package (PR #193). Deterministic model identity and SymPy-based invariant
+proof verification. 5-strategy implication prover, 3-layer inductive safety,
+multi-lemma ProofScript system. 112 tests, 95% coverage.
+
 ---
 
 ## 2026-04-03 — Tier 0 + Tier 1 Complete
