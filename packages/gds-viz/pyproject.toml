@@ -35,6 +35,8 @@ dependencies = [
 
 [project.optional-dependencies]
 phase = ["matplotlib>=3.8", "numpy>=1.26", "gds-continuous>=0.1.0"]
+control = ["matplotlib>=3.8", "numpy>=1.26"]
+plots = ["matplotlib>=3.8", "numpy>=1.26", "gds-continuous>=0.1.0"]
 
 [project.urls]
 Homepage = "https://github.com/BlockScience/gds-core"
