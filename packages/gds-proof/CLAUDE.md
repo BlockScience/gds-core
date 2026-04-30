@@ -161,6 +161,24 @@ model.canonical_dict()
 
 ---
 
+## Lyapunov Stability Proofs (`analysis/lyapunov.py`)
+
+Control-theoretic stability templates using SymPy. Does not use the five-strategy
+prover from `symbolic.py` — performs its own Hessian-based definiteness checks.
+
+| Function | What it proves |
+|----------|---------------|
+| `lyapunov_candidate(V, f, states)` | V(x) > 0 and dV/dt < 0 (continuous) or ΔV < 0 (discrete) |
+| `quadratic_lyapunov(P, A)` | V = x'Px via P > 0 and A'P + PA < 0 (eigenvalue check) |
+| `find_quadratic_lyapunov(A, Q)` | Solve A'P + PA = -Q for P (SymPy linear system) |
+| `passivity_certificate(V, s, f, h)` | dV/dt ≤ s(u, y) for dissipativity |
+
+Results are `LyapunovResult` / `PassivityResult` with `Literal["PROVED", "FAILED", "INCONCLUSIVE"]` status fields.
+
+**Limitation:** Only handles quadratic forms (constant Hessian) definitively. Non-quadratic V returns INCONCLUSIVE. For systems with n > 4, `find_quadratic_lyapunov` may be slow (use `scipy.linalg.solve_continuous_lyapunov` in `gds-analysis` instead).
+
+---
+
 ## Commands
 
 ```bash

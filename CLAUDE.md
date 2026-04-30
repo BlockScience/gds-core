@@ -14,12 +14,26 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | gds-domains | `gds_domains.{stockflow,control,business,software,games,symbolic}` | `packages/gds-domains/` | All domain DSLs |
 | gds-sim | `gds_sim` | `packages/gds-sim/` | Discrete-time simulation |
 | gds-continuous | `gds_continuous` | `packages/gds-continuous/` | Continuous-time ODE engine |
-| gds-analysis | `gds_analysis`, `gds_analysis.psuu` | `packages/gds-analysis/` | Spec-to-sim bridge + PSUU |
+| gds-analysis | `gds_analysis`, `gds_analysis.psuu` | `packages/gds-analysis/` | Spec-to-sim bridge + PSUU + linear systems analysis |
 | gds-interchange | `gds_interchange.owl` | `packages/gds-interchange/` | OWL/SHACL/SPARQL + future bridges |
-| gds-viz | `gds_viz` | `packages/gds-viz/` | Mermaid + phase portraits |
+| gds-viz | `gds_viz` | `packages/gds-viz/` | Mermaid + phase portraits + Bode/Nyquist/root locus |
 | gds-examples | — | `packages/gds-examples/` | Tutorials + examples |
 
 Deprecated shim packages (v0.99.0, re-export with DeprecationWarning): gds-owl, gds-psuu, gds-stockflow, gds-control, gds-games, gds-software, gds-business, gds-symbolic.
+
+## What GDS Is Not
+
+GDS is a **specification and verification** framework, not a simulation engine or general-purpose modeling library. If you have used SimPy, Mesa, cadCAD, or SciPy before, read this section before writing any code.
+
+| Misconception | Reality |
+|--------------|---------|
+| GDS is a simulation engine | GDS is a **specification** layer. Do not write `for t in range(...)` loops. Declare a spec; `gds-sim` or `gds-continuous` executes it. |
+| GDS is SimPy / Mesa / cadCAD | GDS is a typed composition algebra with formal verification. The closest analogy is a specification language (like Alloy or TLA+), not an ABM or process-simulation framework. |
+| GDS is SciPy.integrate | `gds-continuous` wraps SciPy internally, but users declare ODE systems via specs, not `solve_ivp()` calls directly. |
+| Blocks are classes you instantiate freely | Block roles (`BoundaryAction`, `Policy`, `Mechanism`, `ControlAction`) are the four leaf types. Domain DSLs compile *models* into blocks via `compile_model()` / `compile_to_system()`. Hand-wiring blocks is for framework extension, not typical usage. |
+| Verification is type checking | Verification operates on compiled IR (`SystemIR`) and specs (`GDSSpec`). It checks structural topology (G-001..G-006) and semantic properties (SC-001..SC-009), not Python types at runtime. |
+| Parameters get assigned values by GDS | `ParameterSchema` (Theta) is structural metadata only. GDS never binds parameter values. `gds-analysis` and its PSUU module handle sweep and evaluation. |
+| Domain DSLs are interchangeable | Each DSL targets a specific modeling paradigm. Use `gds_domains.stockflow` for conservation-law systems, `.control` for state-space controllers, `.games` for strategic interaction, `.business` for causal/value-stream diagrams, `.software` for architecture diagrams. See the [Choosing a DSL](https://blockscience.github.io/gds-core/guides/choosing-a-dsl/) guide. |
 
 ## Commands
 
@@ -106,6 +120,8 @@ The composition tree follows a convergent tiered pattern:
 ```
 
 `gds_domains.games` is more complex — it subclasses `AtomicBlock` as `OpenGame` with its own IR (`PatternIR`), but projects back to `SystemIR` via `PatternIR.to_system_ir()`.
+
+`gds_domains.symbolic` extends the control DSL with SymPy-based ODEs, linearization (A, B, C, D matrices), transfer functions, poles/zeros, controllability/observability, Padé time delay approximation, and the Gang of Six sensitivity functions. This is the entry point to the classical control theory analysis stack — `LinearizedSystem` flows into `gds-analysis` for numerical analysis and `gds-viz` for frequency-domain plots.
 
 ### Two Type Systems
 
