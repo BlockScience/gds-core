@@ -1,10 +1,6 @@
 """Tests for Lyapunov stability proofs and passivity certificates."""
 
-import pytest
-
 from gds_proof.analysis.lyapunov import (
-    LyapunovResult,
-    PassivityResult,
     find_quadratic_lyapunov,
     lyapunov_candidate,
     passivity_certificate,

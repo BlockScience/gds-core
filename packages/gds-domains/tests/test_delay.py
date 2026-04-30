@@ -10,7 +10,7 @@ from gds_domains.symbolic.transfer import TransferFunction, poles, zeros
 
 class TestPadeApproximation:
     def test_order_1_coefficients(self) -> None:
-        """Order-1 Padé of 1s delay: (−s/2 + 1)/(s/2 + 1)."""
+        """Order-1 Padé of 1s delay: (-s/2 + 1)/(s/2 + 1)."""
         tf = pade_approximation(1.0, order=1)
         # num and den should be order 1 polynomials
         assert len(tf.num) == 2
