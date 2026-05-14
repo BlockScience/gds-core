@@ -42,6 +42,6 @@ flowchart TD
 
 ## Files
 
-- [model.py](https://github.com/BlockScience/gds-examples/blob/main/lotka_volterra/model.py)
-- [test_model.py](https://github.com/BlockScience/gds-examples/blob/main/lotka_volterra/test_model.py)
-- [VIEWS.md](https://github.com/BlockScience/gds-examples/blob/main/lotka_volterra/VIEWS.md)
+- [model.py](https://github.com/DynamicalSystemsGroup/gds-examples/blob/main/lotka_volterra/model.py)
+- [test_model.py](https://github.com/DynamicalSystemsGroup/gds-examples/blob/main/lotka_volterra/test_model.py)
+- [VIEWS.md](https://github.com/DynamicalSystemsGroup/gds-examples/blob/main/lotka_volterra/VIEWS.md)

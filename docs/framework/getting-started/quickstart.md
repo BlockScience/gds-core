@@ -58,4 +58,4 @@ print(f"{report.checks_passed}/{report.checks_total} checks passed")
 
 - [Architecture](../guide/architecture.md) — understand the two-layer design
 - [Blocks & Roles](../guide/blocks.md) — role constraints and composition
-- [Examples](https://blockscience.github.io/gds-examples) — six complete tutorial models
+- [Examples](https://dynamicalsystemsgroup.github.io/gds-examples) — six complete tutorial models

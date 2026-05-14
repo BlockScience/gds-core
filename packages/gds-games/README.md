@@ -435,7 +435,7 @@ Built with [Claude Code](https://claude.ai/code). All code is test-driven and hu
 
 **Author:** [Rohan Mehta](https://github.com/rororowyourboat) — [Dynamical Systems Group](https://www.dynamicalsystemsgroup.com/)
 
-**Theoretical foundation:** [Dr. Michael Zargham](https://github.com/mzargham) and [Dr. Jamsheed Shorish](https://github.com/jshorish) — [Generalized Dynamical Systems, Part I: Foundations](https://blog.block.science/generalized-dynamical-systems-part-i-foundations-2/) (2021).
+**Theoretical foundation:** [Dr. Michael Zargham](https://github.com/mzargham) and [Dr. Jamsheed Shorish](https://github.com/jshorish) — [Generalized Dynamical Systems, Part I: Foundations](https://blog.dynamicalsystemsgroup.com/generalized-dynamical-systems-part-i-foundations-2/) (2021).
 
 **Game-theoretic foundation:** [Ghani, Hedges, Winschel, Zahn](https://arxiv.org/abs/1603.04641) — Compositional Game Theory (2018). Bidirectional composition with contravariant feedback channels.
 

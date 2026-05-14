@@ -2,7 +2,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/gds-software)](https://pypi.org/project/gds-software/)
 [![Python](https://img.shields.io/pypi/pyversions/gds-software)](https://pypi.org/project/gds-software/)
-[![License](https://img.shields.io/github/license/BlockScience/gds-core)](https://github.com/BlockScience/gds-core/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/DynamicalSystemsGroup/gds-core)](https://github.com/DynamicalSystemsGroup/gds-core/blob/main/LICENSE)
 
 **Software architecture DSL over GDS semantics** -- DFDs, state machines, component diagrams, C4 models, ERDs, and dependency graphs with formal verification.
 
@@ -66,4 +66,4 @@ See [Getting Started](getting-started.md) for a full walkthrough.
 
 ## Credits
 
-Built on [gds-framework](../framework/index.md) by [BlockScience](https://block.science).
+Built on [gds-framework](../framework/index.md) by [DynamicalSystemsGroup](https://dynamicalsystemsgroup.com).

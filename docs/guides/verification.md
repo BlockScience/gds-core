@@ -404,7 +404,7 @@ uv run --package gds-examples pytest packages/gds-examples/tests/test_verificati
 
 | File | Purpose |
 |------|---------|
-| [`broken_models.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/gds_examples/verification/broken_models.py) | Deliberately broken models for each check |
-| [`verification_demo.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/gds_examples/verification/verification_demo.py) | Generic and semantic check demos |
-| [`domain_checks_demo.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/gds_examples/verification/domain_checks_demo.py) | StockFlow domain check demos |
-| [`notebook.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/notebooks/verification.py) | Interactive marimo notebook |
+| [`broken_models.py`](https://github.com/DynamicalSystemsGroup/gds-core/blob/main/packages/gds-examples/gds_examples/verification/broken_models.py) | Deliberately broken models for each check |
+| [`verification_demo.py`](https://github.com/DynamicalSystemsGroup/gds-core/blob/main/packages/gds-examples/gds_examples/verification/verification_demo.py) | Generic and semantic check demos |
+| [`domain_checks_demo.py`](https://github.com/DynamicalSystemsGroup/gds-core/blob/main/packages/gds-examples/gds_examples/verification/domain_checks_demo.py) | StockFlow domain check demos |
+| [`notebook.py`](https://github.com/DynamicalSystemsGroup/gds-core/blob/main/packages/gds-examples/notebooks/verification.py) | Interactive marimo notebook |

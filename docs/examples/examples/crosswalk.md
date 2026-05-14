@@ -1,6 +1,6 @@
 # Crosswalk Problem
 
-**Mechanism design** — the canonical GDS example from BlockScience.
+**Mechanism design** — the canonical GDS example from DynamicalSystemsGroup.
 
 A pedestrian decides whether to cross a one-way street while traffic evolves as a discrete Markov chain. A governance body chooses crosswalk placement to minimize accident probability.
 
@@ -38,7 +38,7 @@ flowchart LR
 
 ## Files
 
-- [model.py](https://github.com/BlockScience/gds-examples/blob/main/crosswalk/model.py)
-- [test_model.py](https://github.com/BlockScience/gds-examples/blob/main/crosswalk/test_model.py)
-- [VIEWS.md](https://github.com/BlockScience/gds-examples/blob/main/crosswalk/VIEWS.md)
-- [README.md](https://github.com/BlockScience/gds-examples/blob/main/crosswalk/README.md)
+- [model.py](https://github.com/DynamicalSystemsGroup/gds-examples/blob/main/crosswalk/model.py)
+- [test_model.py](https://github.com/DynamicalSystemsGroup/gds-examples/blob/main/crosswalk/test_model.py)
+- [VIEWS.md](https://github.com/DynamicalSystemsGroup/gds-examples/blob/main/crosswalk/VIEWS.md)
+- [README.md](https://github.com/DynamicalSystemsGroup/gds-examples/blob/main/crosswalk/README.md)

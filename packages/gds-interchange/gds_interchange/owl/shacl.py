@@ -15,7 +15,7 @@ from rdflib import RDF, SH, XSD, Graph, Literal, Namespace, URIRef
 from gds_interchange.owl._namespace import GDS_CORE, GDS_IR, GDS_VERIF, PREFIXES
 
 SH_NS = Namespace("http://www.w3.org/ns/shacl#")
-GDS_SHAPE = Namespace("https://gds.block.science/shapes/")
+GDS_SHAPE = Namespace("https://gds.dynamicalsystemsgroup.com/shapes/")
 
 
 def _bind(g: Graph) -> None:

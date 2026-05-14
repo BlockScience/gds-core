@@ -10,7 +10,7 @@ uv add gds-control
 For development (monorepo):
 
 ```bash
-git clone https://github.com/BlockScience/gds-core.git
+git clone https://github.com/DynamicalSystemsGroup/gds-core.git
 cd gds-core
 uv sync --all-packages
 ```

@@ -2,7 +2,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/gds-symbolic)](https://pypi.org/project/gds-symbolic/)
 [![Python](https://img.shields.io/pypi/pyversions/gds-symbolic)](https://pypi.org/project/gds-symbolic/)
-[![License](https://img.shields.io/github/license/BlockScience/gds-core)](https://github.com/BlockScience/gds-core/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/DynamicalSystemsGroup/gds-core)](https://github.com/DynamicalSystemsGroup/gds-core/blob/main/LICENSE)
 
 **SymPy bridge for gds-control** -- symbolic state equations, automatic linearization, and ODE code generation.
 
@@ -73,4 +73,4 @@ See [Getting Started](getting-started.md) for a full walkthrough.
 
 ## Credits
 
-Built on [gds-control](../control/index.md) by [BlockScience](https://block.science).
+Built on [gds-control](../control/index.md) by [DynamicalSystemsGroup](https://dynamicalsystemsgroup.com).

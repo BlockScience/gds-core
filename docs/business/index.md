@@ -2,7 +2,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/gds-business)](https://pypi.org/project/gds-business/)
 [![Python](https://img.shields.io/pypi/pyversions/gds-business)](https://pypi.org/project/gds-business/)
-[![License](https://img.shields.io/github/license/BlockScience/gds-core)](https://github.com/BlockScience/gds-core/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/DynamicalSystemsGroup/gds-core)](https://github.com/DynamicalSystemsGroup/gds-core/blob/main/LICENSE)
 
 **Business dynamics DSL over GDS semantics** — causal loop diagrams, supply chain networks, and value stream maps with formal verification.
 
@@ -121,4 +121,4 @@ Model lean manufacturing value streams with process steps, inventory buffers, an
 
 ## Credits
 
-Built on [gds-framework](../framework/index.md) by [BlockScience](https://block.science).
+Built on [gds-framework](../framework/index.md) by [DynamicalSystemsGroup](https://dynamicalsystemsgroup.com).

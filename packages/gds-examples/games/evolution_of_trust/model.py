@@ -18,7 +18,7 @@ OGS Game Theory Decomposition:
 
 References:
     - Nicky Case, "The Evolution of Trust" (2017): https://ncase.me/trust/
-    - GitHub issue: https://github.com/BlockScience/gds-core/issues/77
+    - GitHub issue: https://github.com/DynamicalSystemsGroup/gds-core/issues/77
 """
 
 import re

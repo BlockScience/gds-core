@@ -11,7 +11,7 @@ This example is based on the Generalized Dynamical Systems lectures and papers b
 - [GDS Lecture 1 — Foundations](https://www.youtube.com/watch?v=8t-FKDzrnmA)
 - [GDS Lecture 2 — Crosswalk Problem](https://www.youtube.com/watch?v=F3BsilIxgbY)
 - [GDS Lecture 3 — Reachability & Controllability](https://www.youtube.com/watch?v=ZRkYH9JY_Xo)
-- [Generalized Dynamical Systems Part I: Foundations (blog)](https://blog.block.science/generalized-dynamical-systems-part-i-foundations-2/)
+- [Generalized Dynamical Systems Part I: Foundations (blog)](https://blog.dynamicalsystemsgroup.com/generalized-dynamical-systems-part-i-foundations-2/)
 
 ## GDS Decomposition
 

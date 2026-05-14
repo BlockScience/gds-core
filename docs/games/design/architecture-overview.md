@@ -41,7 +41,7 @@
 
 ## Ownership and Delivery
 
-All three packages are **developed by BlockScience**. During delivery:
+All three packages are **developed by DynamicalSystemsGroup**. During delivery:
 
 - **GDS Framework** and **DSL packages** (like OGS) are made public and pip-installable
 - **Client repos** are delivered to the client team who can:
@@ -50,7 +50,7 @@ All three packages are **developed by BlockScience**. During delivery:
   - Build entirely new DSL packages on top of GDS
 
 ```
-              BlockScience develops
+              DynamicalSystemsGroup develops
               ┌─────────────────────────────────┐
               │  gds-framework     (open source) │
               │  gds-games   (open source) │
@@ -185,8 +185,8 @@ IR (Intermediate Representation) is the **contract between layers**.
 ### Repo structure
 
 ```
-BlockScience/gds-framework             ← public, on PyPI as gds-framework
-BlockScience/gds-games            ← public, on PyPI as gds-games
+DynamicalSystemsGroup/gds-framework             ← public, on PyPI as gds-framework
+DynamicalSystemsGroup/gds-games            ← public, on PyPI as gds-games
                                          pure library: ogs/, tests/
                                          depends on gds-framework (PyPI)
 client-app/                            ← private, delivered to client

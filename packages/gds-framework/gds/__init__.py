@@ -1,7 +1,7 @@
 """Generalized Dynamical Systems — typed compositional specs.
 
 GDS synthesizes ideas from GDS theory (Roxin, Zargham & Shorish),
-MSML (BlockScience), BDP-lib (Block Diagram Protocol), and categorical
+MSML (DynamicalSystemsGroup), BDP-lib (Block Diagram Protocol), and categorical
 cybernetics (Ghani, Hedges et al.) into a single, dependency-light
 Python framework.
 """

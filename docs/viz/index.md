@@ -2,9 +2,9 @@
 
 [![PyPI](https://img.shields.io/pypi/v/gds-viz)](https://pypi.org/project/gds-viz/)
 [![Python](https://img.shields.io/pypi/pyversions/gds-viz)](https://pypi.org/project/gds-viz/)
-[![License](https://img.shields.io/github/license/BlockScience/gds-viz)](https://github.com/BlockScience/gds-viz/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/DynamicalSystemsGroup/gds-viz)](https://github.com/DynamicalSystemsGroup/gds-viz/blob/main/LICENSE)
 
-**Mermaid diagram renderers** for [gds-framework](https://blockscience.github.io/gds-framework) specifications.
+**Mermaid diagram renderers** for [gds-framework](https://dynamicalsystemsgroup.github.io/gds-framework) specifications.
 
 ## Six Views
 
@@ -95,7 +95,7 @@ The six views exhaust what is **derivable from the GDS specification** `{h, X}`.
 
 ## Credits
 
-**Author:** [Rohan Mehta](https://github.com/rororowyourboat) — [BlockScience](https://block.science/)
+**Author:** [Rohan Mehta](https://github.com/rororowyourboat) — [DynamicalSystemsGroup](https://dynamicalsystemsgroup.com/)
 
 **Theoretical foundation:** [Dr. Michael Zargham](https://github.com/mzargham) and [Dr. Jamsheed Shorish](https://github.com/jshorish)
 

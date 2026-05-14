@@ -446,9 +446,9 @@ uv run --package gds-examples pytest packages/gds-examples/tests/test_getting_st
 
 | File | Purpose |
 |------|---------|
-| [`stage1_minimal.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/gds_examples/getting_started/stage1_minimal.py) | Minimal heater model |
-| [`stage2_feedback.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/gds_examples/getting_started/stage2_feedback.py) | Feedback loop with policies |
-| [`stage3_dsl.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/gds_examples/getting_started/stage3_dsl.py) | gds-control DSL version |
-| [`stage4_verify_viz.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/gds_examples/getting_started/stage4_verify_viz.py) | Verification and visualization |
-| [`stage5_query.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/gds_examples/getting_started/stage5_query.py) | SpecQuery API |
-| [`getting_started.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/notebooks/getting_started.py) | Interactive marimo notebook |
+| [`stage1_minimal.py`](https://github.com/DynamicalSystemsGroup/gds-core/blob/main/packages/gds-examples/gds_examples/getting_started/stage1_minimal.py) | Minimal heater model |
+| [`stage2_feedback.py`](https://github.com/DynamicalSystemsGroup/gds-core/blob/main/packages/gds-examples/gds_examples/getting_started/stage2_feedback.py) | Feedback loop with policies |
+| [`stage3_dsl.py`](https://github.com/DynamicalSystemsGroup/gds-core/blob/main/packages/gds-examples/gds_examples/getting_started/stage3_dsl.py) | gds-control DSL version |
+| [`stage4_verify_viz.py`](https://github.com/DynamicalSystemsGroup/gds-core/blob/main/packages/gds-examples/gds_examples/getting_started/stage4_verify_viz.py) | Verification and visualization |
+| [`stage5_query.py`](https://github.com/DynamicalSystemsGroup/gds-core/blob/main/packages/gds-examples/gds_examples/getting_started/stage5_query.py) | SpecQuery API |
+| [`getting_started.py`](https://github.com/DynamicalSystemsGroup/gds-core/blob/main/packages/gds-examples/notebooks/getting_started.py) | Interactive marimo notebook |
