@@ -15,12 +15,12 @@
 If you discover a security vulnerability, please report it responsibly:
 
 1. **Do not** open a public GitHub issue
-2. Email **rohan@block.science** with details
+2. Email **rohan@dynamicalsystemsgroup.com** with details
 3. Include steps to reproduce and potential impact
 4. You will receive a response within 72 hours
 
 ## Security Measures
 
-- Dependencies are monitored via [Dependabot](https://github.com/BlockScience/gds-core/security/dependabot)
-- Code is scanned with [CodeQL](https://github.com/BlockScience/gds-core/security/code-scanning)
+- Dependencies are monitored via [Dependabot](https://github.com/DynamicalSystemsGroup/gds-core/security/dependabot)
+- Code is scanned with [CodeQL](https://github.com/DynamicalSystemsGroup/gds-core/security/code-scanning)
 - CI runs `pip-audit` for known vulnerability detection

@@ -3,14 +3,14 @@ message: "If you use this software, please cite it as below."
 authors:
   - family-names: "Mehta"
     given-names: "Rohan"
-    email: "rohan@block.science"
-    affiliation: "BlockScience"
+    email: "rohan@dynamicalsystemsgroup.com"
+    affiliation: "Dynamical Systems Group"
 title: "gds-core"
 version: 0.1.0
 date-released: 2026-02-21
-url: "https://github.com/BlockScience/gds-core"
+url: "https://github.com/DynamicalSystemsGroup/gds-core"
 license: Apache-2.0
-repository-code: "https://github.com/BlockScience/gds-core"
+repository-code: "https://github.com/DynamicalSystemsGroup/gds-core"
 keywords:
   - generalized-dynamical-systems
   - compositional-systems

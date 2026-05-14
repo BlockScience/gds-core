@@ -2,7 +2,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/gds-stockflow)](https://pypi.org/project/gds-stockflow/)
 [![Python](https://img.shields.io/pypi/pyversions/gds-stockflow)](https://pypi.org/project/gds-stockflow/)
-[![License](https://img.shields.io/github/license/BlockScience/gds-stockflow)](LICENSE)
+[![License](https://img.shields.io/github/license/DynamicalSystemsGroup/gds-stockflow)](LICENSE)
 
 Declarative stock-flow DSL over GDS semantics — system dynamics with formal guarantees.
 
@@ -57,7 +57,7 @@ print(f"{report.checks_passed}/{report.checks_total} checks passed")
 
 ## What is this?
 
-`gds-stockflow` is a **domain DSL** that compiles stock-flow diagrams to [GDS](https://github.com/BlockScience/gds-core) specifications. You declare stocks, flows, auxiliaries, and converters as plain data models — the compiler handles the mapping to GDS role blocks, entities, composition trees, and wirings.
+`gds-stockflow` is a **domain DSL** that compiles stock-flow diagrams to [GDS](https://github.com/DynamicalSystemsGroup/gds-core) specifications. You declare stocks, flows, auxiliaries, and converters as plain data models — the compiler handles the mapping to GDS role blocks, entities, composition trees, and wirings.
 
 ```
 Your declaration                    What the compiler produces
@@ -69,7 +69,7 @@ Converter("Fertility")       →     BoundaryAction (exogenous input U)
 StockFlowModel(...)          →     GDSSpec + SystemIR (full GDS specification)
 ```
 
-Once compiled, all downstream GDS tooling works immediately — canonical projection (`h = f ∘ g`), semantic checks, SpecQuery dependency analysis, JSON serialization, and [gds-viz](https://github.com/BlockScience/gds-core/tree/main/packages/gds-viz) diagram generation.
+Once compiled, all downstream GDS tooling works immediately — canonical projection (`h = f ∘ g`), semantic checks, SpecQuery dependency analysis, JSON serialization, and [gds-viz](https://github.com/DynamicalSystemsGroup/gds-core/tree/main/packages/gds-viz) diagram generation.
 
 ## Architecture
 
@@ -204,12 +204,12 @@ report = verify(model, include_gds_checks=True)
 
 ## Examples
 
-Two tutorial examples in [`gds-examples`](https://github.com/BlockScience/gds-core/tree/main/packages/gds-examples) demonstrate stock-flow modeling using the GDS framework primitives:
+Two tutorial examples in [`gds-examples`](https://github.com/DynamicalSystemsGroup/gds-core/tree/main/packages/gds-examples) demonstrate stock-flow modeling using the GDS framework primitives:
 
 | Example | Domain | What It Teaches |
 |---------|--------|-----------------|
-| [SIR Epidemic](https://github.com/BlockScience/gds-core/tree/main/packages/gds-examples/stockflow/sir_epidemic) | Epidemiology | 3-compartment accumulation, sequential + parallel composition |
-| [Lotka-Volterra](https://github.com/BlockScience/gds-core/tree/main/packages/gds-examples/stockflow/lotka_volterra) | Population dynamics | Temporal loops (`.loop()`), predator-prey rate equations |
+| [SIR Epidemic](https://github.com/DynamicalSystemsGroup/gds-core/tree/main/packages/gds-examples/stockflow/sir_epidemic) | Epidemiology | 3-compartment accumulation, sequential + parallel composition |
+| [Lotka-Volterra](https://github.com/DynamicalSystemsGroup/gds-core/tree/main/packages/gds-examples/stockflow/lotka_volterra) | Population dynamics | Temporal loops (`.loop()`), predator-prey rate equations |
 
 ## Status
 
@@ -224,14 +224,14 @@ Built with [Claude Code](https://claude.ai/code). All code is test-driven and hu
 
 ## Credits & Attribution
 
-**Author:** [Rohan Mehta](https://github.com/rororowyourboat) — [BlockScience](https://block.science/)
+**Author:** [Rohan Mehta](https://github.com/rororowyourboat) — [Dynamical Systems Group](https://www.dynamicalsystemsgroup.com/)
 
 **Theoretical foundation:** [Dr. Michael Zargham](https://github.com/mzargham) and [Dr. Jamsheed Shorish](https://github.com/jshorish) — [Generalized Dynamical Systems, Part I: Foundations](https://blog.block.science/generalized-dynamical-systems-part-i-foundations-2/) (2021).
 
-**Architectural inspiration:** [Sean McOwen](https://github.com/SeanMcOwen) — [MSML](https://github.com/BlockScience/MSML) and [bdp-lib](https://github.com/BlockScience/bdp-lib).
+**Architectural inspiration:** [Sean McOwen](https://github.com/SeanMcOwen) — [MSML](https://github.com/DynamicalSystemsGroup/MSML) and [bdp-lib](https://github.com/DynamicalSystemsGroup/bdp-lib).
 
 **Contributors:**
-* [Michael Zargham](https://github.com/mzargham) — Project direction, GDS theory guidance, and technical review (BlockScience).
-* [Peter Hacker](https://github.com/phacker3) — Code auditing and review (BlockScience).
+* [Michael Zargham](https://github.com/mzargham) — Project direction, GDS theory guidance, and technical review (Dynamical Systems Group).
+* [Peter Hacker](https://github.com/phacker3) — Code auditing and review (Dynamical Systems Group).
 
 **Lineage:** Part of the [cadCAD](https://github.com/cadCAD-org/cadCAD) ecosystem for Complex Adaptive Dynamics.

@@ -2,17 +2,17 @@
 
 [![PyPI](https://img.shields.io/pypi/v/gds-examples)](https://pypi.org/project/gds-examples/)
 [![Python](https://img.shields.io/pypi/pyversions/gds-examples)](https://pypi.org/project/gds-examples/)
-[![License](https://img.shields.io/github/license/BlockScience/gds-examples)](LICENSE)
+[![License](https://img.shields.io/github/license/DynamicalSystemsGroup/gds-examples)](LICENSE)
 
-Complete domain models demonstrating every [gds-framework](https://github.com/BlockScience/gds-core/tree/main/packages/gds-framework) feature. Each `model.py` is written as a tutorial chapter with inline GDS theory commentary — read them in order.
+Complete domain models demonstrating every [gds-framework](https://github.com/DynamicalSystemsGroup/gds-core/tree/main/packages/gds-framework) feature. Each `model.py` is written as a tutorial chapter with inline GDS theory commentary — read them in order.
 
 Examples are organized by domain. Some are built using GDS framework primitives directly, while others use higher-level domain DSLs that compile to GDS automatically. See the individual DSL packages:
 
 | Domain | DSL Package | Raw GDS Examples | DSL Examples |
 |--------|-------------|-------------------|--------------|
-| System dynamics | [gds-stockflow](https://github.com/BlockScience/gds-core/tree/main/packages/gds-stockflow) | SIR Epidemic, Lotka-Volterra | SIR Epidemic (DSL) |
-| Control theory | [gds-control](https://github.com/BlockScience/gds-core/tree/main/packages/gds-control) | Thermostat PID | Double Integrator |
-| Game theory | [gds-games](https://github.com/BlockScience/gds-core/tree/main/packages/gds-games) | Prisoner's Dilemma, Insurance, Crosswalk | — |
+| System dynamics | [gds-stockflow](https://github.com/DynamicalSystemsGroup/gds-core/tree/main/packages/gds-stockflow) | SIR Epidemic, Lotka-Volterra | SIR Epidemic (DSL) |
+| Control theory | [gds-control](https://github.com/DynamicalSystemsGroup/gds-core/tree/main/packages/gds-control) | Thermostat PID | Double Integrator |
+| Game theory | [gds-games](https://github.com/DynamicalSystemsGroup/gds-core/tree/main/packages/gds-games) | Prisoner's Dilemma, Insurance, Crosswalk | — |
 
 ## Table of Contents
 
@@ -120,7 +120,7 @@ contact >> infection_policy >> (update_s | update_i | update_r)
 
 </details>
 
-**Domain:** Stock-flow — see [gds-stockflow](https://github.com/BlockScience/gds-core/tree/main/packages/gds-stockflow) for the declarative DSL
+**Domain:** Stock-flow — see [gds-stockflow](https://github.com/DynamicalSystemsGroup/gds-core/tree/main/packages/gds-stockflow) for the declarative DSL
 
 **Files:** [model.py](stockflow/sir_epidemic/model.py) · [tests](stockflow/sir_epidemic/test_model.py) · [views](stockflow/sir_epidemic/VIEWS.md)
 
@@ -155,7 +155,7 @@ system = compile_to_system(model)  # → SystemIR with temporal loops
 
 </details>
 
-**Domain:** Stock-flow — built with [gds-stockflow](https://github.com/BlockScience/gds-core/tree/main/packages/gds-stockflow) DSL
+**Domain:** Stock-flow — built with [gds-stockflow](https://github.com/DynamicalSystemsGroup/gds-core/tree/main/packages/gds-stockflow) DSL
 
 **Files:** [model.py](stockflow/sir_epidemic_dsl/model.py) · [tests](stockflow/sir_epidemic_dsl/test_sir_epidemic_dsl.py) · [views](stockflow/sir_epidemic_dsl/VIEWS.md)
 
@@ -185,7 +185,7 @@ X = (T, E)    U = measured_temp    g = pid_controller    f = update_room    Θ =
 
 </details>
 
-**Domain:** Control — see [gds-control](https://github.com/BlockScience/gds-core/tree/main/packages/gds-control) for the declarative DSL
+**Domain:** Control — see [gds-control](https://github.com/DynamicalSystemsGroup/gds-core/tree/main/packages/gds-control) for the declarative DSL
 
 **Files:** [model.py](control/thermostat/model.py) · [tests](control/thermostat/test_model.py) · [views](control/thermostat/VIEWS.md)
 
@@ -215,7 +215,7 @@ X = (x, y)    U = population_signal    g = compute_rates    f = (update_prey, up
 
 </details>
 
-**Domain:** Stock-flow — see [gds-stockflow](https://github.com/BlockScience/gds-core/tree/main/packages/gds-stockflow) for the declarative DSL
+**Domain:** Stock-flow — see [gds-stockflow](https://github.com/DynamicalSystemsGroup/gds-core/tree/main/packages/gds-stockflow) for the declarative DSL
 
 **Files:** [model.py](stockflow/lotka_volterra/model.py) · [tests](stockflow/lotka_volterra/test_model.py) · [views](stockflow/lotka_volterra/VIEWS.md)
 
@@ -244,7 +244,7 @@ system = pipeline.loop([world models -> decisions])
 
 </details>
 
-**Domain:** Game theory — see [gds-games](https://github.com/BlockScience/gds-core/tree/main/packages/gds-games) for the OGS DSL with compositional game patterns
+**Domain:** Game theory — see [gds-games](https://github.com/DynamicalSystemsGroup/gds-core/tree/main/packages/gds-games) for the OGS DSL with compositional game patterns
 
 **Files:** [model.py](games/prisoners_dilemma/model.py) · [tests](games/prisoners_dilemma/test_model.py) · [views](games/prisoners_dilemma/VIEWS.md) · [architecture viz](games/prisoners_dilemma/visualize.py)
 
@@ -252,7 +252,7 @@ system = pipeline.loop([world models -> decisions])
 
 ### Prisoner's Dilemma (OGS DSL)
 
-**Same game, different approach** -- reimplements the Prisoner's Dilemma using the [gds-games](https://github.com/BlockScience/gds-core/tree/main/packages/gds-games) (OGS) typed DSL instead of hand-wiring GDS blocks. Demonstrates how the OGS DSL expresses the same game-theoretic structure more concisely.
+**Same game, different approach** -- reimplements the Prisoner's Dilemma using the [gds-games](https://github.com/DynamicalSystemsGroup/gds-core/tree/main/packages/gds-games) (OGS) typed DSL instead of hand-wiring GDS blocks. Demonstrates how the OGS DSL expresses the same game-theoretic structure more concisely.
 
 ```python
 decisions = alice_decision | bob_decision
@@ -274,7 +274,7 @@ system = game_round.feedback([payoff -> decisions])
 
 </details>
 
-**Domain:** Game theory -- see [gds-games](https://github.com/BlockScience/gds-core/tree/main/packages/gds-games) for the OGS DSL
+**Domain:** Game theory -- see [gds-games](https://github.com/DynamicalSystemsGroup/gds-core/tree/main/packages/gds-games) for the OGS DSL
 
 **Files:** [model.py](games/prisoners_dilemma_dsl/model.py) · [tests](games/prisoners_dilemma_dsl/test_prisoners_dilemma_dsl.py) · [views script](games/prisoners_dilemma_dsl/generate_views.py)
 
@@ -303,7 +303,7 @@ claim >> risk >> premium >> payout >> reserve_update
 
 </details>
 
-**Domain:** Game theory / finance — see [gds-games](https://github.com/BlockScience/gds-core/tree/main/packages/gds-games) for the OGS DSL
+**Domain:** Game theory / finance — see [gds-games](https://github.com/DynamicalSystemsGroup/gds-core/tree/main/packages/gds-games) for the OGS DSL
 
 **Files:** [model.py](games/insurance/model.py) · [tests](games/insurance/test_model.py) · [views](games/insurance/VIEWS.md)
 
@@ -311,7 +311,7 @@ claim >> risk >> premium >> payout >> reserve_update
 
 ### Crosswalk Problem
 
-**Mechanism design** — the canonical GDS example from BlockScience. A pedestrian decides whether to cross a one-way street while traffic evolves as a discrete Markov chain. A governance body chooses crosswalk placement to minimize accident probability.
+**Mechanism design** — the canonical GDS example from Dynamical Systems Group. A pedestrian decides whether to cross a one-way street while traffic evolves as a discrete Markov chain. A governance body chooses crosswalk placement to minimize accident probability.
 
 ```
 X = traffic_state ∈ {-1, 0, +1}    U = (luck, crossing_position)    g = pedestrian_decision    d = safety_check    f = traffic_transition    Θ = {crosswalk_location}
@@ -331,13 +331,13 @@ observe >> decide >> check >> transition
 
 </details>
 
-**Domain:** Game theory / mechanism design — see [gds-games](https://github.com/BlockScience/gds-core/tree/main/packages/gds-games) for the OGS DSL
+**Domain:** Game theory / mechanism design — see [gds-games](https://github.com/DynamicalSystemsGroup/gds-core/tree/main/packages/gds-games) for the OGS DSL
 
 **Files:** [model.py](games/crosswalk/model.py) · [tests](games/crosswalk/test_model.py) · [views](games/crosswalk/VIEWS.md) · [README](games/crosswalk/README.md)
 
 ## Visualization Guide
 
-A dedicated guide at [`guides/visualization/`](guides/visualization/) makes [`gds-viz`](https://github.com/BlockScience/gds-core/tree/main/packages/gds-viz) a first-class citizen with focused, runnable demos:
+A dedicated guide at [`guides/visualization/`](guides/visualization/) makes [`gds-viz`](https://github.com/DynamicalSystemsGroup/gds-core/tree/main/packages/gds-viz) a first-class citizen with focused, runnable demos:
 
 | Script | What It Demonstrates |
 |--------|---------------------|
@@ -383,7 +383,7 @@ uv run --package gds-examples pytest packages/gds-examples/guides/verification/ 
 
 ## Visualization Views
 
-Each example includes a `generate_views.py` script that produces 6 complementary views via [`gds-viz`](https://github.com/BlockScience/gds-core/tree/main/packages/gds-viz):
+Each example includes a `generate_views.py` script that produces 6 complementary views via [`gds-viz`](https://github.com/DynamicalSystemsGroup/gds-core/tree/main/packages/gds-viz):
 
 | View | Input | What It Shows |
 |------|-------|--------------|
@@ -537,14 +537,14 @@ Built with [Claude Code](https://claude.ai/code). All code is test-driven and hu
 
 ## Credits & Attribution
 
-**Author:** [Rohan Mehta](https://github.com/rororowyourboat) — [BlockScience](https://block.science/)
+**Author:** [Rohan Mehta](https://github.com/rororowyourboat) — [Dynamical Systems Group](https://www.dynamicalsystemsgroup.com/)
 
 **Theoretical foundation:** [Dr. Michael Zargham](https://github.com/mzargham) and [Dr. Jamsheed Shorish](https://github.com/jshorish) — [Generalized Dynamical Systems, Part I: Foundations](https://blog.block.science/generalized-dynamical-systems-part-i-foundations-2/) (2021).
 
-**Architectural inspiration:** [Sean McOwen](https://github.com/SeanMcOwen) — [MSML](https://github.com/BlockScience/MSML) and [bdp-lib](https://github.com/BlockScience/bdp-lib).
+**Architectural inspiration:** [Sean McOwen](https://github.com/SeanMcOwen) — [MSML](https://github.com/DynamicalSystemsGroup/MSML) and [bdp-lib](https://github.com/DynamicalSystemsGroup/bdp-lib).
 
 **Contributors:**
-* [Michael Zargham](https://github.com/mzargham) — Project direction, GDS theory guidance, and technical review (BlockScience).
-* [Peter Hacker](https://github.com/phacker3) — Code auditing and review (BlockScience).
+* [Michael Zargham](https://github.com/mzargham) — Project direction, GDS theory guidance, and technical review (Dynamical Systems Group).
+* [Peter Hacker](https://github.com/phacker3) — Code auditing and review (Dynamical Systems Group).
 
 **Lineage:** Part of the [cadCAD](https://github.com/cadCAD-org/cadCAD) ecosystem for Complex Adaptive Dynamics.

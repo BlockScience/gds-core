@@ -119,8 +119,8 @@ assistants, agents, and LLMs:
 
 | Resource | URL | Use |
 |----------|-----|-----|
-| **llms.txt** | [/llms.txt](https://blockscience.github.io/gds-core/llms.txt) | Compact index of all documentation pages with one-line descriptions |
-| **llms-full.txt** | [/llms-full.txt](https://blockscience.github.io/gds-core/llms-full.txt) | Full concatenated documentation — feed this to an LLM for complete context on the GDS ecosystem |
+| **llms.txt** | [/llms.txt](https://dynamicalsystemsgroup.github.io/gds-core/llms.txt) | Compact index of all documentation pages with one-line descriptions |
+| **llms-full.txt** | [/llms-full.txt](https://dynamicalsystemsgroup.github.io/gds-core/llms-full.txt) | Full concatenated documentation — feed this to an LLM for complete context on the GDS ecosystem |
 
 **If you are an AI agent** working with gds-core, fetch `llms-full.txt` to get
 a comprehensive understanding of the framework's architecture, all 14 packages,
@@ -135,4 +135,4 @@ changes, and new capabilities across all packages.
 
 ## License
 
-Apache-2.0 — [BlockScience](https://block.science)
+Apache-2.0 — [Dynamical Systems Group](https://www.dynamicalsystemsgroup.com)

@@ -1,12 +1,12 @@
 # Crosswalk Problem
 
-Discrete Markov state transitions with mechanism design — the canonical GDS example from BlockScience.
+Discrete Markov state transitions with mechanism design — the canonical GDS example from Dynamical Systems Group.
 
 A pedestrian on one side of a one-way street wants to reach a destination on the other side. They decide whether to cross and where. Traffic evolves as a discrete Markov chain. A governance body chooses where to place the crosswalk to minimize accident probability — **mechanism design** in its simplest form.
 
 ## Source Material
 
-This example is based on the Generalized Dynamical Systems lectures and papers by Michael Zargham and Jamsheed Shorish at BlockScience:
+This example is based on the Generalized Dynamical Systems lectures and papers by Michael Zargham and Jamsheed Shorish at Dynamical Systems Group:
 
 - [GDS Lecture 1 — Foundations](https://www.youtube.com/watch?v=8t-FKDzrnmA)
 - [GDS Lecture 2 — Crosswalk Problem](https://www.youtube.com/watch?v=F3BsilIxgbY)
@@ -29,7 +29,7 @@ f  = traffic_transition              — Markov state update
 
 ## Element Coverage
 
-Every element from the BlockScience lectures is mapped to a GDS component:
+Every element from the Dynamical Systems Group lectures is mapped to a GDS component:
 
 | Lecture Element | GDS Component | Code |
 |---|---|---|

@@ -33,7 +33,7 @@ GDS is a **specification and verification** framework, not a simulation engine o
 | Blocks are classes you instantiate freely | Block roles (`BoundaryAction`, `Policy`, `Mechanism`, `ControlAction`) are the four leaf types. Domain DSLs compile *models* into blocks via `compile_model()` / `compile_to_system()`. Hand-wiring blocks is for framework extension, not typical usage. |
 | Verification is type checking | Verification operates on compiled IR (`SystemIR`) and specs (`GDSSpec`). It checks structural topology (G-001..G-006) and semantic properties (SC-001..SC-009), not Python types at runtime. |
 | Parameters get assigned values by GDS | `ParameterSchema` (Theta) is structural metadata only. GDS never binds parameter values. `gds-analysis` and its PSUU module handle sweep and evaluation. |
-| Domain DSLs are interchangeable | Each DSL targets a specific modeling paradigm. Use `gds_domains.stockflow` for conservation-law systems, `.control` for state-space controllers, `.games` for strategic interaction, `.business` for causal/value-stream diagrams, `.software` for architecture diagrams. See the [Choosing a DSL](https://blockscience.github.io/gds-core/guides/choosing-a-dsl/) guide. |
+| Domain DSLs are interchangeable | Each DSL targets a specific modeling paradigm. Use `gds_domains.stockflow` for conservation-law systems, `.control` for state-space controllers, `.games` for strategic interaction, `.business` for causal/value-stream diagrams, `.software` for architecture diagrams. See the [Choosing a DSL](https://dynamicalsystemsgroup.github.io/gds-core/guides/choosing-a-dsl/) guide. |
 
 ## Commands
 

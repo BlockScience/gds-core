@@ -1,8 +1,8 @@
 site_name: GDS Ecosystem
 site_description: Typed compositional specifications for complex systems — framework, visualization, games, and examples
-site_url: https://blockscience.github.io/gds-core
-repo_url: https://github.com/BlockScience/gds-core
-repo_name: BlockScience/gds-core
+site_url: https://dynamicalsystemsgroup.github.io/gds-core
+repo_url: https://github.com/DynamicalSystemsGroup/gds-core
+repo_name: DynamicalSystemsGroup/gds-core
 
 theme:
   name: material

@@ -1,6 +1,6 @@
 # gds-owl
 
-OWL/Turtle, SHACL, and SPARQL for [gds-framework](https://github.com/BlockScience/gds-core) specifications.
+OWL/Turtle, SHACL, and SPARQL for [gds-framework](https://github.com/DynamicalSystemsGroup/gds-core) specifications.
 
 Exports GDS models (GDSSpec, SystemIR, CanonicalGDS, VerificationReport) to RDF/OWL and provides bidirectional round-trip with Pydantic models.
 
