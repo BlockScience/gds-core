@@ -2,9 +2,9 @@
 
 [![PyPI](https://img.shields.io/pypi/v/gds-viz)](https://pypi.org/project/gds-viz/)
 [![Python](https://img.shields.io/pypi/pyversions/gds-viz)](https://pypi.org/project/gds-viz/)
-[![License](https://img.shields.io/github/license/BlockScience/gds-viz)](LICENSE)
+[![License](https://img.shields.io/github/license/DynamicalSystemsGroup/gds-viz)](LICENSE)
 
-Mermaid diagram renderers for [gds-framework](https://github.com/BlockScience/gds-framework) specifications.
+Mermaid diagram renderers for [gds-framework](https://github.com/DynamicalSystemsGroup/gds-framework) specifications.
 
 ```bash
 uv add gds-viz
@@ -105,14 +105,14 @@ Built with [Claude Code](https://claude.ai/code). All code is test-driven and hu
 
 ## Credits & Attribution
 
-**Author:** [Rohan Mehta](https://github.com/rororowyourboat) — [BlockScience](https://block.science/)
+**Author:** [Rohan Mehta](https://github.com/rororowyourboat) — [Dynamical Systems Group](https://github.com/DynamicalSystemsGroup)
 
 **Theoretical foundation:** [Dr. Michael Zargham](https://github.com/mzargham) and [Dr. Jamsheed Shorish](https://github.com/jshorish) — [Generalized Dynamical Systems, Part I: Foundations](https://blog.block.science/generalized-dynamical-systems-part-i-foundations-2/) (2021).
 
-**Architectural inspiration:** [Sean McOwen](https://github.com/SeanMcOwen) — [MSML](https://github.com/BlockScience/MSML) and [bdp-lib](https://github.com/BlockScience/bdp-lib).
+**Architectural inspiration:** [Sean McOwen](https://github.com/SeanMcOwen) — [MSML](https://github.com/DynamicalSystemsGroup/MSML) and [bdp-lib](https://github.com/DynamicalSystemsGroup/bdp-lib).
 
 **Contributors:**
-* [Michael Zargham](https://github.com/mzargham) — Project direction, GDS theory guidance, and technical review (BlockScience).
-* [Peter Hacker](https://github.com/phacker3) — Code auditing and review (BlockScience).
+* [Michael Zargham](https://github.com/mzargham) — Project direction, GDS theory guidance, and technical review (Dynamical Systems Group).
+* [Peter Hacker](https://github.com/phacker3) — Code auditing and review (Dynamical Systems Group).
 
 **Lineage:** Part of the [cadCAD](https://github.com/cadCAD-org/cadCAD) ecosystem for Complex Adaptive Dynamics.

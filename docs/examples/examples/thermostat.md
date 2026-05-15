@@ -41,6 +41,6 @@ flowchart TD
 
 ## Files
 
-- [model.py](https://github.com/BlockScience/gds-examples/blob/main/thermostat/model.py)
-- [test_model.py](https://github.com/BlockScience/gds-examples/blob/main/thermostat/test_model.py)
-- [VIEWS.md](https://github.com/BlockScience/gds-examples/blob/main/thermostat/VIEWS.md)
+- [model.py](https://github.com/DynamicalSystemsGroup/gds-examples/blob/main/thermostat/model.py)
+- [test_model.py](https://github.com/DynamicalSystemsGroup/gds-examples/blob/main/thermostat/test_model.py)
+- [VIEWS.md](https://github.com/DynamicalSystemsGroup/gds-examples/blob/main/thermostat/VIEWS.md)

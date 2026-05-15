@@ -19,7 +19,7 @@ all requested report types to an output directory.
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from jinja2 import Environment, PackageLoader
+from jinja2 import Environment, PackageLoader, select_autoescape
 
 from gds_domains.games.ir.models import FlowIR, PatternIR
 from gds_domains.games.reports.domain_analysis import generate_domain_analysis
@@ -88,6 +88,7 @@ def _get_jinja_env() -> Environment:
         loader=PackageLoader("gds_domains.games.reports", "templates"),
         trim_blocks=True,
         lstrip_blocks=True,
+        autoescape=select_autoescape(),
     )
 
 

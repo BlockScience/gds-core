@@ -135,9 +135,9 @@ class TestSpecToGraph:
         assert len(wires) == 2  # Sensor->Controller, Controller->Heater
 
     def test_custom_base_uri(self, thermostat_spec: GDSSpec) -> None:
-        g = spec_to_graph(thermostat_spec, base_uri="https://example.com/")
-        ttl = g.serialize(format="turtle")
-        assert "https://example.com/" in ttl
+        base_uri = "https://example.com/"
+        g = spec_to_graph(thermostat_spec, base_uri=base_uri)
+        assert any(str(s).startswith(base_uri) for s in g.subjects())
 
 
 class TestSystemIRToGraph:
@@ -247,7 +247,8 @@ class TestSerializationFormats:
         g = spec_to_graph(thermostat_spec)
         nt = to_ntriples(g)
         assert isinstance(nt, str)
-        assert "gds.block.science" in nt
+        gds_prefix = "https://gds.dynamicalsystemsgroup.com/"
+        assert any(str(s).startswith(gds_prefix) for s in g.subjects())
 
     def test_spec_to_turtle_convenience(self, thermostat_spec: GDSSpec) -> None:
         ttl = spec_to_turtle(thermostat_spec)

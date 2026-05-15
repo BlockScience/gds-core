@@ -2,7 +2,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/gds-stockflow)](https://pypi.org/project/gds-stockflow/)
 [![Python](https://img.shields.io/pypi/pyversions/gds-stockflow)](https://pypi.org/project/gds-stockflow/)
-[![License](https://img.shields.io/github/license/BlockScience/gds-core)](https://github.com/BlockScience/gds-core/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/DynamicalSystemsGroup/gds-core)](https://github.com/DynamicalSystemsGroup/gds-core/blob/main/LICENSE)
 
 **Declarative stock-flow DSL over GDS semantics** — system dynamics with formal verification.
 
@@ -81,4 +81,4 @@ See [Getting Started](getting-started.md) for a full walkthrough.
 
 ## Credits
 
-Built on [gds-framework](../framework/index.md) by [BlockScience](https://block.science).
+Built on [gds-framework](../framework/index.md) by [Dynamical Systems Group](https://github.com/DynamicalSystemsGroup).

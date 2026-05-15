@@ -2,7 +2,8 @@
 
 Demonstrates the 4-role GDS pipeline
 (BoundaryAction -> Policy -> ControlAction -> Mechanism)
-applied to a stylized traffic safety problem from BlockScience (Zargham & Shorish).
+applied to a stylized traffic safety problem from Dynamical Systems Group
+(Zargham & Shorish).
 
 A pedestrian on one side of a one-way street wants to reach a destination on the
 other side. They decide whether to cross (s in {0,1}) and where (position p).

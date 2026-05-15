@@ -2,9 +2,9 @@
 
 [![PyPI](https://img.shields.io/pypi/v/gds-examples)](https://pypi.org/project/gds-examples/)
 [![Python](https://img.shields.io/pypi/pyversions/gds-examples)](https://pypi.org/project/gds-examples/)
-[![License](https://img.shields.io/github/license/BlockScience/gds-examples)](https://github.com/BlockScience/gds-examples/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/DynamicalSystemsGroup/gds-examples)](https://github.com/DynamicalSystemsGroup/gds-examples/blob/main/LICENSE)
 
-**Seven example models** demonstrating every [gds-framework](https://blockscience.github.io/gds-framework) feature. The first six are GDS framework tutorials with inline theory commentary. The seventh uses the OGS game theory DSL with tournament simulation.
+**Seven example models** demonstrating every [gds-framework](https://dynamicalsystemsgroup.github.io/gds-framework) feature. The first six are GDS framework tutorials with inline theory commentary. The seventh uses the OGS game theory DSL with tournament simulation.
 
 ## Quick Start
 
@@ -48,7 +48,7 @@ examples/sir_epidemic/
 
 ## Credits
 
-**Author:** [Rohan Mehta](https://github.com/rororowyourboat) — [BlockScience](https://block.science/)
+**Author:** [Rohan Mehta](https://github.com/rororowyourboat) — [Dynamical Systems Group](https://github.com/DynamicalSystemsGroup)
 
 **Theoretical foundation:** [Dr. Michael Zargham](https://github.com/mzargham) and [Dr. Jamsheed Shorish](https://github.com/jshorish)
 

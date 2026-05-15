@@ -2,7 +2,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/gds-owl)](https://pypi.org/project/gds-owl/)
 [![Python](https://img.shields.io/pypi/pyversions/gds-owl)](https://pypi.org/project/gds-owl/)
-[![License](https://img.shields.io/github/license/BlockScience/gds-core)](https://github.com/BlockScience/gds-core/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/DynamicalSystemsGroup/gds-core)](https://github.com/DynamicalSystemsGroup/gds-core/blob/main/LICENSE)
 
 **OWL/Turtle, SHACL, and SPARQL for GDS specifications** — semantic web interoperability for compositional systems.
 

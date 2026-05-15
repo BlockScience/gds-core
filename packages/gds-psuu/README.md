@@ -2,7 +2,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/gds-psuu)](https://pypi.org/project/gds-psuu/)
 [![Python](https://img.shields.io/pypi/pyversions/gds-psuu)](https://pypi.org/project/gds-psuu/)
-[![License](https://img.shields.io/github/license/BlockScience/gds-core)](https://github.com/BlockScience/gds-core/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/DynamicalSystemsGroup/gds-core)](https://github.com/DynamicalSystemsGroup/gds-core/blob/main/LICENSE)
 
 **Parameter space search under uncertainty** — explore, evaluate, and optimize simulation parameters with Monte Carlo awareness.
 
@@ -162,8 +162,8 @@ Optimizer.suggest()  -->  Evaluator.evaluate(params)  -->  Optimizer.observe(sco
 
 ## Documentation
 
-Full docs at [blockscience.github.io/gds-core](https://blockscience.github.io/gds-core/psuu/).
+Full docs at [dynamicalsystemsgroup.github.io/gds-core](https://dynamicalsystemsgroup.github.io/gds-core/psuu/).
 
 ## License
 
-Apache-2.0 — [BlockScience](https://block.science)
+Apache-2.0 — [Dynamical Systems Group](https://github.com/DynamicalSystemsGroup)

@@ -1,6 +1,6 @@
 """Domain analysis report generator with advanced tag-based insights."""
 
-from jinja2 import Environment, PackageLoader
+from jinja2 import Environment, PackageLoader, select_autoescape
 
 from gds_domains.games.ir.models import PatternIR
 
@@ -11,6 +11,7 @@ def _get_jinja_env() -> Environment:
         loader=PackageLoader("gds_domains.games.reports", "templates"),
         trim_blocks=True,
         lstrip_blocks=True,
+        autoescape=select_autoescape(),
     )
 
 

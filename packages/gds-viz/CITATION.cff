@@ -3,8 +3,8 @@ message: "If you use this software, please cite it as below."
 authors:
   - family-names: "Mehta"
     given-names: "Rohan"
-    email: "rohan@block.science"
-    affiliation: "BlockScience"
+    email: "rohan@dynamicalsystemsgroup.com"
+    affiliation: "Dynamical Systems Group"
 title: "gds-viz"
 version: 0.1.0
 date-released: 2026-02-21

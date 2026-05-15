@@ -6,7 +6,7 @@ readme = "README.md"
 license = "Apache-2.0"
 requires-python = ">=3.12"
 authors = [
-    { name = "Rohan Mehta", email = "rohan@block.science" },
+    { name = "Rohan Mehta", email = "rohan@dynamicalsystemsgroup.com" },
 ]
 keywords = [
     "generalized-dynamical-systems",
@@ -37,9 +37,9 @@ dependencies = [
 phase = ["matplotlib>=3.8", "numpy>=1.26", "gds-continuous>=0.1.0"]
 
 [project.urls]
-Homepage = "https://github.com/BlockScience/gds-core"
-Repository = "https://github.com/BlockScience/gds-core"
-Documentation = "https://blockscience.github.io/gds-core"
+Homepage = "https://github.com/DynamicalSystemsGroup/gds-core"
+Repository = "https://github.com/DynamicalSystemsGroup/gds-core"
+Documentation = "https://dynamicalsystemsgroup.github.io/gds-core"
 
 [build-system]
 requires = ["hatchling"]

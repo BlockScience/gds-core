@@ -2,9 +2,9 @@
 
 [![PyPI](https://img.shields.io/pypi/v/gds-games)](https://pypi.org/project/gds-games/)
 [![Python](https://img.shields.io/pypi/pyversions/gds-games)](https://pypi.org/project/gds-games/)
-[![License](https://img.shields.io/github/license/BlockScience/gds-games)](LICENSE)
+[![License](https://img.shields.io/github/license/DynamicalSystemsGroup/gds-games)](LICENSE)
 
-Typed DSL for compositional game theory, built on [gds-framework](https://github.com/BlockScience/gds-core/tree/main/packages/gds-framework).
+Typed DSL for compositional game theory, built on [gds-framework](https://github.com/DynamicalSystemsGroup/gds-core/tree/main/packages/gds-framework).
 
 ## Table of Contents
 
@@ -412,13 +412,13 @@ ogs report output.json -o reports/
 
 ## Examples
 
-Three tutorial examples in [`gds-examples`](https://github.com/BlockScience/gds-core/tree/main/packages/gds-examples) demonstrate game-theoretic modeling using the GDS framework primitives:
+Three tutorial examples in [`gds-examples`](https://github.com/DynamicalSystemsGroup/gds-core/tree/main/packages/gds-examples) demonstrate game-theoretic modeling using the GDS framework primitives:
 
 | Example | Domain | What It Teaches |
 |---------|--------|-----------------|
-| [Prisoner's Dilemma](https://github.com/BlockScience/gds-core/tree/main/packages/gds-examples/games/prisoners_dilemma) | Game theory | Nested parallel composition, multi-entity state, temporal loops |
-| [Insurance Contract](https://github.com/BlockScience/gds-core/tree/main/packages/gds-examples/games/insurance) | Finance | Complete 4-role taxonomy (ControlAction), pure sequential pipeline |
-| [Crosswalk Problem](https://github.com/BlockScience/gds-core/tree/main/packages/gds-examples/games/crosswalk) | Mechanism design | Discrete Markov transitions, governance parameters |
+| [Prisoner's Dilemma](https://github.com/DynamicalSystemsGroup/gds-core/tree/main/packages/gds-examples/games/prisoners_dilemma) | Game theory | Nested parallel composition, multi-entity state, temporal loops |
+| [Insurance Contract](https://github.com/DynamicalSystemsGroup/gds-core/tree/main/packages/gds-examples/games/insurance) | Finance | Complete 4-role taxonomy (ControlAction), pure sequential pipeline |
+| [Crosswalk Problem](https://github.com/DynamicalSystemsGroup/gds-core/tree/main/packages/gds-examples/games/crosswalk) | Mechanism design | Discrete Markov transitions, governance parameters |
 
 ## Status
 
@@ -433,16 +433,16 @@ Built with [Claude Code](https://claude.ai/code). All code is test-driven and hu
 
 ## Credits & Attribution
 
-**Author:** [Rohan Mehta](https://github.com/rororowyourboat) — [BlockScience](https://block.science/)
+**Author:** [Rohan Mehta](https://github.com/rororowyourboat) — [Dynamical Systems Group](https://github.com/DynamicalSystemsGroup)
 
 **Theoretical foundation:** [Dr. Michael Zargham](https://github.com/mzargham) and [Dr. Jamsheed Shorish](https://github.com/jshorish) — [Generalized Dynamical Systems, Part I: Foundations](https://blog.block.science/generalized-dynamical-systems-part-i-foundations-2/) (2021).
 
 **Game-theoretic foundation:** [Ghani, Hedges, Winschel, Zahn](https://arxiv.org/abs/1603.04641) — Compositional Game Theory (2018). Bidirectional composition with contravariant feedback channels.
 
-**Architectural inspiration:** [Sean McOwen](https://github.com/SeanMcOwen) — [MSML](https://github.com/BlockScience/MSML) and [bdp-lib](https://github.com/BlockScience/bdp-lib).
+**Architectural inspiration:** [Sean McOwen](https://github.com/SeanMcOwen) — [MSML](https://github.com/DynamicalSystemsGroup/MSML) and [bdp-lib](https://github.com/DynamicalSystemsGroup/bdp-lib).
 
 **Contributors:**
-* [Michael Zargham](https://github.com/mzargham) — Project direction, GDS theory guidance, and technical review (BlockScience).
-* [Peter Hacker](https://github.com/phacker3) — Code auditing and review (BlockScience).
+* [Michael Zargham](https://github.com/mzargham) — Project direction, GDS theory guidance, and technical review (Dynamical Systems Group).
+* [Peter Hacker](https://github.com/phacker3) — Code auditing and review (Dynamical Systems Group).
 
 **Lineage:** Part of the [cadCAD](https://github.com/cadCAD-org/cadCAD) ecosystem for Complex Adaptive Dynamics.

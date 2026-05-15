@@ -2,13 +2,13 @@
 
 **One model, many views** — an interactive exploration of Axelrod's iterated Prisoner's Dilemma tournament, built on the GDS ecosystem.
 
-[:octicons-link-external-16: Live Site](https://blockscience.github.io/gds-axelrod/) &nbsp; [:octicons-mark-github-16: Source](https://github.com/BlockScience/gds-axelrod)
+[:octicons-link-external-16: Live Site](https://dynamicalsystemsgroup.github.io/gds-axelrod/) &nbsp; [:octicons-mark-github-16: Source](https://github.com/DynamicalSystemsGroup/gds-axelrod)
 
 ---
 
 ## Overview
 
-[gds-axelrod](https://github.com/BlockScience/gds-axelrod) demonstrates how a single OGS game specification can be projected through six distinct analytical lenses — from narrative storytelling to formal mathematical decomposition to interactive parameter exploration — without simplification or compromise.
+[gds-axelrod](https://github.com/DynamicalSystemsGroup/gds-axelrod) demonstrates how a single OGS game specification can be projected through six distinct analytical lenses — from narrative storytelling to formal mathematical decomposition to interactive parameter exploration — without simplification or compromise.
 
 The project is a concrete realization of the **specification-as-interoperability-layer** pattern described in the [Interoperability Guide](../guides/interoperability.md): one compositional model serves as the single source of truth, and multiple independent tools consume it for different purposes.
 

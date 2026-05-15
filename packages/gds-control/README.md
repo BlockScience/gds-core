@@ -2,7 +2,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/gds-control)](https://pypi.org/project/gds-control/)
 [![Python](https://img.shields.io/pypi/pyversions/gds-control)](https://pypi.org/project/gds-control/)
-[![License](https://img.shields.io/github/license/BlockScience/gds-control)](LICENSE)
+[![License](https://img.shields.io/github/license/DynamicalSystemsGroup/gds-control)](LICENSE)
 
 State-space control DSL over GDS semantics — control theory with formal guarantees.
 
@@ -57,7 +57,7 @@ print(f"{report.checks_passed}/{report.checks_total} checks passed")
 
 ## What is this?
 
-`gds-control` is a **domain DSL** that compiles state-space control systems to [GDS](https://github.com/BlockScience/gds-core) specifications. You declare states, inputs, sensors, and controllers as plain data models — the compiler handles the mapping to GDS role blocks, entities, composition trees, and wirings.
+`gds-control` is a **domain DSL** that compiles state-space control systems to [GDS](https://github.com/DynamicalSystemsGroup/gds-core) specifications. You declare states, inputs, sensors, and controllers as plain data models — the compiler handles the mapping to GDS role blocks, entities, composition trees, and wirings.
 
 ```
 Your declaration                    What the compiler produces
@@ -78,7 +78,7 @@ u = K(y, r)    (control law  → Policy)
 r              (reference    → BoundaryAction)
 ```
 
-Once compiled, all downstream GDS tooling works immediately — canonical projection (`h = f ∘ g`), semantic checks, SpecQuery dependency analysis, JSON serialization, and [gds-viz](https://github.com/BlockScience/gds-core/tree/main/packages/gds-viz) diagram generation.
+Once compiled, all downstream GDS tooling works immediately — canonical projection (`h = f ∘ g`), semantic checks, SpecQuery dependency analysis, JSON serialization, and [gds-viz](https://github.com/DynamicalSystemsGroup/gds-core/tree/main/packages/gds-viz) diagram generation.
 
 ## Architecture
 
@@ -211,11 +211,11 @@ report = verify(model, include_gds_checks=True)
 
 ## Examples
 
-One tutorial example in [`gds-examples`](https://github.com/BlockScience/gds-core/tree/main/packages/gds-examples) demonstrates control system modeling using the GDS framework primitives:
+One tutorial example in [`gds-examples`](https://github.com/DynamicalSystemsGroup/gds-core/tree/main/packages/gds-examples) demonstrates control system modeling using the GDS framework primitives:
 
 | Example | Domain | What It Teaches |
 |---------|--------|-----------------|
-| [Thermostat PID](https://github.com/BlockScience/gds-core/tree/main/packages/gds-examples/control/thermostat) | Control theory | `.feedback()` composition, CONTRAVARIANT backward flow, ControlAction role, multi-variable entities |
+| [Thermostat PID](https://github.com/DynamicalSystemsGroup/gds-core/tree/main/packages/gds-examples/control/thermostat) | Control theory | `.feedback()` composition, CONTRAVARIANT backward flow, ControlAction role, multi-variable entities |
 
 <details>
 <summary><strong>Thermostat structural view</strong> — feedback arrow shows CONTRAVARIANT energy cost flow</summary>
@@ -253,14 +253,14 @@ Built with [Claude Code](https://claude.ai/code). All code is test-driven and hu
 
 ## Credits & Attribution
 
-**Author:** [Rohan Mehta](https://github.com/rororowyourboat) — [BlockScience](https://block.science/)
+**Author:** [Rohan Mehta](https://github.com/rororowyourboat) — [Dynamical Systems Group](https://github.com/DynamicalSystemsGroup)
 
 **Theoretical foundation:** [Dr. Michael Zargham](https://github.com/mzargham) and [Dr. Jamsheed Shorish](https://github.com/jshorish) — [Generalized Dynamical Systems, Part I: Foundations](https://blog.block.science/generalized-dynamical-systems-part-i-foundations-2/) (2021).
 
-**Architectural inspiration:** [Sean McOwen](https://github.com/SeanMcOwen) — [MSML](https://github.com/BlockScience/MSML) and [bdp-lib](https://github.com/BlockScience/bdp-lib).
+**Architectural inspiration:** [Sean McOwen](https://github.com/SeanMcOwen) — [MSML](https://github.com/DynamicalSystemsGroup/MSML) and [bdp-lib](https://github.com/DynamicalSystemsGroup/bdp-lib).
 
 **Contributors:**
-* [Michael Zargham](https://github.com/mzargham) — Project direction, GDS theory guidance, and technical review (BlockScience).
-* [Peter Hacker](https://github.com/phacker3) — Code auditing and review (BlockScience).
+* [Michael Zargham](https://github.com/mzargham) — Project direction, GDS theory guidance, and technical review (Dynamical Systems Group).
+* [Peter Hacker](https://github.com/phacker3) — Code auditing and review (Dynamical Systems Group).
 
 **Lineage:** Part of the [cadCAD](https://github.com/cadCAD-org/cadCAD) ecosystem for Complex Adaptive Dynamics.

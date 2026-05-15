@@ -36,7 +36,7 @@ Completes the 4-role taxonomy. The only example using all four roles: BoundaryAc
 
 ### 6. [Crosswalk Problem](examples/crosswalk.md) — Mechanism Design
 
-The canonical GDS example from BlockScience. Demonstrates mechanism design with a governance parameter constraining agent behavior via discrete Markov transitions.
+The canonical GDS example from Dynamical Systems Group. Demonstrates mechanism design with a governance parameter constraining agent behavior via discrete Markov transitions.
 
 **New:** mechanism design, governance parameters, discrete state
 

@@ -39,7 +39,7 @@ _register(
         name="blocks_by_role",
         description="Group all blocks by their role (kind).",
         query="""\
-PREFIX gds-core: <https://gds.block.science/ontology/core/>
+PREFIX gds-core: <https://gds.dynamicalsystemsgroup.com/ontology/core/>
 
 SELECT ?block_name ?kind
 WHERE {
@@ -56,7 +56,7 @@ _register(
         name="dependency_path",
         description="All wired connections in a GDSSpec.",
         query="""\
-PREFIX gds-core: <https://gds.block.science/ontology/core/>
+PREFIX gds-core: <https://gds.dynamicalsystemsgroup.com/ontology/core/>
 
 SELECT ?wiring_name ?source ?target ?space ?optional
 WHERE {
@@ -78,7 +78,7 @@ _register(
         name="entity_update_map",
         description="Which mechanisms update which entity variables.",
         query="""\
-PREFIX gds-core: <https://gds.block.science/ontology/core/>
+PREFIX gds-core: <https://gds.dynamicalsystemsgroup.com/ontology/core/>
 
 SELECT ?block_name ?entity ?variable
 WHERE {
@@ -98,7 +98,7 @@ _register(
         name="param_impact",
         description="Which parameters are used by which blocks.",
         query="""\
-PREFIX gds-core: <https://gds.block.science/ontology/core/>
+PREFIX gds-core: <https://gds.dynamicalsystemsgroup.com/ontology/core/>
 
 SELECT ?param_name ?block_name ?kind
 WHERE {
@@ -117,8 +117,8 @@ _register(
         name="ir_block_list",
         description="List all BlockIR nodes in a SystemIR with their types.",
         query="""\
-PREFIX gds-core: <https://gds.block.science/ontology/core/>
-PREFIX gds-ir: <https://gds.block.science/ontology/ir/>
+PREFIX gds-core: <https://gds.dynamicalsystemsgroup.com/ontology/core/>
+PREFIX gds-ir: <https://gds.dynamicalsystemsgroup.com/ontology/ir/>
 
 SELECT ?block_name ?block_type ?logic
 WHERE {
@@ -137,7 +137,7 @@ _register(
         name="ir_wiring_list",
         description="List all WiringIR edges in a SystemIR.",
         query="""\
-PREFIX gds-ir: <https://gds.block.science/ontology/ir/>
+PREFIX gds-ir: <https://gds.dynamicalsystemsgroup.com/ontology/ir/>
 
 SELECT ?source ?target ?label ?direction ?is_feedback ?is_temporal
 WHERE {
@@ -159,7 +159,7 @@ _register(
         name="verification_summary",
         description="Summary of verification findings by check ID and severity.",
         query="""\
-PREFIX gds-verif: <https://gds.block.science/ontology/verification/>
+PREFIX gds-verif: <https://gds.dynamicalsystemsgroup.com/ontology/verification/>
 
 SELECT ?check_id ?severity ?passed ?message
 WHERE {
