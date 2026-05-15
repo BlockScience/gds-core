@@ -59,7 +59,7 @@ def title(mo):
 
     *An interactive notebook exploring Rufus Isaacs' foundational
     pursuit-evasion problem (1951) through the
-    [GDS](https://github.com/BlockScience/gds-core) ecosystem.*
+    [GDS](https://github.com/DynamicalSystemsGroup/gds-core) ecosystem.*
 
     Every equation is derived symbolically with SymPy, then integrated
     numerically through `gds-continuous` (wrapping `scipy.integrate.solve_ivp`).
@@ -554,7 +554,7 @@ def references(mo):
       Modern Studies," *Advances in Dynamic Games*, ISDG Vol. 11 (2011)
     - [mzargham/hc-marimo](https://github.com/mzargham/hc-marimo) --
       reference SymPy implementation
-    - [gds-core](https://github.com/BlockScience/gds-core) --
+    - [gds-core](https://github.com/DynamicalSystemsGroup/gds-core) --
       GDS ecosystem (`gds-continuous` for ODE integration)
     """
     )

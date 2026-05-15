@@ -2,7 +2,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/gds-continuous)](https://pypi.org/project/gds-continuous/)
 [![Python](https://img.shields.io/pypi/pyversions/gds-continuous)](https://pypi.org/project/gds-continuous/)
-[![License](https://img.shields.io/github/license/BlockScience/gds-core)](https://github.com/BlockScience/gds-core/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/DynamicalSystemsGroup/gds-core)](https://github.com/DynamicalSystemsGroup/gds-core/blob/main/LICENSE)
 
 **Continuous-time ODE integration engine** -- the continuous-time counterpart to `gds-sim`.
 
@@ -65,4 +65,4 @@ See [Getting Started](getting-started.md) for a full walkthrough.
 
 ## Credits
 
-Built by [BlockScience](https://block.science).
+Built by [Dynamical Systems Group](https://github.com/DynamicalSystemsGroup).

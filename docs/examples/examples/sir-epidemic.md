@@ -63,6 +63,6 @@ Three entities, each with a single count variable:
 
 ## Files
 
-- [model.py](https://github.com/BlockScience/gds-examples/blob/main/sir_epidemic/model.py)
-- [test_model.py](https://github.com/BlockScience/gds-examples/blob/main/sir_epidemic/test_model.py)
-- [VIEWS.md](https://github.com/BlockScience/gds-examples/blob/main/sir_epidemic/VIEWS.md)
+- [model.py](https://github.com/DynamicalSystemsGroup/gds-examples/blob/main/sir_epidemic/model.py)
+- [test_model.py](https://github.com/DynamicalSystemsGroup/gds-examples/blob/main/sir_epidemic/test_model.py)
+- [VIEWS.md](https://github.com/DynamicalSystemsGroup/gds-examples/blob/main/sir_epidemic/VIEWS.md)

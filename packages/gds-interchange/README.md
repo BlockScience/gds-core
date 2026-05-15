@@ -1,6 +1,6 @@
 # gds-interchange
 
-Bidirectional format bridges for [gds-framework](https://github.com/BlockScience/gds-core) specifications.
+Bidirectional format bridges for [gds-framework](https://github.com/DynamicalSystemsGroup/gds-core) specifications.
 
 ## Subpackages
 

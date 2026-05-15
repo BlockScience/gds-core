@@ -79,10 +79,10 @@ Each layer consumes only `get_payoff()` from the specification — no GDS intern
 
 ## Files
 
-- [model.py](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/games/evolution_of_trust/model.py)
-- [strategies.py](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/games/evolution_of_trust/strategies.py)
-- [tournament.py](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/games/evolution_of_trust/tournament.py)
-- [test_model.py](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/games/evolution_of_trust/test_model.py)
+- [model.py](https://github.com/DynamicalSystemsGroup/gds-core/blob/main/packages/gds-examples/games/evolution_of_trust/model.py)
+- [strategies.py](https://github.com/DynamicalSystemsGroup/gds-core/blob/main/packages/gds-examples/games/evolution_of_trust/strategies.py)
+- [tournament.py](https://github.com/DynamicalSystemsGroup/gds-core/blob/main/packages/gds-examples/games/evolution_of_trust/tournament.py)
+- [test_model.py](https://github.com/DynamicalSystemsGroup/gds-core/blob/main/packages/gds-examples/games/evolution_of_trust/test_model.py)
 
 ## Related
 

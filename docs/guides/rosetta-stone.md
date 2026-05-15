@@ -337,8 +337,8 @@ uv run --package gds-examples pytest packages/gds-examples/tests/test_rosetta.py
 
 | File | Purpose |
 |------|---------|
-| [`stockflow_view.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/gds_examples/rosetta/stockflow_view.py) | Stock-flow DSL model |
-| [`control_view.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/gds_examples/rosetta/control_view.py) | Control DSL model |
-| [`game_view.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/gds_examples/rosetta/game_view.py) | Game theory DSL model |
-| [`comparison.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/gds_examples/rosetta/comparison.py) | Cross-domain canonical comparison |
-| [`rosetta.py`](https://github.com/BlockScience/gds-core/blob/main/packages/gds-examples/notebooks/rosetta.py) | Interactive marimo notebook |
+| [`stockflow_view.py`](https://github.com/DynamicalSystemsGroup/gds-core/blob/main/packages/gds-examples/gds_examples/rosetta/stockflow_view.py) | Stock-flow DSL model |
+| [`control_view.py`](https://github.com/DynamicalSystemsGroup/gds-core/blob/main/packages/gds-examples/gds_examples/rosetta/control_view.py) | Control DSL model |
+| [`game_view.py`](https://github.com/DynamicalSystemsGroup/gds-core/blob/main/packages/gds-examples/gds_examples/rosetta/game_view.py) | Game theory DSL model |
+| [`comparison.py`](https://github.com/DynamicalSystemsGroup/gds-core/blob/main/packages/gds-examples/gds_examples/rosetta/comparison.py) | Cross-domain canonical comparison |
+| [`rosetta.py`](https://github.com/DynamicalSystemsGroup/gds-core/blob/main/packages/gds-examples/notebooks/rosetta.py) | Interactive marimo notebook |

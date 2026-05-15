@@ -6,7 +6,7 @@ readme = "README.md"
 license = "Apache-2.0"
 requires-python = ">=3.12"
 authors = [
-    { name = "Rohan Mehta", email = "rohan@block.science" },
+    { name = "Rohan Mehta", email = "rohan@dynamicalsystemsgroup.com" },
 ]
 keywords = [
     "generalized-dynamical-systems",

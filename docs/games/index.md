@@ -2,9 +2,9 @@
 
 [![PyPI](https://img.shields.io/pypi/v/gds-games)](https://pypi.org/project/gds-games/)
 [![Python](https://img.shields.io/pypi/pyversions/gds-games)](https://pypi.org/project/gds-games/)
-[![License](https://img.shields.io/github/license/BlockScience/gds-games)](https://github.com/BlockScience/gds-games/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/DynamicalSystemsGroup/gds-games)](https://github.com/DynamicalSystemsGroup/gds-games/blob/main/LICENSE)
 
-**Typed DSL for compositional game theory**, built on [gds-framework](https://blockscience.github.io/gds-framework).
+**Typed DSL for compositional game theory**, built on [gds-framework](https://dynamicalsystemsgroup.github.io/gds-framework).
 
 ## What is this?
 
@@ -67,7 +67,7 @@ print(f"{report.checks_passed}/{report.checks_total} checks passed")
 
 ## Credits
 
-**Author:** [Rohan Mehta](https://github.com/rororowyourboat) — [BlockScience](https://block.science/)
+**Author:** [Rohan Mehta](https://github.com/rororowyourboat) — [Dynamical Systems Group](https://github.com/DynamicalSystemsGroup)
 
 **Theoretical foundation:** [Dr. Michael Zargham](https://github.com/mzargham) and [Dr. Jamsheed Shorish](https://github.com/jshorish)
 

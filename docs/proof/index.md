@@ -2,7 +2,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/gds-proof)](https://pypi.org/project/gds-proof/)
 [![Python](https://img.shields.io/pypi/pyversions/gds-proof)](https://pypi.org/project/gds-proof/)
-[![License](https://img.shields.io/github/license/BlockScience/gds-core)](https://github.com/BlockScience/gds-core/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/DynamicalSystemsGroup/gds-core)](https://github.com/DynamicalSystemsGroup/gds-core/blob/main/LICENSE)
 
 **Deterministic model identity and SymPy-based invariant proof verification for GDS models.**
 
@@ -76,4 +76,4 @@ See [Getting Started](getting-started.md) for a full walkthrough.
 
 ## Credits
 
-Built on [gds-framework](../framework/index.md) and [SymPy](https://www.sympy.org/) by [BlockScience](https://block.science).
+Built on [gds-framework](../framework/index.md) and [SymPy](https://www.sympy.org/) by [Dynamical Systems Group](https://github.com/DynamicalSystemsGroup).

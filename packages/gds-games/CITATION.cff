@@ -3,7 +3,7 @@ message: "If you use this software, please cite it as below."
 authors:
   - family-names: "Mehta"
     given-names: "Rohan"
-    email: "rohan@block.science"
+    email: "rohan@dynamicalsystemsgroup.com"
     affiliation: "Dynamical Systems Group"
 title: "gds-games"
 version: 0.1.0

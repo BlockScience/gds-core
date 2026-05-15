@@ -55,7 +55,7 @@ gds-sim        ←  simulation engine (standalone — no gds-framework dep, only
 
 ## Links
 
-- [GitHub Organization](https://github.com/BlockScience)
+- [GitHub Organization](https://github.com/DynamicalSystemsGroup)
 - [GDS Theory Paper](https://doi.org/10.57938/e8d456ea-d975-4111-ac41-052ce73cb0cc) (Zargham & Shorish, 2022)
 - [cadCAD Ecosystem](https://github.com/cadCAD-org/cadCAD)
-- [BlockScience](https://block.science/)
+- [Dynamical Systems Group](https://github.com/DynamicalSystemsGroup)

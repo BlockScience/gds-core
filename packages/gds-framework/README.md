@@ -2,8 +2,8 @@
 
 [![PyPI](https://img.shields.io/pypi/v/gds-framework)](https://pypi.org/project/gds-framework/)
 [![Python](https://img.shields.io/pypi/pyversions/gds-framework)](https://pypi.org/project/gds-framework/)
-[![License](https://img.shields.io/github/license/BlockScience/gds-framework)](LICENSE)
-[![CI](https://github.com/BlockScience/gds-framework/actions/workflows/ci.yml/badge.svg)](https://github.com/BlockScience/gds-framework/actions/workflows/ci.yml)
+[![License](https://img.shields.io/github/license/DynamicalSystemsGroup/gds-framework)](LICENSE)
+[![CI](https://github.com/DynamicalSystemsGroup/gds-framework/actions/workflows/ci.yml/badge.svg)](https://github.com/DynamicalSystemsGroup/gds-framework/actions/workflows/ci.yml)
 
 Typed compositional specifications for complex systems, grounded in [Generalized Dynamical Systems](https://doi.org/10.57938/e8d456ea-d975-4111-ac41-052ce73cb0cc) theory (Zargham & Shorish, 2022).
 
@@ -154,7 +154,7 @@ A **thermostat control system** would use `BoundaryAction` for the temperature s
 
 ## Examples
 
-Five tutorial examples in [`gds-examples`](https://github.com/BlockScience/gds-examples) demonstrate every framework feature. Each `model.py` reads like a tutorial chapter with inline GDS theory commentary.
+Five tutorial examples in [`gds-examples`](https://github.com/DynamicalSystemsGroup/gds-examples) demonstrate every framework feature. Each `model.py` reads like a tutorial chapter with inline GDS theory commentary.
 
 | # | Example | What It Teaches | Composition |
 |:-:|---------|-----------------|-------------|
@@ -166,7 +166,7 @@ Five tutorial examples in [`gds-examples`](https://github.com/BlockScience/gds-e
 
 Start with SIR Epidemic and work down — each introduces one new concept.
 
-Each model generates **6 views** automatically via [`gds-viz`](https://github.com/BlockScience/gds-viz). Here are sample views for the SIR Epidemic:
+Each model generates **6 views** automatically via [`gds-viz`](https://github.com/DynamicalSystemsGroup/gds-viz). Here are sample views for the SIR Epidemic:
 
 <details>
 <summary><strong>Structural view</strong> — compiled block graph with role-based shapes and typed wiring labels</summary>
@@ -315,7 +315,7 @@ flowchart LR
 
 </details>
 
-The remaining 2 views (architecture by domain, traceability) are in each example's `VIEWS.md`. See [`gds-examples`](https://github.com/BlockScience/gds-examples) for the full guide.
+The remaining 2 views (architecture by domain, traceability) are in each example's `VIEWS.md`. See [`gds-examples`](https://github.com/DynamicalSystemsGroup/gds-examples) for the full guide.
 
 ## What's Included
 
@@ -350,7 +350,7 @@ Blocks with bidirectional typed interfaces, composed via four operators (`>>`, `
 ## Intellectual Lineage
 
 - **GDS formalism** (Roxin 1960s; [Zargham & Shorish 2022](https://doi.org/10.57938/e8d456ea-d975-4111-ac41-052ce73cb0cc)) — state transitions composed over arbitrary data structures, with formal notions of reachability, controllability, and admissibility
-- **MSML** (BlockScience) — block roles, parameter tracking, typed transmission channels
+- **MSML** (Dynamical Systems Group) — block roles, parameter tracking, typed transmission channels
 - **BDP-lib** (Block Diagram Protocol) — abstract/concrete separation, structural validation
 - **Categorical cybernetics** (Ghani, Hedges et al.) — bidirectional composition with contravariant feedback
 
@@ -358,7 +358,7 @@ See [`docs/gds_deepdive.md`](docs/gds_deepdive.md) for the full analysis.
 
 ## Status
 
-**v0.2.0 — Alpha.** Both layers are implemented and tested (347 tests, 99% coverage). v0.2 adds parameter typing (Θ), canonical projection (h = f ∘ g derivation), tagged metadata, and 6 Mermaid visualization views via [`gds-viz`](https://github.com/BlockScience/gds-viz). The composition algebra and specification layer are stable. Domain packages and simulation execution are not yet built — `gds-framework` is the foundation they will build on.
+**v0.2.0 — Alpha.** Both layers are implemented and tested (347 tests, 99% coverage). v0.2 adds parameter typing (Θ), canonical projection (h = f ∘ g derivation), tagged metadata, and 6 Mermaid visualization views via [`gds-viz`](https://github.com/DynamicalSystemsGroup/gds-viz). The composition algebra and specification layer are stable. Domain packages and simulation execution are not yet built — `gds-framework` is the foundation they will build on.
 
 ## License
 
@@ -369,14 +369,14 @@ Built with [Claude Code](https://claude.ai/code). All code is test-driven and hu
 
 ## Credits & Attribution
 
-**Author:** [Rohan Mehta](https://github.com/rororowyourboat) — [BlockScience](https://block.science/)
+**Author:** [Rohan Mehta](https://github.com/rororowyourboat) — [Dynamical Systems Group](https://github.com/DynamicalSystemsGroup)
 
 **Theoretical foundation:** [Dr. Michael Zargham](https://github.com/mzargham) and [Dr. Jamsheed Shorish](https://github.com/jshorish) — [Generalized Dynamical Systems, Part I: Foundations](https://blog.block.science/generalized-dynamical-systems-part-i-foundations-2/) (2021).
 
-**Architectural inspiration:** [Sean McOwen](https://github.com/SeanMcOwen) — [MSML](https://github.com/BlockScience/MSML) and [bdp-lib](https://github.com/BlockScience/bdp-lib).
+**Architectural inspiration:** [Sean McOwen](https://github.com/SeanMcOwen) — [MSML](https://github.com/DynamicalSystemsGroup/MSML) and [bdp-lib](https://github.com/DynamicalSystemsGroup/bdp-lib).
 
 **Contributors:**
-* [Michael Zargham](https://github.com/mzargham) — Project direction, GDS theory guidance, and technical review (BlockScience).
-* [Peter Hacker](https://github.com/phacker3) — Code auditing and review (BlockScience).
+* [Michael Zargham](https://github.com/mzargham) — Project direction, GDS theory guidance, and technical review (Dynamical Systems Group).
+* [Peter Hacker](https://github.com/phacker3) — Code auditing and review (Dynamical Systems Group).
 
 **Lineage:** Part of the [cadCAD](https://github.com/cadCAD-org/cadCAD) ecosystem for Complex Adaptive Dynamics.

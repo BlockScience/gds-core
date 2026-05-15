@@ -1,6 +1,6 @@
 # gds-domains
 
-Domain-specific languages for the [GDS ecosystem](https://github.com/BlockScience/gds-core).
+Domain-specific languages for the [GDS ecosystem](https://github.com/DynamicalSystemsGroup/gds-core).
 
 ## Subpackages
 

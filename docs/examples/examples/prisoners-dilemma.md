@@ -45,6 +45,6 @@ flowchart TD
 
 ## Files
 
-- [model.py](https://github.com/BlockScience/gds-examples/blob/main/prisoners_dilemma/model.py)
-- [test_model.py](https://github.com/BlockScience/gds-examples/blob/main/prisoners_dilemma/test_model.py)
-- [VIEWS.md](https://github.com/BlockScience/gds-examples/blob/main/prisoners_dilemma/VIEWS.md)
+- [model.py](https://github.com/DynamicalSystemsGroup/gds-examples/blob/main/prisoners_dilemma/model.py)
+- [test_model.py](https://github.com/DynamicalSystemsGroup/gds-examples/blob/main/prisoners_dilemma/test_model.py)
+- [VIEWS.md](https://github.com/DynamicalSystemsGroup/gds-examples/blob/main/prisoners_dilemma/VIEWS.md)

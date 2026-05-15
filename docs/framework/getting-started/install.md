@@ -29,7 +29,7 @@ print(gds.__version__)
 ## Development Setup
 
 ```bash
-git clone https://github.com/BlockScience/gds-framework.git
+git clone https://github.com/DynamicalSystemsGroup/gds-framework.git
 cd gds-framework
 uv sync
 uv run pytest tests/ -v

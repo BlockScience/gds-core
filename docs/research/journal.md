@@ -4,11 +4,11 @@ Structured log of verification research for the Generalized Dynamical Systems
 ecosystem. Each entry records motivation, method, outcome, and next steps.
 
 Verification plan: [verification-plan.md](verification-plan.md)
-Issues: [#134](https://github.com/BlockScience/gds-core/issues/134),
-[#135](https://github.com/BlockScience/gds-core/issues/135),
-[#136](https://github.com/BlockScience/gds-core/issues/136),
-[#137](https://github.com/BlockScience/gds-core/issues/137),
-[#138](https://github.com/BlockScience/gds-core/issues/138)
+Issues: [#134](https://github.com/DynamicalSystemsGroup/gds-core/issues/134),
+[#135](https://github.com/DynamicalSystemsGroup/gds-core/issues/135),
+[#136](https://github.com/DynamicalSystemsGroup/gds-core/issues/136),
+[#137](https://github.com/DynamicalSystemsGroup/gds-core/issues/137),
+[#138](https://github.com/DynamicalSystemsGroup/gds-core/issues/138)
 
 ---
 

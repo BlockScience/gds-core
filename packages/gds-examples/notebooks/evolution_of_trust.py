@@ -748,7 +748,7 @@ def the_lesson(mo):
 
 ---
 
-*Built with [OGS](https://github.com/BlockScience/gds-core)
+*Built with [OGS](https://github.com/DynamicalSystemsGroup/gds-core)
 and inspired by
 [The Evolution of Trust](https://ncase.me/trust/)
 by Nicky Case.*

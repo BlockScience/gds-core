@@ -39,6 +39,6 @@ flowchart LR
 
 ## Files
 
-- [model.py](https://github.com/BlockScience/gds-examples/blob/main/insurance/model.py)
-- [test_model.py](https://github.com/BlockScience/gds-examples/blob/main/insurance/test_model.py)
-- [VIEWS.md](https://github.com/BlockScience/gds-examples/blob/main/insurance/VIEWS.md)
+- [model.py](https://github.com/DynamicalSystemsGroup/gds-examples/blob/main/insurance/model.py)
+- [test_model.py](https://github.com/DynamicalSystemsGroup/gds-examples/blob/main/insurance/test_model.py)
+- [VIEWS.md](https://github.com/DynamicalSystemsGroup/gds-examples/blob/main/insurance/VIEWS.md)

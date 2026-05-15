@@ -1,7 +1,7 @@
 # gds-core
 
-[![License](https://img.shields.io/github/license/BlockScience/gds-core)](LICENSE)
-[![CI](https://github.com/BlockScience/gds-core/actions/workflows/ci.yml/badge.svg)](https://github.com/BlockScience/gds-core/actions/workflows/ci.yml)
+[![License](https://img.shields.io/github/license/DynamicalSystemsGroup/gds-core)](LICENSE)
+[![CI](https://github.com/DynamicalSystemsGroup/gds-core/actions/workflows/ci.yml/badge.svg)](https://github.com/DynamicalSystemsGroup/gds-core/actions/workflows/ci.yml)
 
 Monorepo for the **Generalized Dynamical Systems** ecosystem — typed compositional specifications for complex systems, grounded in [GDS theory](https://doi.org/10.57938/e8d456ea-d975-4111-ac41-052ce73cb0cc) (Zargham & Shorish, 2022).
 
@@ -23,7 +23,7 @@ Monorepo for the **Generalized Dynamical Systems** ecosystem — typed compositi
 
 ```bash
 # Clone and install all packages (editable, workspace-linked)
-git clone https://github.com/BlockScience/gds-core.git
+git clone https://github.com/DynamicalSystemsGroup/gds-core.git
 cd gds-core
 uv sync --all-packages
 
@@ -50,7 +50,7 @@ This is a [uv workspace](https://docs.astral.sh/uv/concepts/workspaces/) monorep
 
 ## Documentation
 
-Full documentation at [blockscience.github.io/gds-core](https://blockscience.github.io/gds-core).
+Full documentation at [dynamicalsystemsgroup.github.io/gds-core](https://dynamicalsystemsgroup.github.io/gds-core).
 
 ## Citation
 
@@ -62,15 +62,15 @@ See [CITATION.cff](CITATION.cff) for BibTeX and other formats.
 
 ## Credits & Attribution
 
-**Author:** [Rohan Mehta](https://github.com/rororowyourboat) — [BlockScience](https://block.science/)
+**Author:** [Rohan Mehta](https://github.com/rororowyourboat) — [Dynamical Systems Group](https://github.com/DynamicalSystemsGroup)
 
 **Theoretical foundation:** [Dr. Michael Zargham](https://github.com/mzargham) and [Dr. Jamsheed Shorish](https://github.com/jshorish) — [Generalized Dynamical Systems, Part I: Foundations](https://blog.block.science/generalized-dynamical-systems-part-i-foundations-2/) (2021).
 
-**Architectural inspiration:** [Sean McOwen](https://github.com/SeanMcOwen) — [MSML](https://github.com/BlockScience/MSML) and [bdp-lib](https://github.com/BlockScience/bdp-lib).
+**Architectural inspiration:** [Sean McOwen](https://github.com/SeanMcOwen) — [MSML](https://github.com/DynamicalSystemsGroup/MSML) and [bdp-lib](https://github.com/DynamicalSystemsGroup/bdp-lib).
 
 **Contributors:**
-* [Michael Zargham](https://github.com/mzargham) — Project direction, GDS theory guidance, and technical review (BlockScience).
-* [Peter Hacker](https://github.com/phacker3) — Code auditing and review (BlockScience).
+* [Michael Zargham](https://github.com/mzargham) — Project direction, GDS theory guidance, and technical review (Dynamical Systems Group).
+* [Peter Hacker](https://github.com/phacker3) — Code auditing and review (Dynamical Systems Group).
 
 **Lineage:** Part of the [cadCAD](https://github.com/cadCAD-org/cadCAD) ecosystem for Complex Adaptive Dynamics.
 

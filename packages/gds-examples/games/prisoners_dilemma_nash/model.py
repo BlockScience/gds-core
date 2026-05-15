@@ -23,7 +23,7 @@ OGS Game Theory Decomposition:
         .feedback([payoff -> decisions])
 
 References:
-    - GitHub issue: https://github.com/BlockScience/gds-core/issues/77
+    - GitHub issue: https://github.com/DynamicalSystemsGroup/gds-core/issues/77
 """
 
 import re
