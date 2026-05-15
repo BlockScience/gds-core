@@ -69,4 +69,4 @@ See [Getting Started](getting-started.md) for a full walkthrough.
 
 ## Credits
 
-Built on [gds-framework](../framework/index.md) and [gds-sim](https://pypi.org/project/gds-sim/) by [Dynamical Systems Group](https://github.com/DynamicalSystemsGroup).
+Built on [gds-framework](../framework/index.md) and [gds-sim](https://pypi.org/project/gds-sim/) by [DynamicalSystemsGroup](https://dynamicalsystemsgroup.com).

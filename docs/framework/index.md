@@ -101,15 +101,15 @@ Blocks with bidirectional typed interfaces, composed via four operators (`>>`, `
 
 ## Credits
 
-**Author:** [Rohan Mehta](https://github.com/rororowyourboat) — [Dynamical Systems Group](https://github.com/DynamicalSystemsGroup)
+**Author:** [Rohan Mehta](https://github.com/rororowyourboat) — [DynamicalSystemsGroup](https://dynamicalsystemsgroup.com/)
 
-**Theoretical foundation:** [Dr. Michael Zargham](https://github.com/mzargham) and [Dr. Jamsheed Shorish](https://github.com/jshorish) — [Generalized Dynamical Systems, Part I: Foundations](https://blog.block.science/generalized-dynamical-systems-part-i-foundations-2/) (2021).
+**Theoretical foundation:** [Dr. Michael Zargham](https://github.com/mzargham) and [Dr. Jamsheed Shorish](https://github.com/jshorish) — [Generalized Dynamical Systems, Part I: Foundations](https://blog.dynamicalsystemsgroup.com/generalized-dynamical-systems-part-i-foundations-2/) (2021).
 
 **Architectural inspiration:** [Sean McOwen](https://github.com/SeanMcOwen) — [MSML](https://github.com/DynamicalSystemsGroup/MSML) and [bdp-lib](https://github.com/DynamicalSystemsGroup/bdp-lib).
 
 **Contributors:**
 
-* [Michael Zargham](https://github.com/mzargham) — Project direction, GDS theory guidance, and technical review (Dynamical Systems Group).
-* [Peter Hacker](https://github.com/phacker3) — Code auditing and review (Dynamical Systems Group).
+* [Michael Zargham](https://github.com/mzargham) — Project direction, GDS theory guidance, and technical review (DynamicalSystemsGroup).
+* [Peter Hacker](https://github.com/phacker3) — Code auditing and review (DynamicalSystemsGroup).
 
 **Lineage:** Part of the [cadCAD](https://github.com/cadCAD-org/cadCAD) ecosystem for Complex Adaptive Dynamics.

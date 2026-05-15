@@ -1,6 +1,6 @@
 # Crosswalk Problem
 
-**Mechanism design** — the canonical GDS example from Dynamical Systems Group.
+**Mechanism design** — the canonical GDS example from DynamicalSystemsGroup.
 
 A pedestrian decides whether to cross a one-way street while traffic evolves as a discrete Markov chain. A governance body chooses crosswalk placement to minimize accident probability.
 

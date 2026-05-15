@@ -1142,5 +1142,5 @@ This closes the loop: SysML v2 declares intent, GDS core verifies structure, the
 - KerML / SysML v2 Overview: https://sim4edu.com/reading/kerml-sysml/
 - GDS Theory: Roxin (1965), Zargham & Shorish (2020)
 - Epidemic Control as Resource Allocation: Preciado, Zargham, Enyioha, Jadbabaie & Pappas — "Optimal Resource Allocation for Control of Networked Epidemic Models" (2014).
-- MSML: Dynamical Systems Group
+- MSML: DynamicalSystemsGroup
 - Categorical Cybernetics: Ghani, Hedges et al.

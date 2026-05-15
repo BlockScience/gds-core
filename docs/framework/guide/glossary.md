@@ -20,6 +20,6 @@ GDS terminology mapped to framework concepts.
 ## Intellectual Lineage
 
 - **GDS formalism** (Roxin 1960s; [Zargham & Shorish 2022](https://doi.org/10.57938/e8d456ea-d975-4111-ac41-052ce73cb0cc)) — state transitions composed over arbitrary data structures
-- **MSML** (Dynamical Systems Group) — block roles, parameter tracking, typed transmission channels
+- **MSML** (DynamicalSystemsGroup) — block roles, parameter tracking, typed transmission channels
 - **BDP-lib** (Block Diagram Protocol) — abstract/concrete separation, structural validation
 - **Categorical cybernetics** (Ghani, Hedges et al.) — bidirectional composition with contravariant feedback

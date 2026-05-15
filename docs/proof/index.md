@@ -76,4 +76,4 @@ See [Getting Started](getting-started.md) for a full walkthrough.
 
 ## Credits
 
-Built on [gds-framework](../framework/index.md) and [SymPy](https://www.sympy.org/) by [Dynamical Systems Group](https://github.com/DynamicalSystemsGroup).
+Built on [gds-framework](../framework/index.md) and [SymPy](https://www.sympy.org/) by [DynamicalSystemsGroup](https://dynamicalsystemsgroup.com).

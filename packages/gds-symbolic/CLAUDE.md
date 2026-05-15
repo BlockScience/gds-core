@@ -16,6 +16,8 @@
 | `model.py` | `SymbolicControlModel(ControlModel)` — adds symbolic equations + validation |
 | `compile.py` | `compile_to_ode(model)` → `(ODEFunction, state_order)` via `parse_expr` + `lambdify` |
 | `linearize.py` | `linearize(model, x0, u0)` → `LinearizedSystem(A, B, C, D)` via Jacobians |
+| `transfer.py` | `ss_to_tf()`, `poles()`, `zeros()`, `controllability_matrix()`, `sensitivity()` (Gang of Six) |
+| `delay.py` | `pade_approximation()`, `delay_system()` — Padé time delay modeling |
 | `errors.py` | `SymbolicError(CSError)` — inherits control domain error hierarchy |
 
 ### Security
@@ -28,10 +30,25 @@ Expression parsing uses `sympy.parsing.sympy_parser.parse_expr` with a restricte
 - `sympy.Expr` (parsed) → R2, transient
 - Lambdified callable → R3, opaque
 
+### Transfer function analysis (`transfer.py`)
+
+Builds on `LinearizedSystem` (A, B, C, D as `list[list[float]]`):
+- `ss_to_tf(ls)` → `TransferFunctionMatrix` via adjugate/determinant method
+- `poles(tf)`, `zeros(tf)` → `list[complex]` via SymPy roots
+- `controllability_matrix(ls)`, `observability_matrix(ls)` → Kalman rank matrices
+- `sensitivity(plant, controller)` → Gang of Six: S, T, CS, PS, KS, KPS
+
+### Padé time delay (`delay.py`)
+
+- `pade_approximation(delay, order)` → all-pass `TransferFunction` approximating e^{-sτ}
+- `delay_system(tf, delay, order)` → cascaded TF with Padé delay
+
 ### Known limitations
 
 - Inputs resolved from constant `params` — no time-varying signals (see gds-continuous CLAUDE.md)
 - `compile()` and `compile_system()` remain structural — symbolic equations don't appear in GDSSpec
+- `poles()`/`zeros()` use SymPy's symbolic root finder — may return incomplete results for degree > 4
+- Transfer functions use the full characteristic polynomial as denominator (MIMO elements share the same denominator)
 
 ## Commands
 

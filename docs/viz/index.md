@@ -95,7 +95,7 @@ The six views exhaust what is **derivable from the GDS specification** `{h, X}`.
 
 ## Credits
 
-**Author:** [Rohan Mehta](https://github.com/rororowyourboat) — [Dynamical Systems Group](https://github.com/DynamicalSystemsGroup)
+**Author:** [Rohan Mehta](https://github.com/rororowyourboat) — [DynamicalSystemsGroup](https://dynamicalsystemsgroup.com/)
 
 **Theoretical foundation:** [Dr. Michael Zargham](https://github.com/mzargham) and [Dr. Jamsheed Shorish](https://github.com/jshorish)
 

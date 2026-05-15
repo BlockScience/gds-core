@@ -19,10 +19,28 @@ __all__ = [
 ]
 
 
+_PHASE_EXPORTS = {"phase_portrait"}
+
+_FREQUENCY_EXPORTS = {"bode_plot", "nyquist_plot", "nichols_plot", "root_locus_plot"}
+
+_RESPONSE_EXPORTS = {"step_response_plot", "impulse_response_plot", "compare_responses"}
+
+
 def __getattr__(name: str) -> object:
-    """Lazy import for optional phase portrait module."""
-    if name == "phase_portrait":
+    """Lazy import for optional visualization modules."""
+    if name in _PHASE_EXPORTS:
         from gds_viz.phase import phase_portrait
 
         return phase_portrait
+
+    if name in _FREQUENCY_EXPORTS:
+        from gds_viz import frequency
+
+        return getattr(frequency, name)
+
+    if name in _RESPONSE_EXPORTS:
+        from gds_viz import response
+
+        return getattr(response, name)
+
     raise AttributeError(f"module 'gds_viz' has no attribute {name!r}")
