@@ -39,7 +39,7 @@ class TestNamespaceURIs:
 
     def test_uriref_generation(self) -> None:
         block_uri = GDS_CORE["Block"]
-        assert str(block_uri) == "https://gds.block.science/ontology/core/Block"
+        assert str(block_uri) == "https://gds.dynamicalsystemsgroup.com/ontology/core/Block"
 
     def test_default_base_uri(self) -> None:
         assert DEFAULT_BASE_URI.startswith("https://")

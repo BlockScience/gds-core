@@ -3,12 +3,12 @@
 from rdflib import Namespace
 
 # Base namespace
-GDS = Namespace("https://gds.block.science/ontology/")
+GDS = Namespace("https://gds.dynamicalsystemsgroup.com/ontology/")
 
 # Sub-namespaces
-GDS_CORE = Namespace("https://gds.block.science/ontology/core/")
-GDS_IR = Namespace("https://gds.block.science/ontology/ir/")
-GDS_VERIF = Namespace("https://gds.block.science/ontology/verification/")
+GDS_CORE = Namespace("https://gds.dynamicalsystemsgroup.com/ontology/core/")
+GDS_IR = Namespace("https://gds.dynamicalsystemsgroup.com/ontology/ir/")
+GDS_VERIF = Namespace("https://gds.dynamicalsystemsgroup.com/ontology/verification/")
 
 # Standard prefix bindings for Turtle output
 PREFIXES: dict[str, Namespace] = {
@@ -19,4 +19,4 @@ PREFIXES: dict[str, Namespace] = {
 }
 
 # Default base URI for instance data
-DEFAULT_BASE_URI = "https://gds.block.science/instance/"
+DEFAULT_BASE_URI = "https://gds.dynamicalsystemsgroup.com/instance/"

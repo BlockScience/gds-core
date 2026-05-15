@@ -247,7 +247,7 @@ class TestSerializationFormats:
         g = spec_to_graph(thermostat_spec)
         nt = to_ntriples(g)
         assert isinstance(nt, str)
-        assert "gds.block.science" in nt
+        assert "gds.dynamicalsystemsgroup.com" in nt
 
     def test_spec_to_turtle_convenience(self, thermostat_spec: GDSSpec) -> None:
         ttl = spec_to_turtle(thermostat_spec)
