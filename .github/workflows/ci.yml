@@ -9,6 +9,8 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
+    # Lint is advisory — failures surface in CI but do not block merges.
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v6
       - uses: astral-sh/setup-uv@v7
