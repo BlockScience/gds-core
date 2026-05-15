@@ -34,9 +34,9 @@ scipy = ["scipy>=1.13", "numpy>=1.26"]
 pandas = ["pandas>=2.0"]
 
 [project.urls]
-Homepage = "https://github.com/BlockScience/gds-core"
-Repository = "https://github.com/BlockScience/gds-core"
-Documentation = "https://blockscience.github.io/gds-core"
+Homepage = "https://github.com/DynamicalSystemsGroup/gds-core"
+Repository = "https://github.com/DynamicalSystemsGroup/gds-core"
+Documentation = "https://dynamicalsystemsgroup.github.io/gds-core"
 
 [build-system]
 requires = ["hatchling"]
