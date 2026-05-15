@@ -65,4 +65,4 @@ See [Getting Started](getting-started.md) for a full walkthrough.
 
 ## Credits
 
-Built by [Dynamical Systems Group](https://github.com/DynamicalSystemsGroup).
+Built by [DynamicalSystemsGroup](https://dynamicalsystemsgroup.com).

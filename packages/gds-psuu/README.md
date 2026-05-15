@@ -166,4 +166,4 @@ Full docs at [dynamicalsystemsgroup.github.io/gds-core](https://dynamicalsystems
 
 ## License
 
-Apache-2.0 — [Dynamical Systems Group](https://github.com/DynamicalSystemsGroup)
+Apache-2.0 — [Dynamical Systems Group](https://www.dynamicalsystemsgroup.com)

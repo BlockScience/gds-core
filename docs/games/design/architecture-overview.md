@@ -41,7 +41,7 @@
 
 ## Ownership and Delivery
 
-All three packages are **developed by Dynamical Systems Group**. During delivery:
+All three packages are **developed by DynamicalSystemsGroup**. During delivery:
 
 - **GDS Framework** and **DSL packages** (like OGS) are made public and pip-installable
 - **Client repos** are delivered to the client team who can:
@@ -50,7 +50,7 @@ All three packages are **developed by Dynamical Systems Group**. During delivery
   - Build entirely new DSL packages on top of GDS
 
 ```
-              Dynamical Systems Group develops
+              DynamicalSystemsGroup develops
               ┌─────────────────────────────────┐
               │  gds-framework     (open source) │
               │  gds-games   (open source) │

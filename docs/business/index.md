@@ -121,4 +121,4 @@ Model lean manufacturing value streams with process steps, inventory buffers, an
 
 ## Credits
 
-Built on [gds-framework](../framework/index.md) by [Dynamical Systems Group](https://github.com/DynamicalSystemsGroup).
+Built on [gds-framework](../framework/index.md) by [DynamicalSystemsGroup](https://dynamicalsystemsgroup.com).
