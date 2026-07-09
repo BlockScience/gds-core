@@ -44,10 +44,17 @@ plugins:
         GDS (Generalized Dynamical Systems) is a typed compositional specification
         framework for complex systems. It provides a composition algebra (stack,
         parallel, feedback, loop), a 3-stage compiler to flat IR, and a verification
-        engine. Five domain DSLs (games, control, stock-flow, software, business)
-        compile to the same GDS IR, validating it as a universal transition calculus.
+        engine. Domain DSLs and runtime packages compile to or operate around the
+        same GDS IR, validating it as a universal transition calculus.
       full_output: llms-full.txt
       sections:
+        Packages:
+          - {packages/index.md: "Canonical package map — distribution names, import paths, roles, and user goals"}
+          - {packages/simulation-analysis.md: "How gds-framework, gds-analysis, gds-sim, gds-continuous, and PSUU fit together"}
+        Concepts:
+          - {concepts/index.md: "Cross-package conceptual map"}
+          - {concepts/specification-vs-execution.md: "Why typed GDS specifications are separate from executable simulation semantics"}
+          - {concepts/simulation-analysis-stack.md: "How the simulation and analysis packages fit together"}
         Framework (gds-framework):
           - {index.md: "Monorepo landing page — package overview, install, architecture"}
           - {framework/index.md: "Core engine — blocks, composition algebra, compiler, verification"}
@@ -55,39 +62,32 @@ plugins:
           - {framework/getting-started/install.md: "Installation for users and developers"}
           - {framework/getting-started/quickstart.md: "Build a thermostat spec in 5 minutes"}
           - framework/guide/*.md
-          - framework/api/*.md
         Visualization (gds-viz):
           - {viz/index.md: "Mermaid diagram renderers for GDS specifications"}
           - {viz/getting-started.md: "First diagram in 3 lines of code"}
           - viz/guide/*.md
-          - viz/api/*.md
         Games (gds-domains):
           - {games/index.md: "Typed DSL for compositional game theory (Open Games)"}
           - {games/getting-started.md: "Model a Prisoner's Dilemma game"}
           - {games/equilibrium.md: "Nash equilibrium computation via Nashpy"}
           - games/guide/*.md
           - games/design/*.md
-          - games/api/*.md
         Business (gds-domains):
           - {business/index.md: "Business dynamics DSL — CLD, supply chain, value stream map"}
           - {business/getting-started.md: "Model a causal loop diagram"}
           - business/guide/*.md
-          - business/api/*.md
         Stock-Flow (gds-domains):
           - {stockflow/index.md: "Declarative stock-flow DSL over GDS semantics"}
           - {stockflow/getting-started.md: "Model an SIR epidemic as stocks and flows"}
           - stockflow/guide/*.md
-          - stockflow/api/*.md
         Control (gds-domains):
           - {control/index.md: "State-space control systems DSL over GDS semantics"}
           - {control/getting-started.md: "Model a PID thermostat controller"}
           - control/guide/*.md
-          - control/api/*.md
         Software (gds-domains):
           - {software/index.md: "Software architecture DSL — DFD, state machine, C4, ERD, component, dependency"}
           - {software/getting-started.md: "Model a data flow diagram"}
           - software/guide/*.md
-          - software/api/*.md
         Examples:
           - {examples/index.md: "Six tutorial models demonstrating every framework feature"}
           - {examples/learning-path.md: "Recommended order for working through examples"}
@@ -99,6 +99,8 @@ plugins:
         Guides:
           - {guides/getting-started.md: "Build a thermostat model in 5 progressive stages"}
           - {guides/choosing-a-dsl.md: "Decision guide for picking the right DSL"}
+          - {guides/simulation.md: "Run a discrete-time model with gds-sim"}
+          - {guides/parameter-sweep.md: "Evaluate simulation models across parameter spaces with PSUU"}
           - {guides/best-practices.md: "Patterns and anti-patterns for GDS modeling"}
           - {guides/rosetta-stone.md: "Same problem modeled with stockflow, control, and games"}
           - {guides/verification.md: "All 3 verification layers with deliberately broken models"}
@@ -114,17 +116,14 @@ plugins:
           - {owl/index.md: "OWL/SHACL/SPARQL for GDS specifications — semantic web interoperability"}
           - {owl/getting-started.md: "Export a spec to Turtle, import back, validate with SHACL"}
           - owl/guide/*.md
-          - owl/api/*.md
         Simulation (gds-sim):
           - {sim/index.md: "Standalone discrete-time simulation runtime for GDS models"}
           - {sim/getting-started.md: "Define a model, run a simulation, inspect results"}
           - sim/guide/*.md
-          - sim/api/*.md
         PSUU (gds-analysis):
           - {psuu/index.md: "Parameter space search under uncertainty for gds-sim via gds_analysis.psuu"}
           - {psuu/getting-started.md: "Installation + first parameter sweep"}
           - psuu/guide/*.md
-          - psuu/api/*.md
         Continuous-Time (gds-continuous):
           - {continuous/index.md: "Continuous-time ODE integration engine — 6 SciPy solvers"}
           - {continuous/getting-started.md: "Define and simulate an ODE system"}
@@ -137,6 +136,18 @@ plugins:
         Analysis (gds-analysis):
           - {analysis/index.md: "Bridge GDSSpec structural annotations to gds-sim runtime"}
           - {analysis/getting-started.md: "Convert a GDSSpec to a runnable simulation model"}
+        API Reference:
+          - {api/index.md: "Guide to generated module, class, and function reference pages"}
+          - framework/api/*.md
+          - viz/api/*.md
+          - games/api/*.md
+          - business/api/*.md
+          - stockflow/api/*.md
+          - control/api/*.md
+          - software/api/*.md
+          - owl/api/*.md
+          - sim/api/*.md
+          - psuu/api/*.md
         Case Studies:
           - {case-studies/index.md: "Real-world projects built on the GDS ecosystem"}
           - {case-studies/axelrod.md: "Axelrod tournament — one model, many views with gds-domains, gds-sim, gds-analysis, gds-viz"}
@@ -151,6 +162,7 @@ plugins:
           - {framework/design/gds-deepdive.md: "GDS theory deep dive — formalism, MSML, BDP-lib synthesis"}
           - {framework/design/v0.2-design.md: "v0.2 architecture — parameter typing, canonical projection, tags"}
           - research/research-boundaries.md
+          - research/deep_research.md
           - research/paper-implementation-gap.md
           - research/semantic-web-summary.md
           - research/formal-representability.md
@@ -183,12 +195,105 @@ markdown_extensions:
 
 nav:
   - Home: index.md
+  - Packages:
+      - Overview: packages/index.md
+      - Simulation & Analysis: packages/simulation-analysis.md
+      - Foundation:
+          - gds-framework:
+              - Overview: framework/index.md
+              - Quick Reference: framework/quick-reference.md
+              - Installation: framework/getting-started/install.md
+              - Quick Start: framework/getting-started/quickstart.md
+              - Architecture: framework/guide/architecture.md
+              - Type System: framework/guide/types.md
+              - Spaces: framework/guide/spaces.md
+              - State & Entities: framework/guide/state.md
+              - Blocks & Roles: framework/guide/blocks.md
+              - Composition Algebra: framework/guide/composition.md
+              - Specification: framework/guide/spec.md
+              - Pipeline: framework/guide/pipeline.md
+              - Verification: framework/guide/verification.md
+              - Glossary: framework/guide/glossary.md
+          - gds-viz:
+              - Overview: viz/index.md
+              - Getting Started: viz/getting-started.md
+              - Views: viz/guide/views.md
+              - Theming: viz/guide/theming.md
+          - gds-interchange / OWL:
+              - Overview: owl/index.md
+              - Getting Started: owl/getting-started.md
+              - Representability: owl/guide/representability.md
+              - Formal Analysis: research/formal-representability.md
+          - gds-proof:
+              - Overview: proof/index.md
+              - Getting Started: proof/getting-started.md
+      - Domain DSLs:
+          - Stock-Flow:
+              - Overview: stockflow/index.md
+              - Getting Started: stockflow/getting-started.md
+              - Elements & GDS Mapping: stockflow/guide/elements.md
+              - Verification: stockflow/guide/verification.md
+          - Control:
+              - Overview: control/index.md
+              - Getting Started: control/getting-started.md
+              - Elements & GDS Mapping: control/guide/elements.md
+              - Verification: control/guide/verification.md
+          - Games:
+              - Overview: games/index.md
+              - Getting Started: games/getting-started.md
+              - Architecture: games/guide/architecture.md
+              - Game Types: games/guide/game-types.md
+              - Patterns & Composition: games/guide/patterns.md
+              - Verification: games/guide/verification.md
+              - Reports: games/guide/reports.md
+              - Visualization: games/guide/visualization.md
+              - CLI: games/guide/cli.md
+              - Equilibrium Analysis: games/equilibrium.md
+              - Architecture Overview: games/design/architecture-overview.md
+          - Software:
+              - Overview: software/index.md
+              - Getting Started: software/getting-started.md
+              - Diagram Types: software/guide/diagram-types.md
+              - Verification: software/guide/verification.md
+          - Business:
+              - Overview: business/index.md
+              - Getting Started: business/getting-started.md
+              - Diagram Types: business/guide/diagram-types.md
+              - Verification: business/guide/verification.md
+          - Symbolic Math:
+              - Overview: symbolic/index.md
+              - Getting Started: symbolic/getting-started.md
+      - Simulation Runtimes:
+          - gds-sim:
+              - Overview: sim/index.md
+              - Getting Started: sim/getting-started.md
+              - Model: sim/guide/model.md
+              - Execution: sim/guide/execution.md
+              - Results: sim/guide/results.md
+          - gds-continuous:
+              - Overview: continuous/index.md
+              - Getting Started: continuous/getting-started.md
+      - Analysis:
+          - gds-analysis:
+              - Overview: analysis/index.md
+              - Getting Started: analysis/getting-started.md
+          - PSUU:
+              - Overview: psuu/index.md
+              - Getting Started: psuu/getting-started.md
+              - Concepts: psuu/guide/concepts.md
+              - Parameter Spaces: psuu/guide/spaces.md
+              - Optimizers: psuu/guide/optimizers.md
+  - Concepts:
+      - Overview: concepts/index.md
+      - Specification vs Execution: concepts/specification-vs-execution.md
+      - Simulation and Analysis Stack: concepts/simulation-analysis-stack.md
   - Learn:
       - Start Here: tutorials/getting-started.md
       - Getting Started Guide: guides/getting-started.md
       - Choosing a DSL: guides/choosing-a-dsl.md
       - Rosetta Stone: guides/rosetta-stone.md
       - Learning Path: examples/learning-path.md
+      - Examples Overview: examples/index.md
       - Models:
           - SIR Epidemic: examples/examples/sir-epidemic.md
           - Thermostat PID: examples/examples/thermostat.md
@@ -200,72 +305,33 @@ nav:
       - Building Models: examples/building-models.md
       - Feature Matrix: examples/feature-matrix.md
   - How-To Guides:
+      - Simulation: guides/simulation.md
+      - Parameter Sweep: guides/parameter-sweep.md
       - Verification: guides/verification.md
       - Visualization: guides/visualization.md
       - Interoperability: guides/interoperability.md
       - Best Practices: guides/best-practices.md
       - Real-World Patterns: guides/real-world-patterns.md
       - Troubleshooting: guides/troubleshooting.md
-  - Reference:
-      - Framework:
-          - Overview: framework/index.md
-          - Quick Reference: framework/quick-reference.md
-          - Getting Started:
-              - Installation: framework/getting-started/install.md
-              - Quick Start: framework/getting-started/quickstart.md
-          - User Guide:
-              - Architecture: framework/guide/architecture.md
-              - Type System: framework/guide/types.md
-              - Spaces: framework/guide/spaces.md
-              - State & Entities: framework/guide/state.md
-              - Blocks & Roles: framework/guide/blocks.md
-              - Composition Algebra: framework/guide/composition.md
-              - Specification: framework/guide/spec.md
-              - Pipeline: framework/guide/pipeline.md
-              - Verification: framework/guide/verification.md
-              - Glossary: framework/guide/glossary.md
-          - API Reference:
-              - Overview: framework/api/index.md
-              - gds: framework/api/init.md
-              - gds.blocks: framework/api/blocks.md
-              - gds.types: framework/api/types.md
-              - gds.state: framework/api/state.md
-              - gds.spaces: framework/api/spaces.md
-              - gds.spec: framework/api/spec.md
-              - gds.canonical: framework/api/canonical.md
-              - gds.compiler: framework/api/compiler.md
-              - gds.ir: framework/api/ir.md
-              - gds.verification: framework/api/verification.md
-              - gds.query: framework/api/query.md
-              - gds.parameters: framework/api/parameters.md
-              - gds.serialize: framework/api/serialize.md
-      - Visualization:
-          - Overview: viz/index.md
-          - Getting Started: viz/getting-started.md
-          - User Guide:
-              - Views: viz/guide/views.md
-              - Theming: viz/guide/theming.md
-          - API Reference:
-              - gds_viz: viz/api/init.md
-              - gds_viz.canonical: viz/api/canonical.md
-              - gds_viz.architecture: viz/api/architecture.md
-              - gds_viz.traceability: viz/api/traceability.md
-              - gds_viz.mermaid: viz/api/mermaid.md
-      - Games:
-          - Overview: games/index.md
-          - Getting Started: games/getting-started.md
-          - User Guide:
-              - Architecture: games/guide/architecture.md
-              - Game Types: games/guide/game-types.md
-              - Patterns & Composition: games/guide/patterns.md
-              - Verification: games/guide/verification.md
-              - Reports: games/guide/reports.md
-              - Visualization: games/guide/visualization.md
-              - CLI: games/guide/cli.md
-              - Equilibrium Analysis: games/equilibrium.md
-          - Design:
-              - Architecture Overview: games/design/architecture-overview.md
-          - API Reference:
+  - API Reference:
+      - Overview: api/index.md
+      - Framework API:
+          - Overview: framework/api/index.md
+          - gds: framework/api/init.md
+          - gds.blocks: framework/api/blocks.md
+          - gds.types: framework/api/types.md
+          - gds.state: framework/api/state.md
+          - gds.spaces: framework/api/spaces.md
+          - gds.spec: framework/api/spec.md
+          - gds.canonical: framework/api/canonical.md
+          - gds.compiler: framework/api/compiler.md
+          - gds.ir: framework/api/ir.md
+          - gds.verification: framework/api/verification.md
+          - gds.query: framework/api/query.md
+          - gds.parameters: framework/api/parameters.md
+          - gds.serialize: framework/api/serialize.md
+      - Domain APIs:
+          - Games:
               - gds_domains.games: games/api/init.md
               - gds_domains.games.dsl.types: games/api/dsl-types.md
               - gds_domains.games.dsl.base: games/api/dsl-base.md
@@ -279,13 +345,7 @@ nav:
               - gds_domains.games.viz: games/api/viz.md
               - gds_domains.games.reports: games/api/reports.md
               - gds_domains.games.cli: games/api/cli.md
-      - Business:
-          - Overview: business/index.md
-          - Getting Started: business/getting-started.md
-          - User Guide:
-              - Diagram Types: business/guide/diagram-types.md
-              - Verification: business/guide/verification.md
-          - API Reference:
+          - Business:
               - Overview: business/api/index.md
               - gds_domains.business: business/api/init.md
               - gds_domains.business.common: business/api/common.md
@@ -302,39 +362,21 @@ nav:
               - gds_domains.business.vsm.compile: business/api/vsm-compile.md
               - gds_domains.business.vsm.checks: business/api/vsm-checks.md
               - gds_domains.business.verification: business/api/verification.md
-      - Stock-Flow:
-          - Overview: stockflow/index.md
-          - Getting Started: stockflow/getting-started.md
-          - User Guide:
-              - Elements & GDS Mapping: stockflow/guide/elements.md
-              - Verification: stockflow/guide/verification.md
-          - API Reference:
+          - Stock-Flow:
               - gds_domains.stockflow: stockflow/api/init.md
               - gds_domains.stockflow.dsl.elements: stockflow/api/elements.md
               - gds_domains.stockflow.dsl.model: stockflow/api/model.md
               - gds_domains.stockflow.dsl.compile: stockflow/api/compile.md
               - gds_domains.stockflow.verification.checks: stockflow/api/checks.md
               - gds_domains.stockflow.verification: stockflow/api/verification.md
-      - Control:
-          - Overview: control/index.md
-          - Getting Started: control/getting-started.md
-          - User Guide:
-              - Elements & GDS Mapping: control/guide/elements.md
-              - Verification: control/guide/verification.md
-          - API Reference:
+          - Control:
               - gds_domains.control: control/api/init.md
               - gds_domains.control.dsl.elements: control/api/elements.md
               - gds_domains.control.dsl.model: control/api/model.md
               - gds_domains.control.dsl.compile: control/api/compile.md
               - gds_domains.control.verification.checks: control/api/checks.md
               - gds_domains.control.verification: control/api/verification.md
-      - Software:
-          - Overview: software/index.md
-          - Getting Started: software/getting-started.md
-          - User Guide:
-              - Diagram Types: software/guide/diagram-types.md
-              - Verification: software/guide/verification.md
-          - API Reference:
+          - Software:
               - Overview: software/api/index.md
               - gds_domains.software: software/api/init.md
               - gds_domains.software.common: software/api/common.md
@@ -363,67 +405,41 @@ nav:
               - gds_domains.software.dependency.compile: software/api/dep-compile.md
               - gds_domains.software.dependency.checks: software/api/dep-checks.md
               - gds_domains.software.verification: software/api/verification.md
-      - OWL:
-          - Overview: owl/index.md
-          - Getting Started: owl/getting-started.md
-          - User Guide:
-              - Representability: owl/guide/representability.md
-              - Formal Analysis: research/formal-representability.md
-          - API Reference:
-              - gds_interchange.owl: owl/api/init.md
-              - gds_interchange.owl.ontology: owl/api/ontology.md
-              - gds_interchange.owl.export: owl/api/export.md
-              - gds_interchange.owl.import_: owl/api/import.md
-              - gds_interchange.owl.shacl: owl/api/shacl.md
-              - gds_interchange.owl.sparql: owl/api/sparql.md
-              - gds_interchange.owl.serialize: owl/api/serialize.md
-      - Simulation:
-          - Overview: sim/index.md
-          - Getting Started: sim/getting-started.md
-          - User Guide:
-              - Model: sim/guide/model.md
-              - Execution: sim/guide/execution.md
-              - Results: sim/guide/results.md
-          - API Reference:
-              - gds_sim: sim/api/init.md
-              - gds_sim.model: sim/api/model.md
-              - gds_sim.types: sim/api/types.md
-              - gds_sim.engine: sim/api/engine.md
-              - gds_sim.results: sim/api/results.md
-              - gds_sim.parallel: sim/api/parallel.md
-              - gds_sim.compat: sim/api/compat.md
-      - PSUU:
-          - Overview: psuu/index.md
-          - Getting Started: psuu/getting-started.md
-          - User Guide:
-              - Concepts: psuu/guide/concepts.md
-              - Parameter Spaces: psuu/guide/spaces.md
-              - Optimizers: psuu/guide/optimizers.md
-          - API Reference:
-              - gds_analysis.psuu: psuu/api/init.md
-              - gds_analysis.psuu.checks: psuu/api/checks.md
-              - gds_analysis.psuu.errors: psuu/api/errors.md
-              - gds_analysis.psuu.metric: psuu/api/metric.md
-              - gds_analysis.psuu.kpi: psuu/api/kpi.md
-              - gds_analysis.psuu.evaluation: psuu/api/evaluation.md
-              - gds_analysis.psuu.space: psuu/api/space.md
-              - gds_analysis.psuu.objective: psuu/api/objective.md
-              - gds_analysis.psuu.optimizers: psuu/api/optimizers.md
-              - gds_analysis.psuu.sensitivity: psuu/api/sensitivity.md
-              - gds_analysis.psuu.sweep: psuu/api/sweep.md
-              - gds_analysis.psuu.results: psuu/api/results.md
-      - Continuous-Time:
-          - Overview: continuous/index.md
-          - Getting Started: continuous/getting-started.md
-      - Symbolic Math:
-          - Overview: symbolic/index.md
-          - Getting Started: symbolic/getting-started.md
-      - Proof:
-          - Overview: proof/index.md
-          - Getting Started: proof/getting-started.md
-      - Analysis:
-          - Overview: analysis/index.md
-          - Getting Started: analysis/getting-started.md
+      - Visualization API:
+          - gds_viz: viz/api/init.md
+          - gds_viz.canonical: viz/api/canonical.md
+          - gds_viz.architecture: viz/api/architecture.md
+          - gds_viz.traceability: viz/api/traceability.md
+          - gds_viz.mermaid: viz/api/mermaid.md
+      - Interchange API:
+          - gds_interchange.owl: owl/api/init.md
+          - gds_interchange.owl.ontology: owl/api/ontology.md
+          - gds_interchange.owl.export: owl/api/export.md
+          - gds_interchange.owl.import_: owl/api/import.md
+          - gds_interchange.owl.shacl: owl/api/shacl.md
+          - gds_interchange.owl.sparql: owl/api/sparql.md
+          - gds_interchange.owl.serialize: owl/api/serialize.md
+      - Simulation API:
+          - gds_sim: sim/api/init.md
+          - gds_sim.model: sim/api/model.md
+          - gds_sim.types: sim/api/types.md
+          - gds_sim.engine: sim/api/engine.md
+          - gds_sim.results: sim/api/results.md
+          - gds_sim.parallel: sim/api/parallel.md
+          - gds_sim.compat: sim/api/compat.md
+      - Analysis API:
+          - gds_analysis.psuu: psuu/api/init.md
+          - gds_analysis.psuu.checks: psuu/api/checks.md
+          - gds_analysis.psuu.errors: psuu/api/errors.md
+          - gds_analysis.psuu.metric: psuu/api/metric.md
+          - gds_analysis.psuu.kpi: psuu/api/kpi.md
+          - gds_analysis.psuu.evaluation: psuu/api/evaluation.md
+          - gds_analysis.psuu.space: psuu/api/space.md
+          - gds_analysis.psuu.objective: psuu/api/objective.md
+          - gds_analysis.psuu.optimizers: psuu/api/optimizers.md
+          - gds_analysis.psuu.sensitivity: psuu/api/sensitivity.md
+          - gds_analysis.psuu.sweep: psuu/api/sweep.md
+          - gds_analysis.psuu.results: psuu/api/results.md
   - Case Studies:
       - case-studies/index.md
       - Axelrod Tournament: case-studies/axelrod.md
@@ -441,6 +457,7 @@ nav:
           - Entity Redesign Proposal: framework/design/proposals/entity-redesign.md
       - Research:
           - Research Boundaries: research/research-boundaries.md
+          - Deep Research Notes: research/deep_research.md
           - Paper Implementation Gap: research/paper-implementation-gap.md
           - Representation Gap: research/representation-gap.md
           - Semantic Web Integration: research/semantic-web-summary.md

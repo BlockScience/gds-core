@@ -6,6 +6,12 @@
 
 **Deterministic model identity and SymPy-based invariant proof verification for GDS models.**
 
+## Package Identity
+
+| Distribution | Import path | Purpose |
+|--------------|-------------|---------|
+| `gds-proof` | `gds_proof` | Symbolic invariant analysis, proof scripts, and deterministic model/proof hashing |
+
 ## What is this?
 
 `gds-proof` is a formal verification layer for the GDS ecosystem. It proves that system invariants are preserved across state transitions using symbolic implication analysis powered by SymPy.
@@ -17,6 +23,17 @@ Where `gds-analysis` answers "what happens when I simulate this?", `gds-proof` a
 - **`ProofBuilder` / `verify_proof()`** -- user-authored multi-lemma proof scripts for INCONCLUSIVE results
 - **`hash_model()` / `hash_proof()`** -- deterministic SHA-256 identity for models and proof scripts
 - **`GDSSymbolicBlock` / `GDSSymbolicModel`** -- adapters bridging GDS structural types to the proof engine
+
+## When to Use It
+
+Use this package when you need to:
+
+- Prove that symbolic invariants are preserved by model transitions.
+- Attach proof findings to a GDS verification report.
+- Hash models and proof scripts for reproducible audits.
+- Bridge a structural GDS specification to SymPy expressions.
+
+Use [`gds-analysis`](../analysis/index.md) when you want empirical or simulation-derived behavior. Use `gds-proof` when a property should be justified symbolically rather than observed through runs.
 
 ## Architecture
 
@@ -65,6 +82,12 @@ Proof results convert to `gds-framework` `Finding` objects via `findings.py`:
 | `PROOF-001` | Invariant preservation (symbolic analysis) |
 
 `Finding.exportable_predicate` is populated with the invariant's canonical SymPy form, making it available to the OWL/RDF exporter in `gds-interchange`.
+
+## Relationship to the Ecosystem
+
+`gds-proof` sits beside the simulation and analysis packages. It depends on [`gds-framework`](../framework/index.md) for model structure, can consume transition semantics supplied by domain packages, and produces verification findings that can be exported through [`gds-interchange`](../owl/index.md).
+
+It answers a different question than [`gds-sim`](../sim/index.md): simulation shows what happened for selected runs, while proof checks whether a stated invariant follows from symbolic transition semantics.
 
 ## Quick Start
 

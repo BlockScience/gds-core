@@ -6,6 +6,13 @@
 
 **OWL/Turtle, SHACL, and SPARQL for GDS specifications** — semantic web interoperability for compositional systems.
 
+## Package Identity
+
+| Distribution | Import path | Purpose |
+|--------------|-------------|---------|
+| `gds-interchange` | `gds_interchange.owl` | Current package for OWL/Turtle, SHACL, SPARQL, and RDF round-trip tooling |
+| `gds-owl` | `gds_interchange.owl` | Compatibility distribution and legacy documentation label |
+
 ## What is this?
 
 `gds-owl` exports GDS specifications to RDF/OWL and imports them back, enabling interoperability with semantic web tooling. It provides:
@@ -15,6 +22,17 @@
 - **SHACL shapes** — constraint validation on exported RDF graphs (structural + semantic)
 - **SPARQL queries** — pre-built query templates for common GDS analysis patterns
 - **Formal representability analysis** — documented classification of what survives the OWL boundary
+
+## When to Use It
+
+Use this package when you need to:
+
+- Export GDS specifications, compiled systems, or verification reports to RDF/Turtle.
+- Validate exported graphs with SHACL constraints.
+- Query GDS structures with SPARQL or load them into semantic-web infrastructure.
+- Document which parts of a model survive an OWL boundary and which remain Python behavior.
+
+Use [`gds-framework`](../framework/index.md) directly when you only need to build or verify models in Python. Use `gds-interchange` when those models need to move across semantic-web or RDF-based tooling.
 
 ## Architecture
 
@@ -65,6 +83,12 @@ The export/import cycle preserves all structural fields. Known lossy fields:
 | `system_ir_to_graph()` | `SystemIR` | RDF graph (ABox) |
 | `canonical_to_graph()` | `CanonicalGDS` | RDF graph (ABox) |
 | `report_to_graph()` | `VerificationReport` | RDF graph (ABox) |
+
+## Relationship to the Ecosystem
+
+`gds-owl` is the semantic interchange layer for GDS. It depends on `gds-framework` structures, consumes specifications and reports produced by the framework and proof packages, and emits RDF artifacts that can be inspected outside Python.
+
+It complements the execution packages rather than replacing them: [`gds-sim`](../sim/index.md) runs dynamics, [`gds-analysis`](../analysis/index.md) studies results, and `gds-owl` makes structural and verification artifacts portable.
 
 ## Installation
 

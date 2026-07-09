@@ -6,6 +6,13 @@
 
 **SymPy bridge for gds-control** -- symbolic state equations, automatic linearization, and ODE code generation.
 
+## Package Identity
+
+| Distribution | Import | Role |
+|---|---|---|
+| `gds-symbolic` | `gds_domains.symbolic` | SymPy bridge for `gds-control` models |
+| `gds-domains` | `gds_domains.symbolic` | Consolidated domain package distribution |
+
 ## What is this?
 
 `gds-symbolic` extends `gds-control`'s `ControlModel` with symbolic mathematics. Instead of writing numerical right-hand side functions by hand, you declare state and output equations as symbolic expressions and let the compiler do the rest.
@@ -15,6 +22,12 @@
 - **`compile_to_ode()`** -- lambdifies symbolic equations into a callable `ODEFunction` compatible with `gds-continuous`
 - **`linearize()`** -- computes Jacobian matrices (A, B, C, D) at an operating point
 - **Safe expression parsing** -- uses `sympy.parsing.sympy_parser.parse_expr`, never `eval`
+
+## When to Use It
+
+Use `gds-symbolic` when a control model's dynamics should be specified as
+symbolic equations and then linearized or compiled to ODE functions. Use
+`gds-control` alone when numerical callables are enough.
 
 ## Architecture
 
@@ -70,6 +83,12 @@ uv add "gds-symbolic[sympy]"
 ```
 
 See [Getting Started](getting-started.md) for a full walkthrough.
+
+## Relationship to the Ecosystem
+
+`gds-symbolic` sits between the control DSL and continuous-time simulation. It
+extends `gds-control` models with SymPy expressions and can produce ODE
+functions for `gds-continuous`.
 
 ## Credits
 

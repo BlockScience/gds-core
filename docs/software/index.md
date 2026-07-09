@@ -6,6 +6,13 @@
 
 **Software architecture DSL over GDS semantics** -- DFDs, state machines, component diagrams, C4 models, ERDs, and dependency graphs with formal verification.
 
+## Package Identity
+
+| Distribution | Import | Role |
+|---|---|---|
+| `gds-software` | `gds_domains.software` | Software architecture DSL over GDS semantics |
+| `gds-domains` | `gds_domains.software` | Consolidated domain package distribution |
+
 ## What is this?
 
 `gds-software` extends the GDS framework with software architecture vocabulary -- six diagram types commonly used in software engineering, each compiled to GDS specifications with structural verification. It provides:
@@ -15,6 +22,13 @@
 - **27 verification checks** -- Domain-specific structural validation across all diagram types
 - **Canonical decomposition** -- Validated h = f &#x2218; g projection for all diagram types
 - **Full GDS integration** -- All downstream tooling works immediately (canonical projection, semantic checks, gds-viz)
+
+## When to Use It
+
+Use `gds-software` when you need formalized software architecture diagrams such
+as DFDs, state machines, C4, ERD, component, or dependency views. Use
+`gds-framework` directly when you need custom GDS structures outside these
+diagram types.
 
 ## Architecture
 
@@ -63,6 +77,12 @@ uv add gds-software
 ```
 
 See [Getting Started](getting-started.md) for a full walkthrough.
+
+## Relationship to the Ecosystem
+
+`gds-software` is a domain DSL. It compiles software architecture declarations
+into GDS specifications so they can be structurally verified, visualized, and
+combined with the broader GDS tooling stack.
 
 ## Credits
 

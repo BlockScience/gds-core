@@ -6,6 +6,13 @@
 
 **State-space control DSL over GDS semantics** -- control theory with formal verification.
 
+## Package Identity
+
+| Distribution | Import | Role |
+|---|---|---|
+| `gds-control` | `gds_domains.control` | State-space control DSL over GDS semantics |
+| `gds-domains` | `gds_domains.control` | Consolidated domain package distribution |
+
 ## What is this?
 
 `gds-control` extends the GDS framework with control systems vocabulary -- states, inputs, sensors, and controllers. It provides:
@@ -15,6 +22,13 @@
 - **6 verification checks** -- Domain-specific structural validation (CS-001..CS-006)
 - **Canonical decomposition** -- Validated h = f &#x2218; g projection mapping directly to state-space representation
 - **Full GDS integration** -- All downstream tooling works immediately (canonical projection, semantic checks, gds-viz)
+
+## When to Use It
+
+Use `gds-control` when your system is best described with state-space control
+concepts: states, inputs, sensors, controllers, and plant dynamics. Use
+`gds-symbolic` when those dynamics should be declared symbolically and compiled
+to ODE functions.
 
 ## Architecture
 
@@ -89,6 +103,12 @@ uv add gds-control
 ```
 
 See [Getting Started](getting-started.md) for a full walkthrough.
+
+## Relationship to the Ecosystem
+
+`gds-control` is a domain DSL. It compiles control declarations into
+`gds-framework` specifications. `gds-symbolic` builds on this layer for symbolic
+equations, and `gds-continuous` can execute compiled ODE functions.
 
 ## Credits
 

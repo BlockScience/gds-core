@@ -4,7 +4,14 @@
 [![Python](https://img.shields.io/pypi/pyversions/gds-games)](https://pypi.org/project/gds-games/)
 [![License](https://img.shields.io/github/license/DynamicalSystemsGroup/gds-games)](https://github.com/DynamicalSystemsGroup/gds-games/blob/main/LICENSE)
 
-**Typed DSL for compositional game theory**, built on [gds-framework](https://dynamicalsystemsgroup.github.io/gds-framework).
+**Typed DSL for compositional game theory**, built on [gds-framework](../framework/index.md).
+
+## Package Identity
+
+| Distribution | Import | Role |
+|---|---|---|
+| `gds-games` | `gds_domains.games` | Compositional game theory and open-game patterns |
+| `gds-domains[games]` | `gds_domains.games` | Consolidated domain package extra |
 
 ## What is this?
 
@@ -17,6 +24,12 @@
 - **7 Markdown report templates** — System overview, verification summary, state machine, interface contracts, and more
 - **6 Mermaid diagram generators** — Structural, hierarchy, flow topology, architecture views
 - **CLI** — `ogs compile`, `ogs verify`, `ogs report`
+
+## When to Use It
+
+Use `gds-games` when your model is a strategic interaction, compositional game,
+or open-game pattern. Use other domain DSLs for physical state dynamics,
+software architecture, or business process models.
 
 ## Architecture
 
@@ -64,6 +77,12 @@ ir = compile_to_ir(pattern)
 report = verify(ir)
 print(f"{report.checks_passed}/{report.checks_total} checks passed")
 ```
+
+## Relationship to the Ecosystem
+
+`gds-games` is a domain DSL. It provides game-theoretic model vocabulary,
+verification, reports, and diagrams while preserving compatibility with the GDS
+composition and verification stack.
 
 ## Credits
 

@@ -10,8 +10,21 @@ GDS gives you a composition algebra for modeling complex systems — from epidem
 |---|---|
 | **[Start Here](tutorials/getting-started.md)** | New to GDS? Follow the hands-on tutorial to build your first model in minutes. |
 | **[Learning Path](examples/learning-path.md)** | Work through seven example models in recommended order, from simple to complex. |
-| **[Choosing a DSL](guides/choosing-a-dsl.md)** | Compare all seven domain DSLs and pick the right one for your problem. |
+| **[Choosing a DSL](guides/choosing-a-dsl.md)** | Compare the domain packages and pick the right one for your problem. |
 | **[Rosetta Stone](guides/rosetta-stone.md)** | See the same problem modeled with stockflow, control, and game theory DSLs side by side. |
+
+## What Do You Want To Do?
+
+| Goal | Start Here |
+|---|---|
+| Understand the package ecosystem | [Packages](packages/index.md) |
+| Define and verify a typed specification | [gds-framework](framework/index.md) |
+| Choose a domain-specific modeling language | [Choosing a DSL](guides/choosing-a-dsl.md) |
+| Render diagrams from a specification | [Visualization](viz/index.md) |
+| Run discrete-time simulations | [gds-sim](sim/index.md) |
+| Understand specification vs execution | [Concepts](concepts/specification-vs-execution.md) |
+| Bridge `GDSSpec` structures to runtime models | [gds-analysis](analysis/index.md) |
+| Sweep or optimize parameters | [Parameter Sweep](guides/parameter-sweep.md) |
 
 ## Interactive Notebooks
 
@@ -27,7 +40,8 @@ Key guides include embedded [marimo](https://marimo.io) notebooks — run code, 
 
 ## Packages
 
-Install just what you need: `uv add gds-core[control,continuous]`
+Install just what you need. See [Packages](packages/index.md) for distribution
+names, import paths, and how the pieces fit together.
 
 ### Structural Specification
 
@@ -123,7 +137,7 @@ assistants, agents, and LLMs:
 | **llms-full.txt** | [/llms-full.txt](https://dynamicalsystemsgroup.github.io/gds-core/llms-full.txt) | Full concatenated documentation — feed this to an LLM for complete context on the GDS ecosystem |
 
 **If you are an AI agent** working with gds-core, fetch `llms-full.txt` to get
-a comprehensive understanding of the framework's architecture, all 14 packages,
+a comprehensive understanding of the framework architecture, package ecosystem,
 the composition algebra, verification engine, and domain DSLs. The file follows
 the [llms.txt](https://llmstxt.org) standard and contains every documentation
 page in this site as plain Markdown.

@@ -6,6 +6,13 @@
 
 **Parameter space search under uncertainty** -- explore, evaluate, and optimize simulation parameters with Monte Carlo awareness.
 
+## Package Identity
+
+| Distribution | Import | Role |
+|---|---|---|
+| `gds-analysis` | `gds_analysis.psuu` | Canonical PSUU implementation |
+| `gds-psuu` | `gds_psuu` | Deprecated compatibility import path |
+
 ## What is this?
 
 `gds_analysis.psuu` bridges `gds-sim` simulations with systematic parameter exploration. It provides:
@@ -22,6 +29,12 @@
     The canonical import path is `gds_analysis.psuu`. The `gds-psuu` distribution
     remains as a compatibility package and re-exports this API via `gds_psuu`,
     but that import path emits a deprecation warning.
+
+## When to Use It
+
+Use PSUU when you have a simulation model and need to evaluate many parameter
+points, score KPI outcomes, optimize objectives, or run sensitivity analysis.
+Use `gds-sim` first when you only need to execute one model trajectory.
 
 ## Architecture
 
@@ -85,6 +98,12 @@ Optimizer.suggest()  -->  Evaluator.evaluate(params)  -->  Optimizer.observe(sco
 3. Each **KPI** extracts a per-run **Metric**, then **Aggregates** across runs into a single score
 4. The **Optimizer** observes the scores and decides what to try next
 
+## Relationship to the Ecosystem
+
+PSUU is the parameter-search layer of `gds-analysis`. It uses `gds-sim` as the
+runtime for evaluations and can validate parameter spaces against GDS parameter
+schemas when those schemas are available.
+
 ## Quick Start
 
 ```bash
@@ -93,6 +112,9 @@ uv add gds-analysis
 ```
 
 See [Getting Started](getting-started.md) for a full walkthrough.
+
+For a task-focused workflow, see the
+[Parameter Sweep how-to](../guides/parameter-sweep.md).
 
 ## Credits
 

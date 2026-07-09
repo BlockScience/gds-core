@@ -6,6 +6,13 @@
 
 **Declarative stock-flow DSL over GDS semantics** — system dynamics with formal verification.
 
+## Package Identity
+
+| Distribution | Import | Role |
+|---|---|---|
+| `gds-stockflow` | `gds_domains.stockflow` | Stock-flow DSL over GDS semantics |
+| `gds-domains` | `gds_domains.stockflow` | Consolidated domain package distribution |
+
 ## What is this?
 
 `gds-stockflow` extends the GDS framework with system dynamics vocabulary — stocks, flows, auxiliaries, and converters. It provides:
@@ -15,6 +22,12 @@
 - **5 verification checks** — Domain-specific structural validation (SF-001..SF-005)
 - **Canonical decomposition** — Validated h = f &#x2218; g projection with state-dominant accumulation
 - **Full GDS integration** — All downstream tooling works immediately (canonical projection, semantic checks, gds-viz)
+
+## When to Use It
+
+Use `gds-stockflow` when your model is naturally expressed as stocks, flows,
+auxiliaries, and converters. Use `gds-sim` or `gds-analysis` when you need to
+execute or analyze trajectories after the structure is defined.
 
 ## Architecture
 
@@ -78,6 +91,12 @@ uv add gds-stockflow
 ```
 
 See [Getting Started](getting-started.md) for a full walkthrough.
+
+## Relationship to the Ecosystem
+
+`gds-stockflow` is a domain DSL. It compiles stock-flow declarations into
+`gds-framework` specifications, which can then be verified, visualized with
+`gds-viz`, and connected to simulation workflows through `gds-analysis`.
 
 ## Credits
 

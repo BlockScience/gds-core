@@ -7,6 +7,12 @@
 
 **Typed compositional specifications for complex systems**, grounded in [Generalized Dynamical Systems](https://doi.org/10.57938/e8d456ea-d975-4111-ac41-052ce73cb0cc) theory (Zargham & Shorish, 2022).
 
+## Package Identity
+
+| Distribution | Import | Role |
+|---|---|---|
+| `gds-framework` | `gds` | Core specification, composition, compilation, and structural verification |
+
 ## What is this?
 
 `gds-framework` is a **foundation layer** for specifying dynamical systems as compositions of typed blocks. It provides the domain-neutral primitives — you bring the domain knowledge.
@@ -21,6 +27,10 @@ GDSSpec, verify()                       check_conservation(), check_stability()
 compile_system() → SystemIR             visualize(), simulate()
 ```
 
+`gds-framework` defines specifications and verifies their structure. It does not
+directly execute trajectories; simulation lives in separate runtime and analysis
+packages. See [Relationship to Simulation and Analysis](#relationship-to-simulation-and-analysis).
+
 A [Generalized Dynamical System](https://doi.org/10.57938/e8d456ea-d975-4111-ac41-052ce73cb0cc) is a pair **{h, X}** where **X** is a state space and **h: X → X** is a state transition map. The GDS canonical form decomposes **h** into a pipeline of typed blocks — observations, decisions, and state updates — that compose via wiring:
 
 | GDS concept | Paper notation | gds-framework |
@@ -32,6 +42,13 @@ A [Generalized Dynamical System](https://doi.org/10.57938/e8d456ea-d975-4111-ac4
 | Admissible input constraint | U: X → ℘(U) | `ControlAction` |
 | Transition map | h = f\|_x ∘ g | Composed wiring (`>>`) |
 | Trajectory | x₀, x₁, ... | Temporal loop (`.loop()`) |
+
+## When to Use It
+
+Use `gds-framework` when you need to define the structure of a system, verify
+typed composition, compile to GDS IR, or declare canonical GDS roles. Use a
+domain DSL when you want a more compact vocabulary for stock-flow, control,
+game, software, or business models.
 
 ## Quick Start
 
@@ -95,9 +112,29 @@ Blocks with bidirectional typed interfaces, composed via four operators (`>>`, `
 **Layer 2 — Specification Layer:**
 `TypeDef` with runtime constraints, typed `Space`s, `Entity` with `StateVariable`s, block roles (`BoundaryAction`, `Policy`, `Mechanism`, `ControlAction`), `GDSSpec` registry, `ParameterSchema` for configuration space Θ, `CanonicalGDS` projection deriving the formal h = f ∘ g decomposition, `Tagged` mixin for inert semantic annotations, semantic verification (completeness, determinism, reachability, type safety, parameter references, canonical wellformedness), `SpecQuery` for dependency analysis, and JSON serialization.
 
+## Relationship to Simulation and Analysis
+
+`gds-framework` is the specification and verification foundation. It defines
+typed blocks, interfaces, state spaces, parameters, canonical structure, and
+structural checks. Runtime behavior is handled by packages above or beside the
+framework:
+
+| Goal | Package |
+|---|---|
+| Run standalone discrete-time simulations | [`gds-sim`](../sim/index.md) |
+| Run continuous-time ODE simulations | [`gds-continuous`](../continuous/index.md) |
+| Bridge `GDSSpec` structures into simulation workflows | [`gds-analysis`](../analysis/index.md) |
+| Sweep parameters, optimize KPIs, and run sensitivity analysis | [`gds_analysis.psuu`](../psuu/index.md) |
+
+For the full package map, see [Packages](../packages/index.md). For the runtime
+path specifically, see [Simulation & Analysis](../packages/simulation-analysis.md).
+
 ## Status
 
-**v0.2.0 — Alpha.** Both layers are implemented and tested (347 tests, 99% coverage). The composition algebra and specification layer are stable. Domain packages and simulation execution are not yet built — `gds-framework` is the foundation they will build on.
+**Alpha.** The composition algebra and specification layer are implemented and
+tested. Domain DSLs, visualization, interchange, simulation, and analysis now
+live in separate packages in the GDS ecosystem; `gds-framework` remains the
+domain-neutral foundation they build on.
 
 ## Credits
 

@@ -6,6 +6,12 @@
 
 **Continuous-time ODE integration engine** -- the continuous-time counterpart to `gds-sim`.
 
+## Package Identity
+
+| Distribution | Import | Role |
+|---|---|---|
+| `gds-continuous` | `gds_continuous` | Standalone continuous-time ODE simulation runtime |
+
 ## What is this?
 
 `gds-continuous` provides an ODE simulation engine for continuous-time dynamical systems. It follows the same standalone architectural pattern as `gds-sim` -- minimal dependencies, Pydantic models, columnar results -- but integrates SciPy's ODE solvers instead of discrete timestep iteration.
@@ -15,6 +21,12 @@
 - **`ODEResults`** -- columnar storage of time series with named state access
 - **6 solver methods** -- `RK45`, `RK23`, `DOP853`, `Radau`, `BDF`, `LSODA` (all via `scipy.integrate.solve_ivp`)
 - **Zero GDS dependency** -- standalone package, same as `gds-sim`
+
+## When to Use It
+
+Use `gds-continuous` when your model is naturally expressed as an ODE system
+`dx/dt = f(t, x, params)`. Use `gds-sim` for discrete timestep models and
+`gds-analysis` when you need to bridge from a `GDSSpec` into runtime workflows.
 
 ## Architecture
 
@@ -43,6 +55,12 @@ scipy + numpy (optional deps)
 | **Dependencies** | pydantic only | pydantic + scipy + numpy |
 
 Both are standalone engines with no `gds-framework` dependency. They can be used independently or bridged via `gds-analysis`.
+
+## Relationship to the Ecosystem
+
+`gds-continuous` is the continuous-time runtime counterpart to `gds-sim`. It is
+part of the simulation and analysis layer, while `gds-framework` remains the
+structural specification layer.
 
 ## Solver Methods
 

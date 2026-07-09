@@ -6,6 +6,13 @@
 
 **Bridge from GDS structural specifications to runtime simulation and analysis.**
 
+## Package Identity
+
+| Distribution | Import | Role |
+|---|---|---|
+| `gds-analysis` | `gds_analysis` | Bridge from `GDSSpec` structures to simulation workflows and reachability analysis |
+| `gds-analysis` | `gds_analysis.psuu` | Parameter search under uncertainty subpackage |
+
 ## What is this?
 
 `gds-analysis` closes the gap between `gds-framework`'s structural annotations (AdmissibleInputConstraint, TransitionSignature) and `gds-sim`'s runtime engine. It provides the behavioral layer that turns verified specifications into executable models.
@@ -16,6 +23,13 @@
 - **`reachable_graph()`** -- returns the full state transition graph as an adjacency structure
 - **`configuration_space()`** -- finds the largest SCC of the reachability graph (Paper Def 4.2)
 - **`trajectory_distances()`** -- computes metric distances along a trajectory for convergence analysis
+
+## When to Use It
+
+Use `gds-analysis` when you start from a verified `GDSSpec` and need to connect
+that structural model to executable simulation components, reachability
+analysis, or trajectory metrics. Use `gds-sim` directly when you already have a
+plain runtime model and do not need the `GDSSpec` bridge.
 
 ## Architecture
 
@@ -59,6 +73,14 @@ GDS specifications are structural -- they declare *what* blocks exist, how they 
 
 `guarded_policy()` wraps a policy function so that `AdmissibleInputConstraint` predicates are checked at every timestep. If a constraint is violated, the guard invokes the fallback function or raises `ConstraintViolationError` with the failing constraint's name and the offending input values.
 
+## Relationship to the Ecosystem
+
+`gds-analysis` sits between specification and execution. It consumes
+`gds-framework` structures and produces or analyzes runtime behavior using
+packages such as `gds-sim`. Its `gds_analysis.psuu` subpackage builds on
+simulation results for parameter sweeps, KPI scoring, optimization, and
+sensitivity analysis.
+
 ## Quick Start
 
 ```bash
@@ -66,6 +88,9 @@ uv add gds-analysis
 ```
 
 See [Getting Started](getting-started.md) for a full walkthrough.
+
+For the broader package flow, see
+[Simulation and Analysis Stack](../concepts/simulation-analysis-stack.md).
 
 ## Credits
 

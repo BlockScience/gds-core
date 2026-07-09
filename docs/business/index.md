@@ -6,6 +6,13 @@
 
 **Business dynamics DSL over GDS semantics** — causal loop diagrams, supply chain networks, and value stream maps with formal verification.
 
+## Package Identity
+
+| Distribution | Import | Role |
+|---|---|---|
+| `gds-business` | `gds_domains.business` | Business dynamics DSL over GDS semantics |
+| `gds-domains` | `gds_domains.business` | Consolidated domain package distribution |
+
 ## What is this?
 
 `gds-business` extends the GDS framework with business dynamics vocabulary — system dynamics diagrams, supply chain modeling, and lean manufacturing analysis. It provides:
@@ -15,6 +22,12 @@
 - **11 verification checks** — Domain-specific structural validation (CLD-001..003, SCN-001..004, VSM-001..004)
 - **Canonical decomposition** — Validated h = f ∘ g projection across all three diagram types
 - **Full GDS integration** — All downstream tooling works immediately (canonical projection, semantic checks, gds-viz)
+
+## When to Use It
+
+Use `gds-business` when the model is a causal loop diagram, supply chain
+network, or value stream map. Use `gds-stockflow` for lower-level stock-flow
+system dynamics, and use `gds-software` for software architecture diagrams.
 
 ## Architecture
 
@@ -118,6 +131,12 @@ Model multi-echelon supply chains with inventory dynamics. Demand sources drive 
 ### Value Stream Maps (VSM)
 
 Model lean manufacturing value streams with process steps, inventory buffers, and material/information flows. Partially stateful — buffers add state when present.
+
+## Relationship to the Ecosystem
+
+`gds-business` is a domain DSL. It compiles business diagrams into
+`gds-framework` specifications, which makes the same verification,
+visualization, and analysis ecosystem available to business models.
 
 ## Credits
 

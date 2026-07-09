@@ -4,7 +4,26 @@
 [![Python](https://img.shields.io/pypi/pyversions/gds-viz)](https://pypi.org/project/gds-viz/)
 [![License](https://img.shields.io/github/license/DynamicalSystemsGroup/gds-viz)](https://github.com/DynamicalSystemsGroup/gds-viz/blob/main/LICENSE)
 
-**Mermaid diagram renderers** for [gds-framework](https://dynamicalsystemsgroup.github.io/gds-framework) specifications.
+**Mermaid diagram renderers** for [gds-framework](../framework/index.md) specifications.
+
+## Package Identity
+
+| Distribution | Import | Role |
+|---|---|---|
+| `gds-viz` | `gds_viz` | Visual projections of GDS specifications and IR |
+
+## What is this?
+
+`gds-viz` renders different projections of GDS specifications as Mermaid
+diagrams. It is a visualization layer: it reads `SystemIR`, `GDSSpec`,
+`CanonicalGDS`, and related structures, then produces diagrams for inspection,
+documentation, and review.
+
+## When to Use It
+
+Use `gds-viz` when you want to inspect model structure, canonical GDS
+decomposition, parameter influence, or traceability. Use runtime packages such
+as `gds-sim` when you need trajectories rather than diagrams.
 
 ## Six Views
 
@@ -92,6 +111,12 @@ The six views exhaust what is **derivable from the GDS specification** `{h, X}`.
 
 - **State Machine View** — requires discrete states and transition guards. GDS defines a continuous state space X, not a finite set of named states.
 - **Simulation / Execution Order View** — requires operational semantics. GDS specifies structure, not runtime.
+
+## Relationship to the Ecosystem
+
+`gds-viz` sits beside `gds-framework` as a tooling package. It visualizes
+structural specifications and compiled IR, while simulation and behavioral
+analysis live in `gds-sim`, `gds-continuous`, and `gds-analysis`.
 
 ## Credits
 
