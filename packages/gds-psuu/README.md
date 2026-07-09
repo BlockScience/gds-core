@@ -4,25 +4,35 @@
 [![Python](https://img.shields.io/pypi/pyversions/gds-psuu)](https://pypi.org/project/gds-psuu/)
 [![License](https://img.shields.io/github/license/DynamicalSystemsGroup/gds-core)](https://github.com/DynamicalSystemsGroup/gds-core/blob/main/LICENSE)
 
-**Parameter space search under uncertainty** — explore, evaluate, and optimize simulation parameters with Monte Carlo awareness.
+**Compatibility package for PSUU.**
 
-Built on top of [gds-sim](../gds-sim/), `gds-psuu` provides a search engine for intelligently exploring simulation parameter spaces to optimize KPIs.
+The canonical PSUU implementation now lives in `gds_analysis.psuu`. This
+package remains as a compatibility distribution that re-exports that API from
+`gds_psuu`, but importing `gds_psuu` emits a `DeprecationWarning`.
+
+New code should install `gds-analysis` and import from `gds_analysis.psuu`.
 
 ## Install
 
 ```bash
-uv add gds-psuu
-# or: pip install gds-psuu
+uv add gds-analysis
+# or: pip install gds-analysis
 
 # For Bayesian optimization (optional):
-uv add "gds-psuu[bayesian]"
+uv add "gds-analysis[psuu]"
+```
+
+Compatibility install:
+
+```bash
+uv add gds-psuu
 ```
 
 ## Quick Start
 
 ```python
 from gds_sim import Model, StateUpdateBlock
-from gds_psuu import (
+from gds_analysis.psuu import (
     KPI, Continuous, GridSearchOptimizer,
     ParameterSpace, Sweep, final_value, mean_agg,
 )
@@ -55,12 +65,15 @@ print(f"Best growth_rate: {best.params['growth_rate']:.3f}")
 
 ## Features
 
+Compatibility imports from `gds_psuu` still work for existing code, but they are
+deprecated. Prefer `from gds_analysis.psuu import ...` in new code.
+
 ### Composable KPIs
 
 **Metric** (per-run scalar) + **Aggregation** (cross-run reducer) = **KPI**:
 
 ```python
-from gds_psuu import (
+from gds_analysis.psuu import (
     KPI, final_value, trajectory_mean, max_value, min_value,
     mean_agg, std_agg, percentile_agg, probability_above, probability_below,
 )
@@ -82,7 +95,7 @@ Per-run distributions are tracked in `EvaluationResult.distributions` for downst
 Three dimension types with validation:
 
 ```python
-from gds_psuu import Continuous, Integer, Discrete, ParameterSpace
+from gds_analysis.psuu import Continuous, Integer, Discrete, ParameterSpace
 
 space = ParameterSpace(params={
     "learning_rate": Continuous(min_val=0.001, max_val=0.1),
@@ -96,7 +109,7 @@ space = ParameterSpace(params={
 Define feasible regions with linear or functional constraints:
 
 ```python
-from gds_psuu import LinearConstraint, FunctionalConstraint
+from gds_analysis.psuu import LinearConstraint, FunctionalConstraint
 
 # x + y <= 1.0
 LinearConstraint(coefficients={"x": 1.0, "y": 1.0}, bound=1.0)
@@ -113,14 +126,14 @@ Grid search filters infeasible points; random search uses rejection sampling.
 |-----------|----------|-------------|
 | `GridSearchOptimizer(n_steps)` | Exhaustive grid | 1-2 dimensions, full coverage |
 | `RandomSearchOptimizer(n_samples, seed)` | Uniform random | Higher dimensions, exploration |
-| `BayesianOptimizer(n_calls, target_kpi)` | Gaussian process (optuna) | Expensive sims, optimization |
+| `BayesianOptimizer(n_trials, target_kpi)` | Optuna TPE search | Expensive sims, optimization |
 
 ### Composable Objectives
 
 Multi-KPI optimization:
 
 ```python
-from gds_psuu import SingleKPI, WeightedSum
+from gds_analysis.psuu import SingleKPI, WeightedSum
 
 # Single KPI (maximize or minimize)
 obj = SingleKPI(name="avg_pop", maximize=True)
@@ -136,14 +149,14 @@ results.best_by_objective(obj)
 Screen parameter importance before running expensive sweeps:
 
 ```python
-from gds_psuu import OATAnalyzer, MorrisAnalyzer
+from gds_analysis.psuu import OATAnalyzer, MorrisAnalyzer
 
 # One-at-a-time: vary each parameter independently
-oat = OATAnalyzer(n_steps=5)
+oat = OATAnalyzer(n_levels=5)
 result = oat.analyze(evaluator, space)
 
 # Morris method: elementary effects (mu_star = influence, sigma = nonlinearity)
-morris = MorrisAnalyzer(r=10, levels=4)
+morris = MorrisAnalyzer(r=10, n_levels=4)
 result = morris.analyze(evaluator, space)
 
 result.ranking("my_kpi")  # parameters sorted by importance

@@ -1,20 +1,27 @@
-# gds-psuu
+# PSUU
 
-[![PyPI](https://img.shields.io/pypi/v/gds-psuu)](https://pypi.org/project/gds-psuu/)
-[![Python](https://img.shields.io/pypi/pyversions/gds-psuu)](https://pypi.org/project/gds-psuu/)
+[![PyPI](https://img.shields.io/pypi/v/gds-analysis)](https://pypi.org/project/gds-analysis/)
+[![Python](https://img.shields.io/pypi/pyversions/gds-analysis)](https://pypi.org/project/gds-analysis/)
 [![License](https://img.shields.io/github/license/DynamicalSystemsGroup/gds-core)](https://github.com/DynamicalSystemsGroup/gds-core/blob/main/LICENSE)
 
 **Parameter space search under uncertainty** -- explore, evaluate, and optimize simulation parameters with Monte Carlo awareness.
 
 ## What is this?
 
-`gds-psuu` bridges `gds-sim` simulations with systematic parameter exploration. It provides:
+`gds_analysis.psuu` bridges `gds-sim` simulations with systematic parameter exploration. It provides:
 
 - **Parameter spaces** -- `Continuous`, `Integer`, and `Discrete` dimensions with validation
+- **Feasibility constraints** -- linear and functional constraints over parameter points
 - **Composable KPIs** -- `Metric` (per-run scalar) + `Aggregation` (cross-run reducer) = `KPI`
-- **3 search strategies** -- Grid, Random, and Bayesian (optuna) optimizers
+- **3 search strategies** -- Grid, Random, and Bayesian/Optuna optimizers
 - **Monte Carlo awareness** -- per-run distributions tracked alongside aggregated scores
-- **Zero mandatory dependencies** beyond `gds-sim` and `pydantic`
+- **Objectives and sensitivity** -- multi-KPI scoring, OAT, and Morris screening
+- **Schema compatibility checks** -- validate sweep spaces against GDS parameter schemas
+
+!!! note "Package naming"
+    The canonical import path is `gds_analysis.psuu`. The `gds-psuu` distribution
+    remains as a compatibility package and re-exports this API via `gds_psuu`,
+    but that import path emits a deprecation warning.
 
 ## Architecture
 
@@ -24,7 +31,7 @@ gds-sim (pip install gds-sim)
 |  Simulation engine: Model, StateUpdateBlock,
 |  Simulation, Results (columnar storage).
 |
-+-- gds-psuu (pip install gds-analysis[psuu])
++-- gds-analysis.psuu (pip install gds-analysis)
     |
     |  Parameter search: ParameterSpace, Metric, Aggregation,
     |  KPI, Evaluator, Sweep, Optimizer.
@@ -81,8 +88,8 @@ Optimizer.suggest()  -->  Evaluator.evaluate(params)  -->  Optimizer.observe(sco
 ## Quick Start
 
 ```bash
-uv add gds-psuu
-# or: pip install gds-analysis[psuu]
+uv add gds-analysis
+# or: pip install gds-analysis
 ```
 
 See [Getting Started](getting-started.md) for a full walkthrough.

@@ -3,15 +3,15 @@
 ## Installation
 
 ```bash
-uv add gds-psuu
-# or: pip install gds-analysis[psuu]
+uv add gds-analysis
+# or: pip install gds-analysis
 ```
 
 For Bayesian optimization (optional):
 
 ```bash
-uv add "gds-psuu[bayesian]"
-# or: pip install gds-analysis[psuu][bayesian]
+uv add "gds-analysis[psuu]"
+# or: pip install "gds-analysis[psuu]"
 ```
 
 For development (monorepo):
@@ -153,12 +153,12 @@ grid = GridSearchOptimizer(n_steps=10)  # 10 points per continuous dim
 rand = RandomSearchOptimizer(n_samples=50, seed=42)
 ```
 
-For Bayesian optimization (requires `gds-psuu[bayesian]`):
+For Bayesian optimization (requires `gds-analysis[psuu]`):
 
 ```python
 from gds_analysis.psuu.optimizers.bayesian import BayesianOptimizer
 
-bayes = BayesianOptimizer(n_calls=30, target_kpi="avg_final_pop", seed=42)
+bayes = BayesianOptimizer(n_trials=30, target_kpi="avg_final_pop", seed=42)
 ```
 
 ## Legacy KPI Support
@@ -173,6 +173,33 @@ kpi = KPI(name="pop", fn=lambda r: final_state_mean(r, "population"))
 ```
 
 Legacy KPIs don't track per-run distributions -- use metric-based KPIs for full Monte Carlo awareness.
+
+## Objectives
+
+Use objectives when selecting the best evaluation from multiple KPI scores:
+
+```python
+from gds_analysis.psuu import SingleKPI, WeightedSum
+
+best_growth = results.best_by_objective(SingleKPI(name="avg_final_pop"))
+balanced = results.best_by_objective(
+    WeightedSum(weights={"avg_final_pop": 1.0, "risk": -0.5})
+)
+```
+
+## Sensitivity Analysis
+
+Sensitivity analyzers run an `Evaluator` over structured parameter variations
+before or after a full sweep:
+
+```python
+from gds_analysis.psuu import Evaluator, OATAnalyzer
+
+evaluator = Evaluator(base_model=model, kpis=kpis, timesteps=10, runs=3)
+sensitivity = OATAnalyzer(n_levels=4).analyze(evaluator, space)
+
+print(sensitivity.ranking("avg_final_pop"))
+```
 
 ## Next Steps
 

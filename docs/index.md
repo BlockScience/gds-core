@@ -52,10 +52,10 @@ Install just what you need: `uv add gds-core[control,continuous]`
 
 | Package | Import | Description |
 |---|---|---|
-| [`gds-sim`](https://pypi.org/project/gds-sim/) | `gds_sim` | Discrete-time simulation engine (standalone) |
+| [`gds-sim`](sim/index.md) | `gds_sim` | Discrete-time simulation engine (standalone) |
 | [`gds-continuous`](continuous/index.md) | `gds_continuous` | Continuous-time ODE engine `[scipy]` |
 | [`gds-analysis`](analysis/index.md) | `gds_analysis` | GDSSpec-to-gds-sim bridge, reachability |
-| [`gds-analysis[psuu]`](psuu/index.md) | `gds_analysis.psuu` | Parameter sweep + Optuna optimization |
+| [`gds-analysis.psuu`](psuu/index.md) | `gds_analysis.psuu` | Parameter sweeps, KPIs, Optuna optimization, sensitivity |
 
 ### Tutorials
 

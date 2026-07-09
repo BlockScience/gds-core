@@ -103,6 +103,36 @@ For the example above: `5 * 113 * 2 = 1130` points.
 
 ---
 
+## Constraints
+
+Constraints restrict the feasible region within a parameter space.
+
+```python
+from gds_analysis.psuu import (
+    Continuous,
+    FunctionalConstraint,
+    LinearConstraint,
+    ParameterSpace,
+)
+
+space = ParameterSpace(
+    params={
+        "x": Continuous(min_val=0.0, max_val=1.0),
+        "y": Continuous(min_val=0.0, max_val=1.0),
+    },
+    constraints=(
+        LinearConstraint(coefficients={"x": 1.0, "y": 1.0}, bound=1.0),
+        FunctionalConstraint(fn=lambda point: point["x"] >= point["y"]),
+    ),
+)
+```
+
+`GridSearchOptimizer` evaluates only feasible grid points.
+`RandomSearchOptimizer` samples until it finds feasible points or reaches its
+retry limit.
+
+---
+
 ## Connecting to GDS Parameter Schema
 
 When your system has a `GDSSpec` with a `ParameterSchema` (the declared parameter space, theta), you can connect it to the sweep so that the optimizer never silently explores values outside declared bounds or type constraints.
@@ -182,4 +212,4 @@ sweep.run()  # raises ValueError if space violates schema
 ```
 
 !!! note
-    The `parameter_schema` field is optional. If omitted, no validation is performed and the sweep runs as before. Install `gds-framework` (or use the `validation` extra: `pip install gds-analysis[psuu][validation]`) to use these features.
+    The `parameter_schema` field is optional. If omitted, no validation is performed and the sweep runs as before.

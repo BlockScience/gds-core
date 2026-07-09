@@ -21,12 +21,12 @@ Pipeline (Python)                    Site (Vite/JavaScript)
 ┌──────────────────────┐            ┌──────────────────────────┐
 │  OGS game definition │──export──→ │  Canvas Petri dish viz   │
 │  gds-sim population  │  (JSON)    │  Mermaid diagrams        │
-│  gds-psuu sweeps     │            │  Narrative chapters      │
+│  PSUU sweeps         │            │  Narrative chapters      │
 │  Nash/dominance calc  │            │  Pyodide PSUU sandbox   │
 └──────────────────────┘            └──────────────────────────┘
 ```
 
-**Pipeline**: Python data generation using `gds-games`, `gds-sim`, `gds-psuu`, and `gds-viz`. Produces JSON artifacts consumed by the frontend.
+**Pipeline**: Python data generation using `gds-games`, `gds-sim`, `gds_analysis.psuu`, and `gds-viz`. Produces JSON artifacts consumed by the frontend.
 
 **Site**: Vite-based JavaScript frontend with Canvas rendering, responsive chapter navigation, and browser-side Python execution via Pyodide.
 
@@ -41,7 +41,7 @@ Each page presents the same underlying Prisoner's Dilemma model through a differ
 | **Visualizations** | Mermaid diagrams across 6 view types | `gds-viz` on `SystemIR` |
 | **Simulation** | Population trajectory tracking over generations | `gds-sim` |
 | **Nash Analysis** | Equilibria and dominance calculations | `PatternIR` from `gds-games` |
-| **PSUU** | Interactive parameter space exploration | `gds-psuu` via Pyodide |
+| **PSUU** | Interactive parameter space exploration | `gds_analysis.psuu` via Pyodide |
 
 ## GDS Ecosystem Integration
 
@@ -69,7 +69,7 @@ Each analytical tool is a thin projection over the specification:
 
 ### Browser-Side Computation
 
-The PSUU page compiles Python (gds-sim + gds-psuu) to WebAssembly via Pyodide, enabling interactive parameter exploration without a backend server.
+The PSUU page compiles Python (`gds-sim` + `gds_analysis.psuu`) to WebAssembly via Pyodide, enabling interactive parameter exploration without a backend server.
 
 ## Related
 

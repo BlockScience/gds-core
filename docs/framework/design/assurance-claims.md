@@ -141,7 +141,7 @@ what evidence is needed and which layer of the ecosystem is responsible.
 | Safety | Behavioral predicates on reachable states | Future T2-2 + gds-analysis |
 | Liveness | Temporal logic model checking or bounded simulation | Future (not planned) |
 | Convergence | Fixed-point analysis or bounded iteration testing | Domain-specific |
-| Optimality | Objective function evaluation over trajectories | Domain-specific + gds-psuu |
+| Optimality | Objective function evaluation over trajectories | Domain-specific + gds_analysis.psuu |
 | Adequacy | Domain expert review, physical testing | Outside framework scope |
 
 The key takeaway: passing all 16 checks (G-001..G-006, SC-001..SC-010)

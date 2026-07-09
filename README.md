@@ -15,8 +15,9 @@ Monorepo for the **Generalized Dynamical Systems** ecosystem — typed compositi
 | [gds-stockflow](packages/gds-stockflow/) | [![PyPI](https://img.shields.io/pypi/v/gds-stockflow)](https://pypi.org/project/gds-stockflow/) | Declarative stock-flow DSL over GDS semantics |
 | [gds-control](packages/gds-control/) | [![PyPI](https://img.shields.io/pypi/v/gds-control)](https://pypi.org/project/gds-control/) | State-space control DSL over GDS semantics |
 | [gds-software](packages/gds-software/) | [![PyPI](https://img.shields.io/pypi/v/gds-software)](https://pypi.org/project/gds-software/) | Software architecture DSL (DFD, SM, C4, ERD, Dependency) |
-| [gds-sim](packages/gds-sim/) | [![PyPI](https://img.shields.io/pypi/v/gds-sim)](https://pypi.org/project/gds-sim/) | Simulation engine for GDS models |
-| [gds-psuu](packages/gds-psuu/) | [![PyPI](https://img.shields.io/pypi/v/gds-psuu)](https://pypi.org/project/gds-psuu/) | Parameter search under uncertainty — composable KPIs, constraints, sensitivity analysis |
+| [gds-sim](packages/gds-sim/) | [![PyPI](https://img.shields.io/pypi/v/gds-sim)](https://pypi.org/project/gds-sim/) | Standalone discrete-time simulation engine for GDS models |
+| [gds-analysis](packages/gds-analysis/) | [![PyPI](https://img.shields.io/pypi/v/gds-analysis)](https://pypi.org/project/gds-analysis/) | GDSSpec-to-simulation bridge, reachability, and `gds_analysis.psuu` parameter search |
+| [gds-psuu](packages/gds-psuu/) | [![PyPI](https://img.shields.io/pypi/v/gds-psuu)](https://pypi.org/project/gds-psuu/) | Deprecated compatibility package re-exporting `gds_analysis.psuu` |
 | [gds-examples](packages/gds-examples/) | [![PyPI](https://img.shields.io/pypi/v/gds-examples)](https://pypi.org/project/gds-examples/) | Tutorial models demonstrating framework features |
 
 ## Quick Start
@@ -31,7 +32,7 @@ uv sync --all-packages
 uv run --package gds-framework pytest packages/gds-framework/tests -v
 
 # Run all tests
-uv run --package gds-framework pytest packages/gds-framework/tests packages/gds-viz/tests packages/gds-games/tests packages/gds-stockflow/tests packages/gds-control/tests packages/gds-software/tests packages/gds-sim/tests packages/gds-psuu/tests packages/gds-examples -v
+uv run --package gds-framework pytest packages/gds-framework/tests packages/gds-viz/tests packages/gds-games/tests packages/gds-stockflow/tests packages/gds-control/tests packages/gds-software/tests packages/gds-sim/tests packages/gds-analysis/tests packages/gds-psuu/tests packages/gds-examples -v
 
 # Lint & format
 uv run ruff check packages/
@@ -40,7 +41,7 @@ uv run ruff format --check packages/
 
 ## Development
 
-This is a [uv workspace](https://docs.astral.sh/uv/concepts/workspaces/) monorepo. All nine packages are developed together with shared tooling:
+This is a [uv workspace](https://docs.astral.sh/uv/concepts/workspaces/) monorepo. All packages are developed together with shared tooling:
 
 - **Linting/formatting**: Ruff (configured at root, line-length 88)
 - **Testing**: pytest per-package

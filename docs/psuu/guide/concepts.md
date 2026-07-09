@@ -1,6 +1,6 @@
 # Concepts
 
-This page explains the core abstractions in `gds-psuu` and how they compose.
+This page explains the core abstractions in `gds_analysis.psuu` and how they compose.
 
 ## The Hierarchy
 
@@ -33,6 +33,23 @@ space = ParameterSpace(params={
 ```
 
 Validation enforces `min_val < max_val` and at least one parameter.
+
+Parameter spaces can also carry feasibility constraints. Grid search filters
+infeasible points; random search uses rejection sampling.
+
+```python
+from gds_analysis.psuu import Continuous, LinearConstraint, ParameterSpace
+
+space = ParameterSpace(
+    params={
+        "x": Continuous(min_val=0.0, max_val=1.0),
+        "y": Continuous(min_val=0.0, max_val=1.0),
+    },
+    constraints=(
+        LinearConstraint(coefficients={"x": 1.0, "y": 1.0}, bound=1.0),
+    ),
+)
+```
 
 ---
 
@@ -173,7 +190,7 @@ An `Optimizer` implements the suggest/observe loop:
 |-----------|----------|-------------|
 | `GridSearchOptimizer(n_steps)` | Exhaustive cartesian product | 1-2 dimensions, need full coverage |
 | `RandomSearchOptimizer(n_samples, seed)` | Uniform random sampling | Higher dimensions, exploration |
-| `BayesianOptimizer(n_calls, target_kpi)` | Gaussian process surrogate | Expensive evaluations, optimization |
+| `BayesianOptimizer(n_trials, target_kpi)` | Optuna TPE search | Expensive evaluations, optimization |
 
 All optimizers implement the same interface:
 
@@ -212,4 +229,30 @@ results.evaluations       # list[EvaluationResult] -- all evaluations
 results.summaries         # list[EvaluationSummary] -- params + scores only
 results.best("kpi_name")  # best evaluation for a KPI
 results.to_dataframe()    # pandas DataFrame (requires pandas)
+```
+
+## Objectives
+
+Objectives reduce multiple KPI scores to one scalar for best-result selection.
+
+```python
+from gds_analysis.psuu import SingleKPI, WeightedSum
+
+results.best_by_objective(SingleKPI(name="profit", maximize=True))
+results.best_by_objective(WeightedSum(weights={"profit": 1.0, "risk": -0.5}))
+```
+
+## Sensitivity Analysis
+
+Sensitivity analyzers evaluate how much parameters influence KPI scores.
+
+```python
+from gds_analysis.psuu import Evaluator, MorrisAnalyzer, OATAnalyzer
+
+evaluator = Evaluator(base_model=model, kpis=kpis, timesteps=100, runs=10)
+oat = OATAnalyzer(n_levels=4).analyze(evaluator, space)
+morris = MorrisAnalyzer(r=10, n_levels=4, seed=42).analyze(evaluator, space)
+
+oat.ranking("my_kpi")
+morris.ranking("my_kpi", metric="mu_star")
 ```

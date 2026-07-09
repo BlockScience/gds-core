@@ -47,16 +47,16 @@ optimizer = RandomSearchOptimizer(n_samples=50, seed=42)
 
 ## BayesianOptimizer
 
-Gaussian process surrogate model that learns from past evaluations.
+Optuna-backed adaptive search that learns from past evaluations.
 
 !!! note "Optional dependency"
-    Requires `scikit-optimize`. Install with: `uv add "gds-psuu[bayesian]"`
+    Requires `optuna`. Install with: `uv add "gds-analysis[psuu]"`
 
 ```python
 from gds_analysis.psuu.optimizers.bayesian import BayesianOptimizer
 
 optimizer = BayesianOptimizer(
-    n_calls=30,
+    n_trials=30,
     target_kpi="avg_final_pop",
     maximize=True,
     seed=42,
@@ -65,12 +65,12 @@ optimizer = BayesianOptimizer(
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `n_calls` | `int` | `20` | Total evaluations (initial + optimization) |
+| `n_trials` | `int` | `20` | Total evaluations |
 | `target_kpi` | `str \| None` | `None` | KPI to optimize (defaults to first) |
 | `maximize` | `bool` | `True` | Maximize (True) or minimize (False) |
 | `seed` | `int \| None` | `None` | Random seed |
 
-**Behavior:** Starts with random exploration (`min(5, n_calls)` initial points), then uses a Gaussian process surrogate to balance exploration and exploitation. Optimizes a single target KPI.
+**Behavior:** Uses Optuna's TPE sampler to suggest parameter points. Optimizes a single target KPI.
 
 **When to use:** Expensive simulations where you want to find the optimum with fewer evaluations. Works best with continuous parameters.
 

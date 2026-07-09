@@ -14,6 +14,10 @@ The GDS ecosystem is a family of composable packages for specifying, visualizing
 | | `gds_domains.software` | Software architecture DSL (DFD, state machine, C4, ERD, etc.) |
 | | `gds_domains.business` | Business dynamics DSL (CLD, supply chain, value stream map) |
 | **gds-sim** | `gds_sim` | Simulation engine (standalone, Pydantic-only) |
+| **gds-continuous** | `gds_continuous` | Continuous-time ODE simulation engine |
+| **gds-analysis** | `gds_analysis` | GDSSpec-to-gds-sim bridge, reachability, trajectory metrics |
+| **gds-analysis.psuu** | `gds_analysis.psuu` | Parameter sweeps, KPIs, optimization, sensitivity analysis |
+| **gds-psuu** | `gds_psuu` | Deprecated compatibility package for `gds_analysis.psuu` |
 | **gds-examples** | — | Tutorial models demonstrating framework features |
 
 ## Dependency Graph
@@ -34,6 +38,13 @@ graph TD
     SW --> E
     B --> E
     SIM[gds-sim]
+    CONT[gds-continuous]
+    AN[gds-analysis]
+    PSUU[gds-analysis.psuu]
+    F --> AN
+    SIM --> AN
+    SIM --> PSUU
+    CONT --> AN
 ```
 
 ## Architecture
@@ -50,7 +61,10 @@ gds-domains.business   ←  business dynamics DSL (depends on gds-framework)
     ↑
 gds-examples   ←  tutorials (depends on gds-framework + gds-viz + all DSLs)
 
-gds-sim        ←  simulation engine (standalone — no gds-framework dep, only pydantic)
+gds-sim        ←  discrete-time simulation engine (standalone — no gds-framework dep, only pydantic)
+gds-continuous ←  continuous-time ODE simulation engine
+gds-analysis   ←  bridges GDSSpec structures to gds-sim runtime and reachability analysis
+gds_analysis.psuu ← parameter sweeps, KPI scoring, optimization, sensitivity on gds-sim
 ```
 
 ## Links

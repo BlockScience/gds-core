@@ -115,8 +115,13 @@ plugins:
           - {owl/getting-started.md: "Export a spec to Turtle, import back, validate with SHACL"}
           - owl/guide/*.md
           - owl/api/*.md
+        Simulation (gds-sim):
+          - {sim/index.md: "Standalone discrete-time simulation runtime for GDS models"}
+          - {sim/getting-started.md: "Define a model, run a simulation, inspect results"}
+          - sim/guide/*.md
+          - sim/api/*.md
         PSUU (gds-analysis):
-          - {psuu/index.md: "Parameter space search under uncertainty for gds-sim"}
+          - {psuu/index.md: "Parameter space search under uncertainty for gds-sim via gds_analysis.psuu"}
           - {psuu/getting-started.md: "Installation + first parameter sweep"}
           - psuu/guide/*.md
           - psuu/api/*.md
@@ -372,6 +377,21 @@ nav:
               - gds_interchange.owl.shacl: owl/api/shacl.md
               - gds_interchange.owl.sparql: owl/api/sparql.md
               - gds_interchange.owl.serialize: owl/api/serialize.md
+      - Simulation:
+          - Overview: sim/index.md
+          - Getting Started: sim/getting-started.md
+          - User Guide:
+              - Model: sim/guide/model.md
+              - Execution: sim/guide/execution.md
+              - Results: sim/guide/results.md
+          - API Reference:
+              - gds_sim: sim/api/init.md
+              - gds_sim.model: sim/api/model.md
+              - gds_sim.types: sim/api/types.md
+              - gds_sim.engine: sim/api/engine.md
+              - gds_sim.results: sim/api/results.md
+              - gds_sim.parallel: sim/api/parallel.md
+              - gds_sim.compat: sim/api/compat.md
       - PSUU:
           - Overview: psuu/index.md
           - Getting Started: psuu/getting-started.md
@@ -381,11 +401,15 @@ nav:
               - Optimizers: psuu/guide/optimizers.md
           - API Reference:
               - gds_analysis.psuu: psuu/api/init.md
+              - gds_analysis.psuu.checks: psuu/api/checks.md
+              - gds_analysis.psuu.errors: psuu/api/errors.md
               - gds_analysis.psuu.metric: psuu/api/metric.md
               - gds_analysis.psuu.kpi: psuu/api/kpi.md
               - gds_analysis.psuu.evaluation: psuu/api/evaluation.md
               - gds_analysis.psuu.space: psuu/api/space.md
+              - gds_analysis.psuu.objective: psuu/api/objective.md
               - gds_analysis.psuu.optimizers: psuu/api/optimizers.md
+              - gds_analysis.psuu.sensitivity: psuu/api/sensitivity.md
               - gds_analysis.psuu.sweep: psuu/api/sweep.md
               - gds_analysis.psuu.results: psuu/api/results.md
       - Continuous-Time:
