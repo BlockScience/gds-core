@@ -12,7 +12,7 @@ jobs:
     # Lint is advisory — issues surface as PR warning annotations,
     # but the job exits green so it doesn't block merges.
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v7
       - run: uv sync --all-packages
       - name: Ruff check (advisory)
@@ -34,7 +34,7 @@ jobs:
           - gds-viz
           - gds-examples
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v7
       - run: uv sync --all-packages
       - name: Run tests
